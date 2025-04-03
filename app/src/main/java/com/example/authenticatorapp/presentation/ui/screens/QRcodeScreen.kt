@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -119,7 +120,7 @@ fun QRcodeScreen(navController: NavHostController, onQRCodeScanned: (String) -> 
                 title = { Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
-                ) { Text("Scan QR-code") }},
+                ) { Text(stringResource(R.string.scan_qr_code)) }},
                 navigationIcon = {
                     IconButton(onClick = {navController.popBackStack()}) {
                         Icon(painterResource(R.drawable.back),

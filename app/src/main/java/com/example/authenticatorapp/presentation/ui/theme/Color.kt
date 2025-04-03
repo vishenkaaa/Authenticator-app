@@ -2,7 +2,7 @@ package com.example.authenticatorapp.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Gray1 = Color(0xFFF9F9F9)
+val Gray1 = Color(0xFFF5F5F5)
 val Gray2 = Color(0xFFE1E1E1)
 val Gray3 = Color(0xFFC7C7C7)
 val Gray4 = Color(0xFFACACAC)

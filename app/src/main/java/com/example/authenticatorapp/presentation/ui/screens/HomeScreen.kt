@@ -102,7 +102,7 @@ fun HomeScreen(navController: NavHostController) {
 
                 Button(
                     onClick = {
-                        navController.navigate("qrScanner")
+                        navController.navigate("QrScanner")
                     },
                     modifier = Modifier
                         .height(50.dp)

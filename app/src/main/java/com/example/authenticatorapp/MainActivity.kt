@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.authenticatorapp.presentation.ui.screens.AddAccountScreen
 import com.example.authenticatorapp.presentation.ui.screens.HomeScreen
 import com.example.authenticatorapp.presentation.ui.screens.OnboardingScreen
 import com.example.authenticatorapp.presentation.ui.screens.PaywallScreen
@@ -74,10 +75,13 @@ class MainActivity : ComponentActivity() {
                         composable("Home"){
                             HomeScreen(navController)
                         }
-                        composable("qrScanner") {
+                        composable("QrScanner") {
                             QRcodeScreen(navController) { scannedData ->
                                 navController.popBackStack()
                             }
+                        }
+                        composable("AddAccount") {
+                            AddAccountScreen(navController)
                         }
                     }
                 }

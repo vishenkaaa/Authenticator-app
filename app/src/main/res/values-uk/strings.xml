@@ -29,4 +29,18 @@
     <string name="add_2fa_codes">Додайте 2FA-коди</string>
     <string name="keep_your_accounts_secure_by_adding_two_factor_authentication">Зберігайте свої облікові записи, додавши двофакторну автентифікацію.</string>
     <string name="scan_qr_code">Сканувати QR-код</string>
+    <string name="add_account">Додати обліковий запис</string>
+    <string name="service">Сервіс</string>
+    <string name="account">Обліковий запис</string>
+    <string name="key">Ключ</string>
+    <string name="type_of_key">Тип ключа</string>
+    <string name="add">Додати</string>
+    <string name="general">Загальне</string>
+    <string name="banking_and_finance">Банкінг та фінанси</string>
+    <string name="website">Веб-сайт</string>
+    <string name="mail">Пошта</string>
+    <string name="social">Соціальні мережі</string>
+    <string name="services">Сервіси</string>
+    <string name="time_based">На основі часу</string>
+    <string name="counter_based">На основі лічильника</string>
 </resources>

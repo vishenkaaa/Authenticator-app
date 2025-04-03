@@ -29,4 +29,18 @@
     <string name="add_2fa_codes">Add 2FA Codes</string>
     <string name="keep_your_accounts_secure_by_adding_two_factor_authentication">Keep your accounts secure by adding two-factor authentication.</string>
     <string name="scan_qr_code">Scan QR-code</string>
+    <string name="add_account">Add account</string>
+    <string name="service">Service</string>
+    <string name="account">Account</string>
+    <string name="key">Key</string>
+    <string name="type_of_key">Type of key</string>
+    <string name="add">Add</string>
+    <string name="general">General</string>
+    <string name="banking_and_finance">Banking and finance</string>
+    <string name="website">Website</string>
+    <string name="mail">Mail</string>
+    <string name="social">Social</string>
+    <string name="services">Services</string>
+    <string name="time_based">Time-based</string>
+    <string name="counter_based">Counter-based</string>
 </resources>

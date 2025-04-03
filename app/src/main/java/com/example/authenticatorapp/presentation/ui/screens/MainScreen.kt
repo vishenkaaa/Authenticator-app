@@ -151,7 +151,7 @@ fun MainScreen(navController: NavHostController) {
                     )
 
                     Button(
-                        onClick = {},
+                        onClick = {navController.navigate("QrScanner")},
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .fillMaxWidth()
@@ -179,7 +179,7 @@ fun MainScreen(navController: NavHostController) {
                     Spacer(Modifier.height(16.dp))
 
                     Button(
-                        onClick = {},
+                        onClick = {navController.navigate("AddAccount")},
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .fillMaxWidth()
