@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Аутентифікатор</string>
+    <string name="authenticator">Автентифікатор</string>
+    <string name="your_digital">Ваш цифровий</string>
+    <string name="shield">щит</string>
+    <string name="safer_account">Безпечніший\nакаунт</string>
+    <string name="simple_camera_code_setting">Просте налаштування коду\nкамери</string>
+    <string name="enhanced_privacy">Посилена\nконфіденційність</string>
+    <string name="unlock_full_access_to_all_the_features">Розблокуйте повний досту\nдо всіх функцій</string>
+    <string name="securely_protect_your_data_from_intrusion_and_data_loss">Надійно захищати ваші дані від вторгнення\nта втрати даних</string>
+    <string name="just_scan_the_qr_code_or_add_it_manually">Просто сканувати QR-код\nабо додати його вручну</string>
+    <string name="securely_conduct_crypto_transactions_and_keep_your_wallet_safe">Надійно проводити криптовалютні транзакції\nта забезпечити безпеку гаманця</string>
+    <string name="_3_day_free_trial_than_6_99_usd_per_week">3-денна безкоштовна пробна версія,\nніж 6,99 дол. на тиждень</string>
+    <string name="restore">Відновити</string>
+    <string name="continue_">Продовжити</string>
+    <string name="terms_of_use">Умови</string>
+    <string name="privacy_policy">Політика конфіденційності</string>
+    <string name="_1_year">1 Рік</string>
+    <string name="_3_days_free_trial">3 дні безкоштовна пробна версія</string>
+    <string name="save_88">Збережіть 88%</string>
+    <string name="just_0_83_per_week">Всього 0,83 дол. на тиждень</string>
+    <string name="free_trial_enabled">Безкоштовна пробна версія увімкнена</string>
+    <string name="pick_your_plan_and_get_benefits">Виберіть свій план і отримайте\nпереваги</string>
+    <string name="subtitle_text_about_benefits">Текст субтитрів про переваги</string>
+    <string name="_39_99_usd_only_0_83_per_week">39,99 дол. Лише 0,83 на тиждень</string>
+    <string name="than_6_99_usd_per_week">далі 6,99 дол. на тиждень</string>
+    <string name="you_must_agree_to_the_terms_of_service_and_privacy_policy_to_proceed_with_login">Ви повинні погодитися з Умовами використання та Політикою конфіденційності, щоб продовжити вхід</string>
+    <string name="add_2fa_codes">Додайте 2FA-коди</string>
+    <string name="keep_your_accounts_secure_by_adding_two_factor_authentication">Зберігайте свої облікові записи, додавши двофакторну автентифікацію.</string>
+    <string name="scan_qr_code">Сканувати QR-код</string>
+</resources>
