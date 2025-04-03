@@ -31,6 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.AuthenticatorAppTheme
@@ -40,7 +42,7 @@ import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -99,7 +101,9 @@ fun HomeScreen() {
                 )
 
                 Button(
-                    onClick = {},
+                    onClick = {
+                        navController.navigate("qrScanner")
+                    },
                     modifier = Modifier
                         .height(50.dp)
                         .fillMaxWidth()
@@ -122,13 +126,5 @@ fun HomeScreen() {
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun prewiew() {
-    AuthenticatorAppTheme {
-        HomeScreen()
     }
 }

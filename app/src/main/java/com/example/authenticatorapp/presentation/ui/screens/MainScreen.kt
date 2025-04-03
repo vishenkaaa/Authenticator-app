@@ -56,6 +56,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.screens.HomeScreen
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
@@ -68,7 +69,7 @@ import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 enum class Screen { HOME, INFO }
 
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavHostController) {
     var currentScreen by remember { mutableStateOf(Screen.HOME) }
     var isMenuExpanded by remember { mutableStateOf(false) }
     var colors = MaterialTheme.colorScheme
@@ -109,7 +110,7 @@ fun MainScreen() {
                     .padding(paddingValues)
             ) {
                 when (currentScreen) {
-                    Screen.HOME -> HomeScreen()
+                    Screen.HOME -> HomeScreen(navController)
                     Screen.INFO -> InfoScreen()
                 }
             }
@@ -252,15 +253,6 @@ fun CustomBottomNavigation(
                 )
             }
         }
-    }
-}
-
-@SuppressLint("ComposableNaming")
-@Preview
-@Composable
-private fun preview() {
-    AuthenticatorAppTheme {
-        MainScreen()
     }
 }
 

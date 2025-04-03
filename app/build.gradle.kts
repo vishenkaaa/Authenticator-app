@@ -74,4 +74,10 @@ dependencies {
     implementation(libs.play.services.auth.v2130)
 
     //implementation(libs.kotlin.onetimepassword)
+
+    implementation(libs.barcode.scanning)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
 }

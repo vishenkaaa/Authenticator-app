@@ -1,23 +1,26 @@
 package com.example.authenticatorapp
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.authenticatorapp.presentation.ui.screens.HomeScreen
 import com.example.authenticatorapp.presentation.ui.screens.OnboardingScreen
 import com.example.authenticatorapp.presentation.ui.screens.PaywallScreen
+import com.example.authenticatorapp.presentation.ui.screens.QRcodeScreen
 import com.example.authenticatorapp.presentation.ui.screens.SigninScreen
 import com.example.authenticatorapp.presentation.ui.screens.SplashScreen
 import com.example.authenticatorapp.presentation.ui.theme.AuthenticatorAppTheme
@@ -57,10 +60,10 @@ class MainActivity : ComponentActivity() {
                             SplashScreen(navController, this@MainActivity)
                         }
                         composable("Onboarding") {
-                            OnboardingScreen(navController = navController, context = this@MainActivity)
+                            OnboardingScreen(navController)
                         }
                         composable("Main") {
-                            MainScreen()
+                            MainScreen(navController)
                         }
                         composable("Paywall"){
                             PaywallScreen(navController, this@MainActivity)
@@ -69,7 +72,12 @@ class MainActivity : ComponentActivity() {
                             SigninScreen(navController)
                         }
                         composable("Home"){
-                            HomeScreen()
+                            HomeScreen(navController)
+                        }
+                        composable("qrScanner") {
+                            QRcodeScreen(navController) { scannedData ->
+                                navController.popBackStack()
+                            }
                         }
                     }
                 }

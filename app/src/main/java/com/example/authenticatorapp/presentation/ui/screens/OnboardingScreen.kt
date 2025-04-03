@@ -60,7 +60,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun OnboardingScreen(navController: NavHostController, context: MainActivity){
+fun OnboardingScreen(navController: NavHostController){
 
     val titles = listOf(
         stringResource(R.string.safer_account),
