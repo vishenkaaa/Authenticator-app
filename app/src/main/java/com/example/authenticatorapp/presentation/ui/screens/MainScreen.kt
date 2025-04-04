@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +28,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -37,8 +39,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,25 +59,30 @@ import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.screens.HomeScreen
+import com.example.authenticatorapp.presentation.ui.screens.ServiceItem
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.AuthenticatorAppTheme
 import com.example.authenticatorapp.presentation.ui.theme.Blue
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
+import kotlinx.coroutines.launch
 
 enum class Screen { HOME, INFO }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
     var currentScreen by remember { mutableStateOf(Screen.HOME) }
     var isMenuExpanded by remember { mutableStateOf(false) }
     var colors = MaterialTheme.colorScheme
+    val sheetState = rememberModalBottomSheetState()
 
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomCenter) {
@@ -125,89 +135,79 @@ fun MainScreen(navController: NavHostController) {
             )
         }
 
-        AnimatedVisibility(
-            visible = isMenuExpanded,
-            enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
-            exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
-            modifier = Modifier.align(Alignment.BottomCenter).wrapContentHeight(),
-        ) {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
-                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-                color = colors.background,
+        if(isMenuExpanded)
+            ModalBottomSheet(
+                onDismissRequest = { isMenuExpanded = false },
+                sheetState = sheetState,
+                containerColor = colors.background,
+                windowInsets = WindowInsets(0, 0, 0, 0)
             ) {
                 Column(
-                    modifier = Modifier.padding(vertical = 8.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 60.dp).fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(bottom = 29.dp)
-                            .width(40.dp)
-                            .height(5.dp)
-                            .background(Gray5, RoundedCornerShape(2.dp))
-                    )
+                    LazyColumn {
+                        item {
+                            Button(
+                                onClick = {isMenuExpanded = false
+                                    navController.navigate("QrScanner")},
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp)
+                                    .fillMaxWidth()
+                                    .height(50.dp),
+                                shape = RoundedCornerShape(24.dp),
+                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                    containerColor = colors.onPrimaryContainer,
+                                    contentColor = MainBlue
+                                ),
+                                border = if (!isSystemInDarkTheme()) BorderStroke(2.dp, MainBlue) else BorderStroke(2.dp, Gray6)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.qr_code),
+                                    contentDescription = "QR",
+                                    tint = if (!isSystemInDarkTheme()) MainBlue else White
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Scan QR-code",
+                                    style = AppTypography.bodyMedium,
+                                    color = if (!isSystemInDarkTheme()) MainBlue else White
+                                )
+                            }
+                            Spacer(Modifier.height(16.dp))
+                        }
 
-                    Button(
-                        onClick = {navController.navigate("QrScanner")},
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(24.dp),
-                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                            containerColor = colors.onPrimaryContainer,
-                            contentColor = MainBlue
-                        ),
-                        border = if (!isSystemInDarkTheme()) BorderStroke(2.dp, MainBlue) else BorderStroke(2.dp, Gray6)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.qr_code),
-                            contentDescription = "QR",
-                            tint = if (!isSystemInDarkTheme()) MainBlue else White
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Scan QR-code",
-                            style = AppTypography.bodyMedium,
-                            color = if (!isSystemInDarkTheme()) MainBlue else White
-                        )
+                        item {
+                            Button(
+                                onClick = {isMenuExpanded = false
+                                    navController.navigate("AddAccount")},
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp)
+                                    .fillMaxWidth()
+                                    .height(50.dp),
+                                shape = RoundedCornerShape(24.dp),
+                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                    containerColor = colors.onPrimaryContainer,
+                                    contentColor = MainBlue
+                                ),
+                                border = if (!isSystemInDarkTheme()) BorderStroke(2.dp, MainBlue) else BorderStroke(2.dp, Gray6)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.edit),
+                                    contentDescription = "Edit",
+                                    tint = if (!isSystemInDarkTheme()) MainBlue else White
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Enter code manually",
+                                    style = AppTypography.bodyMedium,
+                                    color = if (!isSystemInDarkTheme()) MainBlue else White
+                                )
+                            }
+                        }
                     }
-
-                    Spacer(Modifier.height(16.dp))
-
-                    Button(
-                        onClick = {navController.navigate("AddAccount")},
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(24.dp),
-                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                            containerColor = colors.onPrimaryContainer,
-                            contentColor = MainBlue
-                        ),
-                        border = if (!isSystemInDarkTheme()) BorderStroke(2.dp, MainBlue) else BorderStroke(2.dp, Gray6)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.edit),
-                            contentDescription = "Edit",
-                            tint = if (!isSystemInDarkTheme()) MainBlue else White
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Enter code manually",
-                            style = AppTypography.bodyMedium,
-                            color = if (!isSystemInDarkTheme()) MainBlue else White
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(60.dp))
                 }
             }
-        }
     }
 }
 

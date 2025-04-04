@@ -219,12 +219,13 @@ fun AddAccountScreen(navController: NavController) {
             onDismissRequest = { serviceExpanded = false },
             sheetState = sheetState,
             containerColor = colors.onPrimaryContainer,
+            windowInsets = WindowInsets(0, 0, 0, 0)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .padding(bottom = 27.dp)
+                    .padding(bottom = 41.dp)
             ) {
 
                 Text(
@@ -423,7 +424,8 @@ fun AddAccountScreen(navController: NavController) {
         ModalBottomSheet(
             onDismissRequest = { typesOfKeyExpanded = false },
             sheetState = sheetState,
-            containerColor = colors.onPrimaryContainer
+            containerColor = colors.onPrimaryContainer,
+            windowInsets = WindowInsets(0, 0, 0, 0)
         ) {
             Column(
                 modifier = Modifier
