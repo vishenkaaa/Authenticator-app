@@ -89,8 +89,8 @@ fun AddAccountScreen(navController: NavController) {
             },
             shape = RoundedCornerShape(20.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = Color.White,
-                focusedContainerColor = Color.White,
+                unfocusedContainerColor = colors.onPrimaryContainer,
+                focusedContainerColor = colors.onPrimaryContainer,
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
                 focusedLabelColor = Gray5,
@@ -119,8 +119,8 @@ fun AddAccountScreen(navController: NavController) {
             },
             shape = RoundedCornerShape(20.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = Color.White,
-                focusedContainerColor = Color.White,
+                unfocusedContainerColor = colors.onPrimaryContainer,
+                focusedContainerColor = colors.onPrimaryContainer,
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
                 focusedLabelColor = Gray5,
@@ -148,8 +148,8 @@ fun AddAccountScreen(navController: NavController) {
             },
             shape = RoundedCornerShape(20.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = Color.White,
-                focusedContainerColor = Color.White,
+                unfocusedContainerColor = colors.onPrimaryContainer,
+                focusedContainerColor = colors.onPrimaryContainer,
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
                 focusedLabelColor = Gray5,
@@ -178,8 +178,8 @@ fun AddAccountScreen(navController: NavController) {
             },
             shape = RoundedCornerShape(20.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = Color.White,
-                focusedContainerColor = Color.White,
+                unfocusedContainerColor = colors.onPrimaryContainer,
+                focusedContainerColor = colors.onPrimaryContainer,
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
                 focusedLabelColor = Gray5,
@@ -218,7 +218,7 @@ fun AddAccountScreen(navController: NavController) {
         ModalBottomSheet(
             onDismissRequest = { serviceExpanded = false },
             sheetState = sheetState,
-            containerColor = White
+            containerColor = colors.onPrimaryContainer,
         ) {
             Column(
                 modifier = Modifier
@@ -343,29 +343,29 @@ fun AddAccountScreen(navController: NavController) {
                         }
                     }
 
-//                    item {
-//                        ServiceItem(
-//                            text = "Amazon",
-//                            iconResId = R.drawable.s_amazon
-//                        ) {
-//                            selectedService = "Amazon"
-//                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-//                                if (!sheetState.isVisible) serviceExpanded = false
-//                            }
-//                        }
-//                    }
+                    item {
+                        ServiceItem(
+                            text = "Amazon",
+                            iconResId = R.drawable.s_amazon_png
+                        ) {
+                            selectedService = "Amazon"
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) serviceExpanded = false
+                            }
+                        }
+                    }
 
-//                    item {
-//                        ServiceItem(
-//                            text = "PayPal",
-//                            iconResId = R.drawable.s_paypal
-//                        ) {
-//                            selectedService = "PayPal"
-//                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-//                                if (!sheetState.isVisible) serviceExpanded = false
-//                            }
-//                        }
-//                    }
+                    item {
+                        ServiceItem(
+                            text = "PayPal",
+                            iconResId = R.drawable.s_paypall_png
+                        ) {
+                            selectedService = "PayPal"
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) serviceExpanded = false
+                            }
+                        }
+                    }
 
                     item {
                         ServiceItem(
@@ -391,17 +391,17 @@ fun AddAccountScreen(navController: NavController) {
                         }
                     }
 
-//                    item {
-//                        ServiceItem(
-//                            text = "Reddit",
-//                            iconResId = R.drawable.s_reddit
-//                        ) {
-//                            selectedService = "Reddit"
-//                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-//                                if (!sheetState.isVisible) serviceExpanded = false
-//                            }
-//                        }
-//                    }
+                    item {
+                        ServiceItem(
+                            text = "Reddit",
+                            iconResId = R.drawable.s_reddit_png
+                        ) {
+                            selectedService = "Reddit"
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) serviceExpanded = false
+                            }
+                        }
+                    }
 
                     item {
                         ServiceItem(
@@ -423,7 +423,7 @@ fun AddAccountScreen(navController: NavController) {
         ModalBottomSheet(
             onDismissRequest = { typesOfKeyExpanded = false },
             sheetState = sheetState,
-            containerColor = White
+            containerColor = colors.onPrimaryContainer
         ) {
             Column(
                 modifier = Modifier
@@ -469,7 +469,7 @@ fun ServiceItem(
             Image(
                 painter = painterResource(id = iconResId),
                 contentDescription = null,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp).size(32.dp)
             )
             Text(
                 text = text,
