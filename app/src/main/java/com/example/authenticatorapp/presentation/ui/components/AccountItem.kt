@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -48,8 +49,8 @@ fun AccountItem(account: AccountEntity, otp: String, remainingTime: Int = 0, con
                 spotColor = Color(0xFF000000).copy(alpha = 0.1f),
                 ambientColor = Color(0xFF000000).copy(alpha = 0.1f)
             )
+            .background(MaterialTheme.colorScheme.onPrimaryContainer)
             .clip(RoundedCornerShape(24.dp))
-            .background(Color.White)
             .padding(16.dp),
         verticalAlignment = Alignment.Top
     ) {

@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
+import com.example.authenticatorapp.presentation.ui.theme.LightBlue
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 
 @Composable
@@ -29,7 +30,7 @@ fun CustomCircularProgressIndicator(remainingTime: Int){
             val sweepAngle = 360f * (remainingTime / 30f)
 
             drawArc(
-                color = Color(0xFFC6DFFF),
+                color = LightBlue,
                 startAngle = -90f + sweepAngle,
                 sweepAngle = 360f - sweepAngle,
                 useCenter = false,

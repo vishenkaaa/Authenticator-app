@@ -43,7 +43,7 @@ private val DarkColorScheme = darkColorScheme(
 
     outline = Gray4,
     secondaryContainer = Gray3,
-    outlineVariant = Gray2,
+    outlineVariant = Color(0xFF1E1E1E),
     inverseSurface = Gray1,
     inversePrimary = White,
 
