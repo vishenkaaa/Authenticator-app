@@ -38,7 +38,7 @@ fun ServiceItem(
             )
             Text(
                 text = text,
-                style = AppTypography.bodyMedium
+                style = AppTypography.labelMedium
             )
         }
         Divider(

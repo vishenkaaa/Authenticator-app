@@ -46,6 +46,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -84,6 +85,8 @@ fun MainScreen(navController: NavHostController, context: Context, viewModel: Ho
     var colors = MaterialTheme.colorScheme
     val sheetState = rememberModalBottomSheetState()
 
+    val allAccounts by viewModel.accounts.collectAsState(initial = emptyList())
+
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomCenter) {
 
@@ -120,7 +123,7 @@ fun MainScreen(navController: NavHostController, context: Context, viewModel: Ho
                     .padding(paddingValues)
             ) {
                 when (currentScreen) {
-                    Screen.HOME -> HomeScreen(navController, context, viewModel)
+                    Screen.HOME -> HomeScreen(navController, context, viewModel, allAccounts)
                     Screen.INFO -> InfoScreen()
                 }
             }

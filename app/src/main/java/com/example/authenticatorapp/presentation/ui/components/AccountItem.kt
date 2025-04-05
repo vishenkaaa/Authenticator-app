@@ -6,39 +6,66 @@ import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
+import com.example.authenticatorapp.presentation.ui.theme.Blue
+import com.example.authenticatorapp.presentation.ui.theme.Gray1
+import com.example.authenticatorapp.presentation.ui.theme.Gray2
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
+import com.example.authenticatorapp.presentation.viewmodel.AddAccountViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountItem(account: AccountEntity, otp: String, remainingTime: Int = 0, context: Context, isTimeBased: Boolean) {
+fun AccountItem(account: AccountEntity, otp: String, remainingTime: Int = 0, context: Context, isTimeBased: Boolean, viewModel: AddAccountViewModel = hiltViewModel()) {
+    var accountExpanded by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    var showConfirmDialog by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -51,7 +78,14 @@ fun AccountItem(account: AccountEntity, otp: String, remainingTime: Int = 0, con
             )
             .background(MaterialTheme.colorScheme.onPrimaryContainer)
             .clip(RoundedCornerShape(24.dp))
-            .padding(16.dp),
+            .padding(16.dp)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        accountExpanded = true
+                    }
+                )
+            },
         verticalAlignment = Alignment.Top
     ) {
         Image(
@@ -109,6 +143,131 @@ fun AccountItem(account: AccountEntity, otp: String, remainingTime: Int = 0, con
                 }
             }
         }
+
+        if(accountExpanded)
+            ModalBottomSheet(
+                onDismissRequest = { accountExpanded = false },
+                sheetState = sheetState,
+                containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                windowInsets = WindowInsets(0, 0, 0, 0)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 41.dp)
+                ) {
+                    LazyColumn {
+                        item {
+                            Column {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable(onClick = {
+                                            accountExpanded = false
+                                        })
+                                        .padding(vertical = 12.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.edit),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onPrimary,
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp)
+                                            .size(24.dp)
+                                    )
+                                    Text(
+                                        text = "Edit",
+                                        style = AppTypography.labelMedium
+                                    )
+                                }
+                                Divider(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = Black.copy(alpha = 0.1f)
+                                )
+                            }
+                        }
+                        item {
+                            Column {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable(onClick = {
+                                            accountExpanded = false
+                                            showConfirmDialog = true
+                                        })
+                                        .padding(vertical = 12.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_delete),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onPrimary,
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp)
+                                            .size(24.dp)
+                                    )
+                                    Text(
+                                        text = "Delete",
+                                        style = AppTypography.labelMedium
+                                    )
+                                }
+                                Divider(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = Black.copy(alpha = 0.1f)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+        if (showConfirmDialog) {
+            AlertDialog(
+                onDismissRequest = { showConfirmDialog = false },
+                title = {
+                    Text(
+                        stringResource(R.string.confirm_deletion),
+                        style = AppTypography.titleMedium,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                },
+                text = {
+                    Text(
+                        stringResource(R.string.are_you_sure_you_want_to_delete_this_account),
+                        style = AppTypography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                },
+                confirmButton = {
+                    Text(
+                        text = "Delete",
+                        color = MaterialTheme.colorScheme.error,
+                        style = AppTypography.labelMedium,
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .clickable {
+                                viewModel.deleteAccount(account.id)
+                                showConfirmDialog = false
+                            }
+                    )
+                },
+                dismissButton = {
+                    Text(
+                        text = "Cancel",
+                        color = Blue,
+                        style = AppTypography.labelMedium,
+                        modifier = Modifier.clickable {
+                            showConfirmDialog = false
+                        }
+                    )
+                },
+                containerColor = MaterialTheme.colorScheme.background,
+                shape = RoundedCornerShape(16.dp)
+            )
+        }
+
     }
 }
 

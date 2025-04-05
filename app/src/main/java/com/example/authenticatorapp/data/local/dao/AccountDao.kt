@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.authenticatorapp.data.local.model.AccountEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -18,4 +19,10 @@ interface AccountDao {
 
     @Delete
     suspend fun deleteAccount(account: AccountEntity)
+
+    @Query("DELETE FROM accounts WHERE id = :accountId")
+    suspend fun deleteAccountById(accountId: Int)
+
+    @Update
+    suspend fun updateAccount(account: AccountEntity)
 }

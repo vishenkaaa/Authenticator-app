@@ -70,8 +70,8 @@ import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun HomeScreen(navController: NavHostController, context: Context, viewModel: HomeViewModel = hiltViewModel()) {
-    val allAccounts by viewModel.accounts.collectAsState(initial = emptyList())
+fun HomeScreen(navController: NavHostController, context: Context,viewModel: HomeViewModel = hiltViewModel(), accounts: List<AccountEntity>) {
+    val allAccounts = accounts
     val isLoading by viewModel.isLoadingAccounts.collectAsState()
 
     var selectedTabIndex by remember { mutableStateOf(0) }
@@ -92,31 +92,31 @@ fun HomeScreen(navController: NavHostController, context: Context, viewModel: Ho
 
         if(!isLoading)
             OutlinedTextField(
-            value = searchQuery,
-            onValueChange = {searchQuery = it},
-            textStyle = AppTypography.bodyMedium,
-            placeholder = { Text(text = stringResource(R.string.search), style = AppTypography.labelMedium) },
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.ic_search),
-                    contentDescription = "Search",
-                    tint = Color.Unspecified
+                value = searchQuery,
+                onValueChange = {searchQuery = it},
+                textStyle = AppTypography.bodyMedium,
+                placeholder = { Text(text = stringResource(R.string.search), style = AppTypography.labelMedium) },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_search),
+                        contentDescription = "Search",
+                        tint = Color.Unspecified
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 20.dp),
+                shape = RoundedCornerShape(20.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedContainerColor = colors.onPrimaryContainer,
+                    focusedContainerColor = colors.onPrimaryContainer,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedLabelColor = Gray5,
+                    unfocusedLabelColor = Color.Gray,
                 )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(top = 20.dp),
-            shape = RoundedCornerShape(20.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = colors.onPrimaryContainer,
-                focusedContainerColor = colors.onPrimaryContainer,
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                focusedLabelColor = Gray5,
-                unfocusedLabelColor = Color.Gray,
-            ),
-        )
+            )
 
         if(isLoading){
             Box(
@@ -128,7 +128,8 @@ fun HomeScreen(navController: NavHostController, context: Context, viewModel: Ho
                 CircularProgressIndicator()
             }
         }
-        else if (allAccounts.isNotEmpty()) {
+        else
+            if (allAccounts.isNotEmpty()) {
             TabLayout(
                 selectedTabIndex = selectedTabIndex,
                 onTabSelected = { selectedTabIndex = it }

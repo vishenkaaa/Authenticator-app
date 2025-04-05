@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.screens.AddAccountScreen
 import com.example.authenticatorapp.presentation.ui.screens.HomeScreen
 import com.example.authenticatorapp.presentation.ui.screens.OnboardingScreen
@@ -73,7 +74,7 @@ class MainActivity : ComponentActivity() {
                             SigninScreen(navController)
                         }
                         composable("Home"){
-                            HomeScreen(navController, this@MainActivity)
+                            HomeScreen(navController, this@MainActivity, accounts = emptyList<AccountEntity>())
                         }
                         composable("QrScanner") {
                             QRcodeScreen(navController) { scannedData ->
