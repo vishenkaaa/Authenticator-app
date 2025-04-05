@@ -1,6 +1,7 @@
 package com.juraj.fluid
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -65,20 +66,17 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.screens.HomeScreen
-import com.example.authenticatorapp.presentation.ui.screens.ServiceItem
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
-import com.example.authenticatorapp.presentation.ui.theme.AuthenticatorAppTheme
-import com.example.authenticatorapp.presentation.ui.theme.Blue
-import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 enum class Screen { HOME, INFO }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun MainScreen(navController: NavHostController, context: Context) {
     var currentScreen by remember { mutableStateOf(Screen.HOME) }
     var isMenuExpanded by remember { mutableStateOf(false) }
     var colors = MaterialTheme.colorScheme
@@ -120,7 +118,7 @@ fun MainScreen(navController: NavHostController) {
                     .padding(paddingValues)
             ) {
                 when (currentScreen) {
-                    Screen.HOME -> HomeScreen(navController)
+                    Screen.HOME -> HomeScreen(navController, context)
                     Screen.INFO -> InfoScreen()
                 }
             }

@@ -1,5 +1,7 @@
 package com.example.authenticatorapp.presentation.ui.screens
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -18,16 +19,19 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.authenticatorapp.presentation.ui.components.ServiceItem
+import com.example.authenticatorapp.presentation.ui.components.SimpleServiceItem
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
+import com.example.authenticatorapp.presentation.viewmodel.AddAccountViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddAccountScreen(navController: NavController) {
+fun AddAccountScreen(navController: NavController, context: Context, viewModel: AddAccountViewModel = hiltViewModel()) {
     val colors = MaterialTheme.colorScheme
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -193,7 +197,31 @@ fun AddAccountScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = {  },
+            onClick = {
+                if (selectedService.isBlank()) {
+                    Toast.makeText(context, "Service name is required", Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
+                if (accountText.isBlank()) {
+                    Toast.makeText(context, "Email/Username is required", Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
+                if (keyText.isBlank()) {
+                    Toast.makeText(context, "Secret key is required", Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
+
+                viewModel.addAccount(
+                    service = selectedService,
+                    email = accountText,
+                    secret = keyText,
+                    type = selectedTypeOfKey,
+                    algorithm = "HmacSHA1", // В майбутньому можна зробити вибір алгоритму
+                    digits = 6
+                )
+
+                navController.popBackStack()
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -242,7 +270,7 @@ fun AddAccountScreen(navController: NavController) {
                     item {
                         ServiceItem(
                             text = stringResource(R.string.banking_and_finance),
-                            iconResId = R.drawable.banking_and__finance
+                            iconResId = R.drawable.s_banking_and_finance
                         ) {
                             selectedService = txt_banking
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -254,7 +282,7 @@ fun AddAccountScreen(navController: NavController) {
                     item {
                         ServiceItem(
                             text = stringResource(R.string.website),
-                            iconResId = R.drawable.website
+                            iconResId = R.drawable.s_website
                         ) {
                             selectedService = txt_website
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -266,7 +294,7 @@ fun AddAccountScreen(navController: NavController) {
                     item {
                         ServiceItem(
                             text = stringResource(R.string.mail),
-                            iconResId = R.drawable.mail
+                            iconResId = R.drawable.s_mail
                         ) {
                             selectedService = txt_mail
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -278,7 +306,7 @@ fun AddAccountScreen(navController: NavController) {
                     item {
                         ServiceItem(
                             text = stringResource(R.string.social),
-                            iconResId = R.drawable.social
+                            iconResId = R.drawable.s_social
                         ) {
                             selectedService = txt_social
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -451,61 +479,5 @@ fun AddAccountScreen(navController: NavController) {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun ServiceItem(
-    text: String,
-    iconResId: Int,
-    onClick: () -> Unit
-) {
-    Column {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(vertical = 12.dp)
-        ) {
-            Image(
-                painter = painterResource(id = iconResId),
-                contentDescription = null,
-                modifier = Modifier.padding(horizontal = 16.dp).size(32.dp)
-            )
-            Text(
-                text = text,
-                style = AppTypography.bodyMedium
-            )
-        }
-        Divider(
-            modifier = Modifier.fillMaxWidth(),
-            color = Black.copy(alpha = 0.1f)
-        )
-    }
-}
-
-@Composable
-fun SimpleServiceItem(
-    text: String,
-    onClick: () -> Unit
-) {
-    Column {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(vertical = 12.dp)
-        ) {
-            Text(
-                text = text,
-                style = AppTypography.bodyMedium
-            )
-        }
-        Divider(
-            modifier = Modifier.fillMaxWidth(),
-            color = Black.copy(alpha = 0.1f)
-        )
     }
 }
