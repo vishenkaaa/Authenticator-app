@@ -42,4 +42,10 @@
     <string name="services">Services</string>
     <string name="time_based">Time-based</string>
     <string name="counter_based">Counter-based</string>
+    <string name="service_name_is_required">Service name is required</string>
+    <string name="account_name_is_required">Account name is required</string>
+    <string name="secret_key_is_required">Secret key is required</string>
+    <string name="search">Search</string>
+    <string name="nothing_found">Nothing found</string>
+    <string name="update">Update</string>
 </resources>

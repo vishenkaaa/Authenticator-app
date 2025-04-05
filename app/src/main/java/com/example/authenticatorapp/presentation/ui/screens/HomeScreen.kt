@@ -3,9 +3,12 @@ package com.example.authenticatorapp.presentation.ui.screens
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,22 +19,34 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -41,10 +56,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.components.AccountItem
+import com.example.authenticatorapp.presentation.ui.components.TabLayout
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
+import com.example.authenticatorapp.presentation.ui.theme.Gray2
 import com.example.authenticatorapp.presentation.ui.theme.Gray3
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
+import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
 import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
@@ -52,7 +71,12 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(navController: NavHostController, context: Context, viewModel: HomeViewModel = hiltViewModel()) {
-    val accounts by viewModel.accounts.collectAsState()
+    val allAccounts by viewModel.accounts.collectAsState(initial = emptyList())
+    val isLoading by viewModel.isLoadingAccounts.collectAsState()
+
+    var selectedTabIndex by remember { mutableStateOf(0) }
+    var searchQuery by remember { mutableStateOf("") }
+    val colors = MaterialTheme.colorScheme
 
     Column(
         modifier = Modifier
@@ -62,13 +86,81 @@ fun HomeScreen(navController: NavHostController, context: Context, viewModel: Ho
     ) {
         Text(
             text = stringResource(R.string.authenticator),
-            modifier = Modifier.padding(top = 52.dp, bottom = 32.dp),
+            modifier = Modifier.padding(top = 52.dp),
             style = AppTypography.bodyLarge
         )
 
-        if (accounts.isNotEmpty())
+        if(!isLoading)
+            OutlinedTextField(
+            value = searchQuery,
+            onValueChange = {searchQuery = it},
+            textStyle = AppTypography.bodyMedium,
+            placeholder = { Text(text = stringResource(R.string.search), style = AppTypography.labelMedium) },
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(R.drawable.ic_search),
+                    contentDescription = "Search",
+                    tint = Color.Unspecified
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(top = 20.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedContainerColor = colors.onPrimaryContainer,
+                focusedContainerColor = colors.onPrimaryContainer,
+                focusedBorderColor = Color.Transparent,
+                unfocusedBorderColor = Color.Transparent,
+                focusedLabelColor = Gray5,
+                unfocusedLabelColor = Color.Gray,
+            ),
+        )
+
+        if(isLoading){
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        else if (allAccounts.isNotEmpty()) {
+            TabLayout(
+                selectedTabIndex = selectedTabIndex,
+                onTabSelected = { selectedTabIndex = it }
+            )
+
+            val filteredAccounts = if (selectedTabIndex == 0) {
+                allAccounts.filter {
+                    it.type == "TOTP" && matchesSearchQuery(it, searchQuery)
+                }
+            } else {
+                allAccounts.filter {
+                    it.type == "HOTP" && matchesSearchQuery(it, searchQuery)
+                }
+            }
+
+            if (filteredAccounts.isEmpty()) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.nothing_found),
+                        color = Color.Gray,
+                        style = AppTypography.labelMedium
+                    )
+                }
+            }
+
             LazyColumn {
-                items(accounts) { account ->
+                items(filteredAccounts) { account ->
                     val otp = remember { mutableStateOf(viewModel.generateOtp(account)) }
                     val remainingTime = remember { mutableStateOf(calculateRemainingTime()) }
 
@@ -82,13 +174,27 @@ fun HomeScreen(navController: NavHostController, context: Context, viewModel: Ho
                         }
                     }
 
-                    AccountItem(account, otp.value, remainingTime.value, context)
+                    if(selectedTabIndex == 0)
+                        AccountItem(
+                            account = account,
+                            otp = otp.value,
+                            remainingTime = remainingTime.value,
+                            context = context,
+                            isTimeBased = true)
+                    else
+                        AccountItem(
+                            account = account,
+                            otp = otp.value,
+                            context = context,
+                            isTimeBased = false)
                 }
             }
+        }
         else {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(top = 32.dp)
                     .padding(horizontal = 16.dp)
                     .shadow(
                         elevation = 8.dp,
@@ -159,6 +265,14 @@ fun HomeScreen(navController: NavHostController, context: Context, viewModel: Ho
             }
         }
     }
+}
+
+private fun matchesSearchQuery(account: AccountEntity, query: String): Boolean {
+    if (query.isBlank()) return true
+
+    val searchLower = query.lowercase()
+    return account.serviceName.lowercase().contains(searchLower) ||
+            account.email.lowercase().contains(searchLower)
 }
 
 private fun calculateRemainingTime(): Int {

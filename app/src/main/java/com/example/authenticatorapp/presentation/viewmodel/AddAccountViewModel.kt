@@ -39,7 +39,7 @@ class AddAccountViewModel @Inject constructor(
         val account = AccountEntity(
             serviceName = service,
             email = email,
-            secret = secret.replace(" ", ""),  // Видаляємо пробіли у секретному ключі
+            secret = secret.replace(" ", ""),
             type = typeNormalized,
             algorithm = algorithmNormalized,
             digits = digits

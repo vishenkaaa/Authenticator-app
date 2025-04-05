@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,16 +24,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.authenticatorapp.MainActivity
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
+import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 
 @Composable
 fun SplashScreen(navController: NavHostController, context: MainActivity) {
+
+    val viewModel: HomeViewModel = hiltViewModel()
+    val isLoading by viewModel.isLoadingAccounts.collectAsState()
 
     val alpha = remember {
         Animatable(0f)
@@ -41,12 +50,19 @@ fun SplashScreen(navController: NavHostController, context: MainActivity) {
             1f,
             animationSpec = tween(2500)
         )
-        delay(2000)
+
+        withTimeoutOrNull(3000) {
+            while (isLoading) {
+                delay(100)
+            }
+        }
+
+        delay(500)
 
         withContext(Dispatchers.Main) {
             if (onBoardingIsFinished(context = context)) {
                 navController.popBackStack()
-                navController.navigate("Signin")
+                navController.navigate("Main")
             } else {
                 navController.popBackStack()
                 navController.navigate("Onboarding")

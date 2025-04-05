@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -21,22 +22,23 @@ import com.example.authenticatorapp.presentation.ui.screens.QRcodeScreen
 import com.example.authenticatorapp.presentation.ui.screens.SigninScreen
 import com.example.authenticatorapp.presentation.ui.screens.SplashScreen
 import com.example.authenticatorapp.presentation.ui.theme.AuthenticatorAppTheme
+import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
 import com.juraj.fluid.MainScreen
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        //
-        val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putBoolean("isFinished", false)
-        editor.apply()
-        //
+//        val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
+//        val editor = sharedPreferences.edit()
+//        editor.putBoolean("isFinished", false)
+//        editor.apply()
 
         val currentLocale = Locale.getDefault().language
         if (currentLocale == "uk") {
@@ -54,7 +56,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
 
-                    NavHost(navController = navController, startDestination = "Main"){
+                    NavHost(navController = navController, startDestination = "Splash"){
                         composable("Splash"){
                             SplashScreen(navController, this@MainActivity)
                         }

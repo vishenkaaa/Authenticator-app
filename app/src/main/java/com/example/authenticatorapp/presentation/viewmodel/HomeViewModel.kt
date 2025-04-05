@@ -6,16 +6,28 @@ import androidx.lifecycle.viewModelScope
 import com.example.authenticatorapp.data.local.dao.AccountDao
 import com.example.authenticatorapp.data.local.model.AccountEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val accountDao: AccountDao) : ViewModel() {
-    val accounts: StateFlow<List<AccountEntity>> = accountDao.getAllAccounts().stateIn(
-        viewModelScope, SharingStarted.Lazily, emptyList()
-    )
+    private val _isLoadingAccounts = MutableStateFlow(true)
+    val isLoadingAccounts: StateFlow<Boolean> = _isLoadingAccounts
+
+    val accounts: StateFlow<List<AccountEntity>> = accountDao.getAllAccounts()
+        .onEach {
+            _isLoadingAccounts.value = false
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = emptyList()
+        )
 
     fun generateOtp(account: AccountEntity): String {
         return try {

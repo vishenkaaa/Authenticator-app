@@ -63,12 +63,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.screens.HomeScreen
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
+import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -76,7 +78,7 @@ enum class Screen { HOME, INFO }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController, context: Context) {
+fun MainScreen(navController: NavHostController, context: Context, viewModel: HomeViewModel = hiltViewModel()) {
     var currentScreen by remember { mutableStateOf(Screen.HOME) }
     var isMenuExpanded by remember { mutableStateOf(false) }
     var colors = MaterialTheme.colorScheme
@@ -118,7 +120,7 @@ fun MainScreen(navController: NavHostController, context: Context) {
                     .padding(paddingValues)
             ) {
                 when (currentScreen) {
-                    Screen.HOME -> HomeScreen(navController, context)
+                    Screen.HOME -> HomeScreen(navController, context, viewModel)
                     Screen.INFO -> InfoScreen()
                 }
             }

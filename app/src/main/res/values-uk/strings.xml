@@ -43,4 +43,10 @@
     <string name="services">Сервіси</string>
     <string name="time_based">На основі часу</string>
     <string name="counter_based">На основі лічильника</string>
+    <string name="service_name_is_required">Назва сервісу є обов`язковою</string>
+    <string name="account_name_is_required">Назва облікового запису є обов`язковою</string>
+    <string name="secret_key_is_required">Секретний ключ є обов`язковим</string>
+    <string name="search">Пошук</string>
+    <string name="nothing_found">Нічого не знайдено</string>
+    <string name="update">Оновити</string>
 </resources>

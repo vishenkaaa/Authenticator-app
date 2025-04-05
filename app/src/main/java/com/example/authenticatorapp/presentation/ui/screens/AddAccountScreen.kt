@@ -199,15 +199,18 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
         Button(
             onClick = {
                 if (selectedService.isBlank()) {
-                    Toast.makeText(context, "Service name is required", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,
+                        context.getString(R.string.service_name_is_required), Toast.LENGTH_SHORT).show()
                     return@Button
                 }
                 if (accountText.isBlank()) {
-                    Toast.makeText(context, "Email/Username is required", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,
+                        context.getString(R.string.account_name_is_required), Toast.LENGTH_SHORT).show()
                     return@Button
                 }
                 if (keyText.isBlank()) {
-                    Toast.makeText(context, "Secret key is required", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,
+                        context.getString(R.string.secret_key_is_required), Toast.LENGTH_SHORT).show()
                     return@Button
                 }
 
@@ -216,7 +219,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                     email = accountText,
                     secret = keyText,
                     type = selectedTypeOfKey,
-                    algorithm = "HmacSHA1", // В майбутньому можна зробити вибір алгоритму
+                    algorithm = "HmacSHA1",
                     digits = 6
                 )
 
@@ -462,7 +465,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                     .padding(bottom = 27.dp)
             ) {
                 val txt_time_based = stringResource(R.string.time_based)
-                val txt_counter_based = stringResource(R.string.time_based)
+                val txt_counter_based = stringResource(R.string.counter_based)
 
                 SimpleServiceItem(text = stringResource(R.string.time_based)) {
                     selectedTypeOfKey = txt_time_based
