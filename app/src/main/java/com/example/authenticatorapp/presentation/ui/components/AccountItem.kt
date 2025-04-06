@@ -48,8 +48,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.navDeepLink
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.data.local.model.AccountEntity
+import com.example.authenticatorapp.presentation.ui.screens.AddAccountScreen
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Blue
 import com.example.authenticatorapp.presentation.ui.theme.Gray1
@@ -61,7 +64,14 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountItem(account: AccountEntity, otp: String, remainingTime: Int = 0, context: Context, isTimeBased: Boolean, viewModel: AddAccountViewModel = hiltViewModel()) {
+fun AccountItem(account: AccountEntity,
+                otp: String,
+                remainingTime: Int = 0,
+                context: Context,
+                isTimeBased: Boolean,
+                viewModel: AddAccountViewModel = hiltViewModel(),
+                navController: NavHostController
+) {
     var accountExpanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     var showConfirmDialog by remember { mutableStateOf(false) }
@@ -166,6 +176,7 @@ fun AccountItem(account: AccountEntity, otp: String, remainingTime: Int = 0, con
                                         .fillMaxWidth()
                                         .clickable(onClick = {
                                             accountExpanded = false
+                                            navController.navigate("EditAccount/${account.id}")
                                         })
                                         .padding(vertical = 12.dp)
                                 ) {
@@ -178,7 +189,7 @@ fun AccountItem(account: AccountEntity, otp: String, remainingTime: Int = 0, con
                                             .size(24.dp)
                                     )
                                     Text(
-                                        text = "Edit",
+                                        text = stringResource(R.string.edit),
                                         style = AppTypography.labelMedium
                                     )
                                 }
@@ -209,7 +220,7 @@ fun AccountItem(account: AccountEntity, otp: String, remainingTime: Int = 0, con
                                             .size(24.dp)
                                     )
                                     Text(
-                                        text = "Delete",
+                                        text = stringResource(R.string.delete),
                                         style = AppTypography.labelMedium
                                     )
                                 }

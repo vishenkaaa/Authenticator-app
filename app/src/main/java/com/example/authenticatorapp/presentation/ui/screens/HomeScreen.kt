@@ -70,7 +70,12 @@ import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun HomeScreen(navController: NavHostController, context: Context,viewModel: HomeViewModel = hiltViewModel(), accounts: List<AccountEntity>) {
+fun HomeScreen(
+    navController: NavHostController,
+    context: Context,
+    viewModel: HomeViewModel = hiltViewModel(),
+    accounts: List<AccountEntity>
+) {
     val allAccounts = accounts
     val isLoading by viewModel.isLoadingAccounts.collectAsState()
 
@@ -90,12 +95,17 @@ fun HomeScreen(navController: NavHostController, context: Context,viewModel: Hom
             style = AppTypography.bodyLarge
         )
 
-        if(!isLoading)
+        if (!isLoading && allAccounts.isNotEmpty())
             OutlinedTextField(
                 value = searchQuery,
-                onValueChange = {searchQuery = it},
+                onValueChange = { searchQuery = it },
                 textStyle = AppTypography.bodyMedium,
-                placeholder = { Text(text = stringResource(R.string.search), style = AppTypography.labelMedium) },
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.search),
+                        style = AppTypography.labelMedium
+                    )
+                },
                 leadingIcon = {
                     Icon(
                         painter = painterResource(R.drawable.ic_search),
@@ -118,7 +128,7 @@ fun HomeScreen(navController: NavHostController, context: Context,viewModel: Hom
                 )
             )
 
-        if(isLoading){
+        if (isLoading) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -127,144 +137,146 @@ fun HomeScreen(navController: NavHostController, context: Context,viewModel: Hom
             ) {
                 CircularProgressIndicator()
             }
-        }
-        else
+        } else
             if (allAccounts.isNotEmpty()) {
-            TabLayout(
-                selectedTabIndex = selectedTabIndex,
-                onTabSelected = { selectedTabIndex = it }
-            )
-
-            val filteredAccounts = if (selectedTabIndex == 0) {
-                allAccounts.filter {
-                    it.type == "TOTP" && matchesSearchQuery(it, searchQuery)
-                }
-            } else {
-                allAccounts.filter {
-                    it.type == "HOTP" && matchesSearchQuery(it, searchQuery)
-                }
-            }
-
-            if (filteredAccounts.isEmpty()) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.nothing_found),
-                        color = Color.Gray,
-                        style = AppTypography.labelMedium
-                    )
-                }
-            }
-
-            LazyColumn {
-                items(filteredAccounts) { account ->
-                    val otp = remember { mutableStateOf(viewModel.generateOtp(account)) }
-                    val remainingTime = remember { mutableStateOf(calculateRemainingTime()) }
-
-                    LaunchedEffect(Unit) {
-                        while (true) {
-                            delay(1000)
-                            remainingTime.value = calculateRemainingTime()
-                            if (remainingTime.value <= 1) {
-                                otp.value = viewModel.generateOtp(account)
-                            }
-                        }
-                    }
-
-                    if(selectedTabIndex == 0)
-                        AccountItem(
-                            account = account,
-                            otp = otp.value,
-                            remainingTime = remainingTime.value,
-                            context = context,
-                            isTimeBased = true)
-                    else
-                        AccountItem(
-                            account = account,
-                            otp = otp.value,
-                            context = context,
-                            isTimeBased = false)
-                }
-            }
-        }
-        else {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 32.dp)
-                    .padding(horizontal = 16.dp)
-                    .shadow(
-                        elevation = 8.dp,
-                        shape = RoundedCornerShape(24.dp),
-                        clip = false,
-                        spotColor = Gray5,
-                        ambientColor = Gray3
-                    )
-                    .background(Color.Transparent, RoundedCornerShape(24.dp)),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                Image(
-                    painter = if (isSystemInDarkTheme()) painterResource(R.drawable.main_bg_dark)
-                    else painterResource(R.drawable.main_bg_light),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(0.92f)
+                TabLayout(
+                    selectedTabIndex = selectedTabIndex,
+                    onTabSelected = { selectedTabIndex = it }
                 )
 
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .padding(bottom = 13.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        text = stringResource(R.string.add_2fa_codes),
-                        modifier = Modifier.padding(bottom = 8.dp),
-                        fontFamily = interFontFamily,
-                        fontWeight = FontWeight.W700,
-                        fontSize = 24.sp
-                    )
+                val filteredAccounts = if (selectedTabIndex == 0) {
+                    allAccounts.filter {
+                        it.type == "TOTP" && matchesSearchQuery(it, searchQuery)
+                    }
+                } else {
+                    allAccounts.filter {
+                        it.type == "HOTP" && matchesSearchQuery(it, searchQuery)
+                    }
+                }
 
-                    Text(
-                        text = stringResource(R.string.keep_your_accounts_secure_by_adding_two_factor_authentication),
-                        modifier = Modifier.padding(bottom = 32.dp),
-                        textAlign = TextAlign.Center,
-                        style = AppTypography.labelMedium
-                    )
-
-                    Button(
-                        onClick = {
-                            navController.navigate("QrScanner")
-                        },
+                if (filteredAccounts.isEmpty()) {
+                    Box(
+                        contentAlignment = Alignment.Center,
                         modifier = Modifier
-                            .height(50.dp)
-                            .fillMaxWidth()
-                            .shadow(4.dp, shape = RoundedCornerShape(27.dp)),
-                        shape = RoundedCornerShape(27.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MainBlue
-                        )
+                            .fillMaxSize()
+                            .padding(16.dp)
                     ) {
-                        Image(
-                            painter = painterResource(R.drawable.qr_code),
-                            contentDescription = "Google",
-                        )
-                        Spacer(modifier = Modifier.width(15.dp))
                         Text(
-                            text = stringResource(R.string.scan_qr_code),
-                            color = White,
-                            style = AppTypography.bodyLarge
+                            text = stringResource(R.string.nothing_found),
+                            color = Color.Gray,
+                            style = AppTypography.labelMedium
                         )
                     }
                 }
+
+                LazyColumn {
+                    items(filteredAccounts) { account ->
+                        val otp = remember { mutableStateOf(viewModel.generateOtp(account)) }
+                        val remainingTime = remember { mutableStateOf(calculateRemainingTime()) }
+
+                        LaunchedEffect(Unit) {
+                            while (true) {
+                                delay(1000)
+                                remainingTime.value = calculateRemainingTime()
+                                if (remainingTime.value <= 1) {
+                                    otp.value = viewModel.generateOtp(account)
+                                }
+                            }
+                        }
+
+                        if (selectedTabIndex == 0)
+                            AccountItem(
+                                account = account,
+                                otp = otp.value,
+                                remainingTime = remainingTime.value,
+                                context = context,
+                                isTimeBased = true,
+                                navController = navController
+                            )
+                        else
+                            AccountItem(
+                                account = account,
+                                otp = otp.value,
+                                context = context,
+                                isTimeBased = false,
+                                navController = navController
+                            )
+                    }
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 32.dp)
+                        .padding(horizontal = 16.dp)
+                        .shadow(
+                            elevation = 8.dp,
+                            shape = RoundedCornerShape(24.dp),
+                            clip = false,
+                            spotColor = Gray5,
+                            ambientColor = Gray3
+                        )
+                        .background(Color.Transparent, RoundedCornerShape(24.dp)),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    Image(
+                        painter = if (isSystemInDarkTheme()) painterResource(R.drawable.main_bg_dark)
+                        else painterResource(R.drawable.main_bg_light),
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(0.92f)
+                    )
+
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .padding(bottom = 13.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.add_2fa_codes),
+                            modifier = Modifier.padding(bottom = 8.dp),
+                            fontFamily = interFontFamily,
+                            fontWeight = FontWeight.W700,
+                            fontSize = 24.sp
+                        )
+
+                        Text(
+                            text = stringResource(R.string.keep_your_accounts_secure_by_adding_two_factor_authentication),
+                            modifier = Modifier.padding(bottom = 32.dp),
+                            textAlign = TextAlign.Center,
+                            style = AppTypography.labelMedium
+                        )
+
+                        Button(
+                            onClick = {
+                                navController.navigate("QrScanner")
+                            },
+                            modifier = Modifier
+                                .height(50.dp)
+                                .fillMaxWidth()
+                                .shadow(4.dp, shape = RoundedCornerShape(27.dp)),
+                            shape = RoundedCornerShape(27.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MainBlue
+                            )
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.qr_code),
+                                contentDescription = "Google",
+                            )
+                            Spacer(modifier = Modifier.width(15.dp))
+                            Text(
+                                text = stringResource(R.string.scan_qr_code),
+                                color = White,
+                                style = AppTypography.bodyLarge
+                            )
+                        }
+                    }
+                }
             }
-        }
     }
 }
 

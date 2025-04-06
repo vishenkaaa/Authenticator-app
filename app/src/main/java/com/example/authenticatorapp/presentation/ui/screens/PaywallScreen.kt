@@ -53,6 +53,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.example.authenticatorapp.MainActivity
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.presentation.ui.components.SubscriptionOption
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Blue
 import com.example.authenticatorapp.presentation.ui.theme.Gray1
@@ -268,83 +269,6 @@ fun PaywallScreen(navController: NavController, context: MainActivity){
                     fontWeight = FontWeight.W400,
                     fontSize = 12.sp,
                     textDecoration = TextDecoration.Underline,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun SubscriptionOption(
-    title: String,
-    description: String,
-    isSelected: Boolean,
-    onSelect: () -> Unit
-) {
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp, start = 16.dp, end = 16.dp)
-                .background(
-                    color = White,
-                    shape = RoundedCornerShape(30.dp)
-                )
-                .border(
-                    3.dp,
-                    color = if (isSelected) MainBlue else Gray2,
-                    RoundedCornerShape(30.dp)
-                )
-                .clickable(onClick = onSelect,
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() })
-                .padding(start = 24.dp, end = 16.dp, top = 5.dp, bottom = 5.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = title,
-                        color = if (isSelected) Blue else Color(0xFF2A313E),
-                        fontWeight = FontWeight.W700,
-                        fontSize = 14.sp,
-                        fontFamily = interFontFamily,
-                    )
-                    Text(
-                        text = description,
-                        color = Color(0xFF2A313E),
-                        style = AppTypography.labelSmall
-                    )
-                }
-                RadioButton(
-                    selected = isSelected,
-                    onClick = onSelect,
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = MainBlue,
-                        unselectedColor = Gray3
-                    )
-                )
-            }
-        }
-
-        if (title == stringResource(id = R.string._1_year) && isSelected) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = -59.dp, y = (0).dp)
-                    .background(MainBlue, shape = RoundedCornerShape(50))
-                    .padding(horizontal = 10.dp, vertical = 6.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.save_88),
-                    color = White,
-                    fontWeight = FontWeight.W400,
-                    fontSize = 11.sp
                 )
             }
         }

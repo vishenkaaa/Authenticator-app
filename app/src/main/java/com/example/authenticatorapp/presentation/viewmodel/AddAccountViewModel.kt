@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.authenticatorapp.data.local.dao.AccountDao
 import com.example.authenticatorapp.data.local.model.AccountEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -92,6 +94,15 @@ class AddAccountViewModel @Inject constructor(
     fun deleteAccount(id: Int) {
         viewModelScope.launch {
             accountDao.deleteAccountById(id)
+        }
+    }
+
+    private val _account = MutableStateFlow<AccountEntity?>(null)
+    val account = _account.asStateFlow()
+
+    fun getAccountById(accountId: Int) {
+        viewModelScope.launch {
+            _account.value = accountDao.getAccountById(accountId)
         }
     }
 }

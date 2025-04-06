@@ -58,6 +58,7 @@ fun SplashScreen(navController: NavHostController, context: MainActivity) {
         }
 
         delay(500)
+        delay(500)
 
         withContext(Dispatchers.Main) {
             if (onBoardingIsFinished(context = context)) {

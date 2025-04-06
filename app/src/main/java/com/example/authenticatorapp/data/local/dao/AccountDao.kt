@@ -25,4 +25,7 @@ interface AccountDao {
 
     @Update
     suspend fun updateAccount(account: AccountEntity)
+
+    @Query("SELECT * FROM accounts WHERE id = :accountId")
+    suspend fun getAccountById(accountId: Int): AccountEntity?
 }

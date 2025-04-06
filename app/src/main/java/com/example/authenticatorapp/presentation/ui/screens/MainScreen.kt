@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -67,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.presentation.ui.components.CustomBottomNavigation
 import com.example.authenticatorapp.presentation.ui.screens.HomeScreen
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
@@ -108,9 +110,10 @@ fun MainScreen(navController: NavHostController, context: Context, viewModel: Ho
                             modifier = Modifier.scale(1.25f)
                         ) {
                             Icon(
-                                imageVector =  Icons.Default.Add,
+                                painter = painterResource(R.drawable.ic_add),
                                 contentDescription = "Додати",
-                                tint = Color.White
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     }
@@ -211,51 +214,6 @@ fun MainScreen(navController: NavHostController, context: Context, viewModel: Ho
                     }
                 }
             }
-    }
-}
-
-@Composable
-fun CustomBottomNavigation(
-    currentScreen: Screen,
-    onScreenSelected: (Screen) -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 20.dp)
-            .paint(
-                painter = painterResource(R.drawable.nav_bar),
-                contentScale = ContentScale.FillWidth
-            )
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 40.dp)
-                .offset(y = (12).dp)
-        ) {
-            IconButton(onClick = { onScreenSelected(Screen.HOME) }) {
-                Icon(
-                    if (currentScreen == Screen.HOME) painterResource(R.drawable.key_checked) else painterResource(R.drawable.key),
-                    contentDescription = "Головна",
-                    tint = MainBlue
-                )
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            IconButton(onClick = { onScreenSelected(Screen.INFO) }) {
-                Icon(
-                    if (currentScreen == Screen.INFO) painterResource(R.drawable.info_checked) else painterResource(R.drawable.info),
-                    contentDescription = "Інформація",
-                    tint = MainBlue
-                )
-            }
-        }
     }
 }
 

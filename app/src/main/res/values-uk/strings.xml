@@ -51,4 +51,7 @@
     <string name="update">Оновити</string>
     <string name="are_you_sure_you_want_to_delete_this_account">Ви впевнені, що хочете видалити цей акаунт?</string>
     <string name="confirm_deletion">Підтвердження видалення</string>
+    <string name="edit">Редагувати</string>
+    <string name="delete">Видалити</string>
+    <string name="save">Зберегти</string>
 </resources>

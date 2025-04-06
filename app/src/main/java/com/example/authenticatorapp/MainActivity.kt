@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.screens.AddAccountScreen
 import com.example.authenticatorapp.presentation.ui.screens.HomeScreen
@@ -83,6 +85,19 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("AddAccount") {
                             AddAccountScreen(navController, this@MainActivity)
+                        }
+                        composable(
+                            "EditAccount/{accountId}",
+                            arguments = listOf(navArgument("accountId") { type = NavType.IntType })
+                        ) { backStackEntry ->
+                            val accountId = backStackEntry.arguments?.getInt("accountId")
+                            accountId?.let {
+                                AddAccountScreen(
+                                    navController = navController,
+                                    context = this@MainActivity,
+                                    oldAccountId = accountId
+                                )
+                            }
                         }
                     }
                 }

@@ -22,6 +22,7 @@ import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.components.ServiceItem
 import com.example.authenticatorapp.presentation.ui.components.SimpleServiceItem
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
@@ -31,7 +32,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddAccountScreen(navController: NavController, context: Context, viewModel: AddAccountViewModel = hiltViewModel()) {
+fun AddAccountScreen(navController: NavController, context: Context, viewModel: AddAccountViewModel = hiltViewModel(), oldAccountId: Int? = null) {
     val colors = MaterialTheme.colorScheme
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -44,6 +45,24 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
 
     var accountText by remember { mutableStateOf("") }
     var keyText by remember { mutableStateOf("") }
+
+    if(oldAccountId!=null){
+        LaunchedEffect(key1 = oldAccountId) {
+            oldAccountId?.let { id ->
+                viewModel.getAccountById(id)
+            }
+        }
+
+        val oldAccount = viewModel.account.collectAsState().value
+        LaunchedEffect(key1 = oldAccount) {
+            oldAccount?.let {
+                accountText = it.email
+                keyText = it.secret
+                selectedService = it.serviceName
+                selectedTypeOfKey = if(it.type == "TOTP") "Time-based" else "Counter-based"
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -214,14 +233,25 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                     return@Button
                 }
 
-                viewModel.addAccount(
-                    service = selectedService,
-                    email = accountText,
-                    secret = keyText,
-                    type = selectedTypeOfKey,
-                    algorithm = "HmacSHA1",
-                    digits = 6
-                )
+                if(oldAccountId == null)
+                    viewModel.addAccount(
+                        service = selectedService,
+                        email = accountText,
+                        secret = keyText,
+                        type = selectedTypeOfKey,
+                        algorithm = "HmacSHA1",
+                        digits = 6
+                    )
+                else
+                    viewModel.updateAccount(
+                        id = oldAccountId,
+                        service = selectedService,
+                        email = accountText,
+                        secret = keyText,
+                        type = selectedTypeOfKey,
+                        algorithm = "HmacSHA1",
+                        digits = 6
+                    )
 
                 navController.popBackStack()
             },
@@ -232,13 +262,16 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
             colors = ButtonDefaults.buttonColors(containerColor = MainBlue)
         ) {
             Icon(
-                imageVector = Icons.Default.Add,
+                painter = if(oldAccountId==null) painterResource(R.drawable.ic_add)
+                else painterResource(R.drawable.edit),
                 contentDescription = "Add",
+                Modifier.size(24.dp),
                 tint = Color.White
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = stringResource(R.string.add),
+                text = if(oldAccountId==null) stringResource(R.string.add)
+                else stringResource(R.string.save),
                 style = AppTypography.bodyMedium,
                 color = White
             )
