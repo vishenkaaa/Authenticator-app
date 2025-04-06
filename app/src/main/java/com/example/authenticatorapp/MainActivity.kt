@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.authenticatorapp.data.local.model.AccountEntity
+import com.example.authenticatorapp.presentation.ui.screens.AboutAppScreen
 import com.example.authenticatorapp.presentation.ui.screens.AddAccountScreen
 import com.example.authenticatorapp.presentation.ui.screens.HomeScreen
 import com.example.authenticatorapp.presentation.ui.screens.InfoScreen
@@ -98,8 +99,11 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         }
-                        composable("InfoScreen") {
+                        composable("Info") {
                             InfoScreen(navController, this@MainActivity)
+                        }
+                        composable("AboutApp") {
+                            AboutAppScreen(navController)
                         }
                     }
                 }

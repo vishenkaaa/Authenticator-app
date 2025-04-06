@@ -46,18 +46,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.components.CustomBottomNavigation
-import com.example.authenticatorapp.presentation.ui.screens.HomeScreen
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
+import com.example.authenticatorapp.presentation.viewmodel.NavigationViewModel
 
 enum class Screen { HOME, INFO }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavController, context: Context, viewModel: HomeViewModel = hiltViewModel()) {
-    var currentScreen by remember { mutableStateOf(Screen.HOME) }
+fun MainScreen(navController: NavController, context: Context, viewModel: HomeViewModel = hiltViewModel(), navigationViewModel: NavigationViewModel = hiltViewModel()) {
+    val currentScreen by navigationViewModel.selectedTab.collectAsState()
+
     var isMenuExpanded by remember { mutableStateOf(false) }
     var colors = MaterialTheme.colorScheme
     val sheetState = rememberModalBottomSheetState()
@@ -71,7 +72,7 @@ fun MainScreen(navController: NavController, context: Context, viewModel: HomeVi
             bottomBar = {
                 Box{
                     CustomBottomNavigation(currentScreen) { selectedScreen ->
-                        currentScreen = selectedScreen
+                        navigationViewModel.selectTab(selectedScreen)
                     }
 
                     Box(

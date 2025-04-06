@@ -104,11 +104,6 @@ fun SigninScreen(navController: NavController) {
                     text = "Sign in",
                     color = colors.onPrimary,
                     style = AppTypography.bodyLarge,
-                    modifier = Modifier
-                        .clickable {
-                            navController.popBackStack()
-                            navController.navigate("Onboarding")
-                        }
                 )
                 Spacer(modifier = Modifier.weight(1f))
             }

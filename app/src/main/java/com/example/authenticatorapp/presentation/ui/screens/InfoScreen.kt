@@ -76,7 +76,9 @@ fun InfoScreen(navController: NavController, context: Context){
             InfoItem(
                 icon = R.drawable.ic_shield,
                 text = stringResource(R.string.about_authenticator_app),
-                onClick = {  }
+                onClick = {
+                    navController.navigate("AboutApp")
+                }
             ),
             InfoItem(
                 icon = R.drawable.ic_calendar,
