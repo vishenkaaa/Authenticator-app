@@ -53,4 +53,10 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="save">Save</string>
+    <string name="contact_us">Contact Us</string>
+    <string name="customer_support">Customer support</string>
+    <string name="about_authenticator_app">About Authenticator app</string>
+    <string name="subscription">Subscription</string>
+    <string name="premium_features">Premium features</string>
+    <string name="useful_information">Useful information</string>
 </resources>

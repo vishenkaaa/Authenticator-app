@@ -19,8 +19,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.presentation.ui.screens.Screen
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
-import com.juraj.fluid.Screen
 
 @Composable
 fun CustomBottomNavigation(

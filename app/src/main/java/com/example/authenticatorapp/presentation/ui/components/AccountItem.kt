@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,7 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,7 +38,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,19 +45,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.navDeepLink
+import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.data.local.model.AccountEntity
-import com.example.authenticatorapp.presentation.ui.screens.AddAccountScreen
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Blue
-import com.example.authenticatorapp.presentation.ui.theme.Gray1
-import com.example.authenticatorapp.presentation.ui.theme.Gray2
+import com.example.authenticatorapp.presentation.ui.theme.Gray4
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
 import com.example.authenticatorapp.presentation.viewmodel.AddAccountViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +63,7 @@ fun AccountItem(account: AccountEntity,
                 context: Context,
                 isTimeBased: Boolean,
                 viewModel: AddAccountViewModel = hiltViewModel(),
-                navController: NavHostController
+                navController: NavController
 ) {
     var accountExpanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -81,10 +74,10 @@ fun AccountItem(account: AccountEntity,
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 6.dp)
             .shadow(
-                elevation = 4.dp,
+                elevation = 5.dp,
                 shape = RoundedCornerShape(24.dp),
-                spotColor = Color(0xFF000000).copy(alpha = 0.1f),
-                ambientColor = Color(0xFF000000).copy(alpha = 0.1f)
+                ambientColor = Gray4,
+                spotColor = Gray4
             )
             .background(MaterialTheme.colorScheme.onPrimaryContainer)
             .clip(RoundedCornerShape(24.dp))

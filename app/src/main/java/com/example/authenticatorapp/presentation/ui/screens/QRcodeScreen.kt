@@ -48,12 +48,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.utils.QRCodeAnalyzer
 
 @Composable
-fun QRcodeScreen(navController: NavHostController, onQRCodeScanned: (String) -> Unit){
+fun QRcodeScreen(navController: NavController, onQRCodeScanned: (String) -> Unit){
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val previewView = remember{PreviewView(context)}

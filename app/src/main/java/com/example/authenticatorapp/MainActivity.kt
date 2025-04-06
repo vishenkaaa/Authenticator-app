@@ -19,17 +19,16 @@ import androidx.navigation.navArgument
 import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.screens.AddAccountScreen
 import com.example.authenticatorapp.presentation.ui.screens.HomeScreen
+import com.example.authenticatorapp.presentation.ui.screens.InfoScreen
+import com.example.authenticatorapp.presentation.ui.screens.MainScreen
 import com.example.authenticatorapp.presentation.ui.screens.OnboardingScreen
 import com.example.authenticatorapp.presentation.ui.screens.PaywallScreen
 import com.example.authenticatorapp.presentation.ui.screens.QRcodeScreen
 import com.example.authenticatorapp.presentation.ui.screens.SigninScreen
 import com.example.authenticatorapp.presentation.ui.screens.SplashScreen
 import com.example.authenticatorapp.presentation.ui.theme.AuthenticatorAppTheme
-import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
-import com.juraj.fluid.MainScreen
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -98,6 +97,9 @@ class MainActivity : ComponentActivity() {
                                     oldAccountId = accountId
                                 )
                             }
+                        }
+                        composable("InfoScreen") {
+                            InfoScreen(navController, this@MainActivity)
                         }
                     }
                 }
