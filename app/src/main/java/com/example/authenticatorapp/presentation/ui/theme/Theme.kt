@@ -39,7 +39,7 @@ private val DarkColorScheme = darkColorScheme(
     secondary = MainBlue,
     tertiary = LightBlue,
     background = Color(0xFF121212),
-    surface = Gray5,
+    surface = Gray4,
 
     outline = Gray4,
     secondaryContainer = Gray3,

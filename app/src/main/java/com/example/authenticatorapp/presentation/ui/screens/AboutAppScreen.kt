@@ -3,6 +3,7 @@ package com.example.authenticatorapp.presentation.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -24,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
+import com.example.authenticatorapp.presentation.ui.theme.Gray3
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
 
@@ -60,6 +63,7 @@ fun AboutAppScreen(navController: NavController) {
             "What is an\nAuthenticator app?",
             Modifier.padding(horizontal = 16.dp),
             style = AppTypography.titleSmall,
+            color = colors.onPrimary
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -113,8 +117,7 @@ fun StyledParagraph(
             fontWeight = FontWeight.W500,
             fontSize = 16.sp,
             fontFamily = interFontFamily,
-            color = Gray6
-        )
+            color = if(!isSystemInDarkTheme()) Color(0xFF3E3E3E) else Gray3)
         ) {
             append(boldText)
         }
@@ -125,7 +128,7 @@ fun StyledParagraph(
     Text(
         text = annotatedString,
         style = AppTypography.labelMedium,
-        color = Gray6,
+        color = colors.surface,
         modifier = modifier
     )
 }
