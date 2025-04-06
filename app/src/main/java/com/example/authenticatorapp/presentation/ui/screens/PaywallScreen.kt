@@ -94,10 +94,8 @@ fun PaywallScreen(navController: NavController, context: MainActivity){
 
                     modifier = Modifier
                         .size(24.dp)
-                        .padding(end = 5.dp, top = 5.dp, bottom = 5.dp)
                         .clickable {
                             navController.popBackStack()
-                            navController.navigate("SignIn")
                         }
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -198,7 +196,7 @@ fun PaywallScreen(navController: NavController, context: MainActivity){
                 onClick = {
                     onBoardingIsDone(context)
                     navController.popBackStack()
-                    navController.navigate("SignIn")
+                    navController.navigate("")
                 },
                 modifier = Modifier
                     .height(50.dp)

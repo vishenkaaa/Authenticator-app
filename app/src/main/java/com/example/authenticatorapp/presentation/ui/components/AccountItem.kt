@@ -76,8 +76,8 @@ fun AccountItem(account: AccountEntity,
             .shadow(
                 elevation = 5.dp,
                 shape = RoundedCornerShape(24.dp),
-                ambientColor = Gray4,
-                spotColor = Gray4
+                ambientColor = MaterialTheme.colorScheme.inverseSurface,
+                spotColor = MaterialTheme.colorScheme.inverseSurface
             )
             .background(MaterialTheme.colorScheme.onPrimaryContainer)
             .clip(RoundedCornerShape(24.dp))

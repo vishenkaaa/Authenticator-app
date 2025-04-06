@@ -3,7 +3,6 @@ package com.example.authenticatorapp.presentation.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,20 +14,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.presentation.ui.components.StyledParagraph
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
-import com.example.authenticatorapp.presentation.ui.theme.Gray3
-import com.example.authenticatorapp.presentation.ui.theme.Gray6
-import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
 
 @Composable
 fun AboutAppScreen(navController: NavController) {
@@ -98,37 +89,4 @@ fun AboutAppScreen(navController: NavController) {
             modifier = Modifier.padding(horizontal = 16.dp)
         )
     }
-}
-
-@Composable
-fun StyledParagraph(
-    startText: String,
-    boldText: String,
-    endText: String,
-    modifier: Modifier = Modifier
-) {
-    val colors = MaterialTheme.colorScheme
-
-    val annotatedString = buildAnnotatedString {
-
-        append(startText)
-
-        withStyle( style = SpanStyle(
-            fontWeight = FontWeight.W500,
-            fontSize = 16.sp,
-            fontFamily = interFontFamily,
-            color = if(!isSystemInDarkTheme()) Color(0xFF3E3E3E) else Gray3)
-        ) {
-            append(boldText)
-        }
-
-        append(endText)
-    }
-
-    Text(
-        text = annotatedString,
-        style = AppTypography.labelMedium,
-        color = colors.surface,
-        modifier = modifier
-    )
 }

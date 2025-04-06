@@ -198,11 +198,11 @@ fun HomeScreen(
                         .padding(top = 32.dp)
                         .padding(horizontal = 16.dp)
                         .shadow(
-                            elevation = 8.dp,
+                            elevation = 10.dp,
                             shape = RoundedCornerShape(24.dp),
                             clip = false,
-                            spotColor = Gray5,
-                            ambientColor = Gray3
+                            spotColor = colors.inverseSurface,
+                            ambientColor = colors.inverseSurface
                         )
                         .background(Color.Transparent, RoundedCornerShape(24.dp)),
                     contentAlignment = Alignment.BottomCenter

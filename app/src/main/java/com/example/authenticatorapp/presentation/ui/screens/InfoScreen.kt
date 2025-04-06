@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.presentation.ui.components.InfoBlock
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Gray4
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
@@ -83,7 +84,9 @@ fun InfoScreen(navController: NavController, context: Context){
             InfoItem(
                 icon = R.drawable.ic_calendar,
                 text = stringResource(R.string.subscription),
-                onClick = { }
+                onClick = {
+                    navController.navigate("Subscription")
+                }
             ),
             InfoItem(
                 icon = R.drawable.ic_star,
@@ -98,97 +101,9 @@ fun InfoScreen(navController: NavController, context: Context){
         )
     }
 }
-@Composable
-fun InfoBlock(
-    headerText: String,
-    items: List<InfoItem>,
-) {
-    val colors = MaterialTheme.colorScheme
-    Column {
-        Text(
-            text = headerText,
-            modifier = Modifier.padding(top = 24.dp, bottom = 16.dp),
-            style = AppTypography.bodyLarge
-        )
-
-        Box(
-            Modifier
-                .background(
-                    color = colors.onPrimaryContainer,
-                    shape = RoundedCornerShape(24.dp)
-                )
-                .shadow(
-                    elevation = 10.dp,
-                    shape = RoundedCornerShape(24.dp),
-                    ambientColor = Gray4,
-                    spotColor = Gray4
-                )
-                .background(
-                    color = colors.onPrimaryContainer,
-                    shape = RoundedCornerShape(24.dp)
-                )
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .fillMaxWidth()
-        ) {
-            Column {
-                items.forEachIndexed { index, item ->
-                    InfoItemRow(
-                        icon = item.icon,
-                        text = item.text,
-                        onClick = item.onClick
-                    )
-
-                    if (index < items.size - 1) {
-                        Divider(
-                            modifier = Modifier.fillMaxWidth(),
-                            color = Black.copy(alpha = 0.1f)
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
 data class InfoItem(
     val icon: Int,
     val text: String,
     val onClick: () -> Unit
 )
-
-@Composable
-private fun InfoItemRow(
-    icon: Int,
-    text: String,
-    onClick: () -> Unit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 12.dp)
-    ) {
-        Icon(
-            painter = painterResource(id = icon),
-            contentDescription = null,
-            tint = Color.Unspecified,
-            modifier = Modifier
-                .padding(end = 8.dp)
-                .size(24.dp)
-        )
-        Text(
-            text = text,
-            modifier = Modifier.weight(1f),
-            style = AppTypography.bodyMedium
-        )
-        Icon(
-            painter = painterResource(id = R.drawable.ic_right),
-            contentDescription = null,
-            tint = Color.Unspecified,
-            modifier = Modifier
-                .padding(end = 8.dp)
-                .size(24.dp)
-        )
-    }
-}

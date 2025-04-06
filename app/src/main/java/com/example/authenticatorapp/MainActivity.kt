@@ -27,6 +27,7 @@ import com.example.authenticatorapp.presentation.ui.screens.PaywallScreen
 import com.example.authenticatorapp.presentation.ui.screens.QRcodeScreen
 import com.example.authenticatorapp.presentation.ui.screens.SigninScreen
 import com.example.authenticatorapp.presentation.ui.screens.SplashScreen
+import com.example.authenticatorapp.presentation.ui.screens.SubscriptionScreen
 import com.example.authenticatorapp.presentation.ui.theme.AuthenticatorAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
@@ -104,6 +105,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("AboutApp") {
                             AboutAppScreen(navController)
+                        }
+                        composable("Subscription") {
+                            SubscriptionScreen(navController)
                         }
                     }
                 }
