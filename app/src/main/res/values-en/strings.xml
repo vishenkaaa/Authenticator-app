@@ -60,4 +60,10 @@
     <string name="subscription">Subscription</string>
     <string name="premium_features">Premium features</string>
     <string name="useful_information">Useful information</string>
+    <string name="your_current_plan_is_a_subscription">Your current plan is a %1$s subscription</string>
+    <string name="next_billing_date">Next billing date %1$s</string>
+    <string name="change_plan">Change Plan</string>
+    <string name="cancel_plan">Cancel Plan</string>
+    <string name="choose_a_plan">Choose a plan</string>
+    <string name="restore_purchases">Restore Purchases</string>
 </resources>

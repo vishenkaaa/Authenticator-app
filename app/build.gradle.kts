@@ -80,8 +80,6 @@ dependencies {
     implementation(libs.google.firebase.auth.ktx)
     implementation(libs.play.services.auth.v2130)
 
-    //implementation(libs.kotlin.onetimepassword)
-
     implementation(libs.barcode.scanning)
     implementation(libs.androidx.camera.core)
     implementation(libs.camera.camera2)
@@ -93,5 +91,5 @@ dependencies {
     kapt(libs.hilt.compiler)
     kapt (libs.androidx.room.compiler)
     implementation (libs.androidx.lifecycle.viewmodel.ktx)
-
+    implementation (libs.androidx.security.crypto)
 }

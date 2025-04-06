@@ -54,10 +54,16 @@
     <string name="edit">Редагувати</string>
     <string name="delete">Видалити</string>
     <string name="save">Зберегти</string>
-    <string name="contact_us">Contact Us</string>
-    <string name="customer_support">Customer support</string>
-    <string name="about_authenticator_app">About Authenticator app</string>
-    <string name="subscription">Subscription</string>
-    <string name="premium_features">Premium features</string>
-    <string name="useful_information">Useful information</string>
+    <string name="contact_us">Зв`язатися з нами</string>
+    <string name="customer_support">Служба підтримки</string>
+    <string name="about_authenticator_app">Про додаток Authenticator</string>
+    <string name="subscription">Підписка</string>
+    <string name="premium_features">Преміум функції</string>
+    <string name="useful_information">Корисна інформація</string>
+    <string name="your_current_plan_is_a_subscription">Ваш поточний план - %1$s підписка</string>
+    <string name="next_billing_date">Наступна дата оплати %1$s</string>
+    <string name="change_plan">Змінити план</string>
+    <string name="cancel_plan">Скасувати план</string>
+    <string name="choose_a_plan">Обрати план</string>
+    <string name="restore_purchases">Відновити покупки</string>
 </resources>

@@ -24,6 +24,7 @@ navigationCompose = "2.8.9"
 playServicesAuth = "21.0.0"
 playServicesAuthVersion = "21.3.0"
 roomRuntime = "2.6.1"
+securityCrypto = "1.1.0-alpha06"
 uiTextGoogleFonts = "1.6.4"
 firebaseAuthKtx = "23.2.0"
 roomCommon = "2.6.1"
@@ -42,6 +43,7 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
 androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCamera2" }
 barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "barcodeScanning" }

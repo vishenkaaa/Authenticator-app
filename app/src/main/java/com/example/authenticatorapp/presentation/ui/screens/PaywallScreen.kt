@@ -50,6 +50,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.MainActivity
 import com.example.authenticatorapp.R
@@ -62,10 +64,11 @@ import com.example.authenticatorapp.presentation.ui.theme.Gray3
 import com.example.authenticatorapp.presentation.ui.theme.LightBlue
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
+import com.example.authenticatorapp.presentation.viewmodel.SubscriptionViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun PaywallScreen(navController: NavController, context: MainActivity){
+fun PaywallScreen(navController: NavController, context: MainActivity, viewModel: SubscriptionViewModel = hiltViewModel()){
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -195,8 +198,17 @@ fun PaywallScreen(navController: NavController, context: MainActivity){
             Button(
                 onClick = {
                     onBoardingIsDone(context)
+                    if(selectedPlan==oneYearText)
+                        viewModel.saveSubscription(
+                            plan = "Yearly",
+                            hasFreeTrial = freeTrialIsSelected
+                        )
+                    else
+                        viewModel.saveSubscription(
+                            plan = "Weekly",
+                            hasFreeTrial = freeTrialIsSelected
+                        )
                     navController.popBackStack()
-                    navController.navigate("")
                 },
                 modifier = Modifier
                     .height(50.dp)
