@@ -98,7 +98,9 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
-                            navController.popBackStack()
+                            if(onBoardingIsFinished(context)) navController.popBackStack()
+                            else navController.navigate("Main")
+                            onBoardingIsDone(context)
                         }
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -197,7 +199,6 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
-                    onBoardingIsDone(context)
                     if(selectedPlan==oneYearText)
                         viewModel.saveSubscription(
                             plan = "Yearly",
@@ -208,7 +209,10 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
                             plan = "Weekly",
                             hasFreeTrial = freeTrialIsSelected
                         )
-                    navController.popBackStack()
+
+                    if(onBoardingIsFinished(context)) navController.popBackStack()
+                    else navController.navigate("Main")
+                    onBoardingIsDone(context)
                 },
                 modifier = Modifier
                     .height(50.dp)

@@ -1,5 +1,6 @@
 package com.example.authenticatorapp.presentation.viewmodel
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
@@ -7,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.example.authenticatorapp.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -14,15 +16,15 @@ import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class SubscriptionViewModel @Inject constructor (application: Application)
+class SubscriptionViewModel @Inject constructor (application: Application, private val authRepository: AuthRepository)
     : AndroidViewModel(application) {
 
+    @SuppressLint("StaticFieldLeak")
     private val context: Context = application.applicationContext
 
     private val prefs by lazy {
         EncryptedSharedPreferences.create(
-            context,
-            "subscription_prefs",
+            context, "subscription_prefs",
             MasterKey.Builder(context)
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                 .build(),
@@ -37,9 +39,27 @@ class SubscriptionViewModel @Inject constructor (application: Application)
     private val _nextBilling = MutableStateFlow<String?>(null)
     val nextBilling: StateFlow<String?> = _nextBilling
 
+    private val _isAuthenticated = MutableStateFlow(false)
+    val isAuthenticated: StateFlow<Boolean> = _isAuthenticated
+
     init {
+        checkAuthStatus()
+        monitorAuthChanges()
         _plan.value = prefs.getString("plan", null)
         _nextBilling.value = prefs.getString("next_billing", null)
+    }
+
+    fun checkAuthStatus() {
+        _isAuthenticated.value = authRepository.isUserLoggedIn()
+    }
+
+    private fun monitorAuthChanges() {
+        authRepository.monitorAuthState { isLoggedIn ->
+            _isAuthenticated.value = isLoggedIn
+            if (isLoggedIn) {
+                loadSubscription()
+            }
+        }
     }
 
     fun saveSubscription(plan: String, hasFreeTrial: Boolean) {
@@ -66,8 +86,10 @@ class SubscriptionViewModel @Inject constructor (application: Application)
     }
 
     fun loadSubscription() {
-        _plan.value = prefs.getString("plan", null)
-        _nextBilling.value = formatDate(prefs.getString("next_billing", null))
+        if (_isAuthenticated.value) {
+            _plan.value = prefs.getString("plan", null)
+            _nextBilling.value = formatDate(prefs.getString("next_billing", null))
+        }
     }
 
     fun clearSubscription() {

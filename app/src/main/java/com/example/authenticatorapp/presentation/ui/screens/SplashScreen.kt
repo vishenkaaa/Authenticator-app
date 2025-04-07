@@ -109,7 +109,7 @@ fun SplashScreen(navController: NavController, context: MainActivity) {
     }
 }
 
-private fun onBoardingIsFinished(context: MainActivity): Boolean{
+fun onBoardingIsFinished(context: MainActivity): Boolean{
     val sharedPreferences = context.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
     return sharedPreferences.getBoolean("isFinished", false)
 }

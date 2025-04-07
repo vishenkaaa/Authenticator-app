@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,23 +28,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
-import com.example.authenticatorapp.presentation.ui.theme.Gray4
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.viewmodel.SubscriptionViewModel
-import java.util.concurrent.Flow.Subscription
 
 @Composable
 fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionViewModel = hiltViewModel()) {
@@ -58,6 +52,7 @@ fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionView
 
     val plan by viewModel.plan.collectAsState()
     val billing by viewModel.nextBilling.collectAsState()
+    val isAuthenticated by viewModel.isAuthenticated.collectAsState()
 
     Column(
         Modifier
@@ -85,6 +80,56 @@ fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionView
                 style = AppTypography.bodyLarge,
             )
             Spacer(modifier = Modifier.weight(1f))
+        }
+
+        if(!isAuthenticated){
+            Box(
+                Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 24.dp)
+                    .background(
+                        color = colors.onPrimaryContainer,
+                        shape = RoundedCornerShape(24.dp)
+                    )
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(24.dp),
+                        ambientColor = colors.inverseSurface,
+                        spotColor = colors.inverseSurface
+                    )
+                    .background(
+                        color = colors.onPrimaryContainer,
+                        shape = RoundedCornerShape(24.dp)
+                    )
+                    .padding(horizontal = 16.dp, vertical = 20.dp)
+                    .fillMaxWidth()
+                    .clickable { navController.navigate("SignIn") }
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_login),
+                        contentDescription = null,
+                        tint = Color.Unspecified,
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .size(24.dp)
+                    )
+                    Text(
+                        text = "Sign in",
+                        modifier = Modifier.weight(1f),
+                        style = AppTypography.bodyMedium
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_right),
+                        contentDescription = null,
+                        tint = Color.Unspecified,
+                        modifier = Modifier
+                            .size(24.dp)
+                    )
+                }
+            }
         }
 
         if (plan != null) {
