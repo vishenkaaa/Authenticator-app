@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -157,8 +158,9 @@ fun HomeScreen(
                     }
                 }
 
-                LazyColumn {
-                    items(filteredAccounts) { account ->
+                LazyColumn() {
+                    itemsIndexed(filteredAccounts) { index, account ->
+                        val isLastItem = index == filteredAccounts.size - 1
                         val otp = remember { mutableStateOf(viewModel.generateOtp(account)) }
                         val remainingTime = remember { mutableStateOf(calculateRemainingTime()) }
 
@@ -179,7 +181,8 @@ fun HomeScreen(
                                 remainingTime = remainingTime.value,
                                 context = context,
                                 isTimeBased = true,
-                                navController = navController
+                                navController = navController,
+                                isLastItem = isLastItem
                             )
                         else
                             AccountItem(
@@ -187,7 +190,8 @@ fun HomeScreen(
                                 otp = otp.value,
                                 context = context,
                                 isTimeBased = false,
-                                navController = navController
+                                navController = navController,
+                                isLastItem = isLastItem
                             )
                     }
                 }

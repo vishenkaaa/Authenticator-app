@@ -3,6 +3,7 @@ package com.example.authenticatorapp.presentation.viewmodel
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.example.authenticatorapp.data.repository.AuthRepository
+import com.example.authenticatorapp.data.repository.SubscriptionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -18,8 +20,11 @@ import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class SubscriptionViewModel @Inject constructor (application: Application, private val authRepository: AuthRepository)
-    : AndroidViewModel(application) {
+class SubscriptionViewModel @Inject constructor(
+    application: Application,
+    private val authRepository: AuthRepository,
+    private val subscriptionRepository: SubscriptionRepository
+) : AndroidViewModel(application) {
 
     @SuppressLint("StaticFieldLeak")
     private val context: Context = application.applicationContext
@@ -44,12 +49,10 @@ class SubscriptionViewModel @Inject constructor (application: Application, priva
     private val _isAuthenticated = MutableStateFlow(false)
     val isAuthenticated: StateFlow<Boolean> = _isAuthenticated
 
-    private val _deleteAccountStatus = MutableStateFlow<DeleteAccountStatus>(DeleteAccountStatus.Idle)
-    val deleteAccountStatus: StateFlow<DeleteAccountStatus> = _deleteAccountStatus
-
     init {
         checkAuthStatus()
         monitorAuthChanges()
+
         _plan.value = prefs.getString("plan", null)
         _nextBilling.value = prefs.getString("next_billing", null)
     }
@@ -61,78 +64,100 @@ class SubscriptionViewModel @Inject constructor (application: Application, priva
     private fun monitorAuthChanges() {
         authRepository.monitorAuthState { isLoggedIn ->
             _isAuthenticated.value = isLoggedIn
-            if (isLoggedIn) {
-                loadSubscription()
-            }
+            if (isLoggedIn) loadSubscription()
         }
     }
 
-    fun signOut(context: Context){
+    fun signOut(context: Context) {
         authRepository.signOut(context)
+        clearLocalSubscription()
         checkAuthStatus()
-        monitorAuthChanges()
     }
 
     fun deleteUserAccount() {
-        _deleteAccountStatus.value = DeleteAccountStatus.InProgress
-
         viewModelScope.launch {
             val success = authRepository.deleteAccount(context)
-
-            if (success) {
-                clearSubscription()
-                _deleteAccountStatus.value = DeleteAccountStatus.Success
-            } else {
-                _deleteAccountStatus.value = DeleteAccountStatus.Error("Помилка видалення акаунта")
+            if (!success) {
+                Log.d("SubscriptionViewModel", "User account successfully deleted")
             }
         }
     }
 
     fun saveSubscription(plan: String, hasFreeTrial: Boolean) {
-        val today = LocalDate.now()
-        val nextBillingDate = when {
-            plan.contains("Yearly", ignoreCase = true) -> today.plusYears(1)
-            hasFreeTrial -> today.plusDays(3).plusWeeks(1)
-            else -> today.plusWeeks(1)
+        viewModelScope.launch {
+            val user = authRepository.getCurrentUser() ?: return@launch
+
+            val today = LocalDate.now()
+            val nextBilling = when {
+                plan.contains("Yearly", ignoreCase = true) -> today.plusYears(1)
+                hasFreeTrial -> today.plusDays(3).plusWeeks(1)
+                else -> today.plusWeeks(1)
+            }.toString()
+
+            // Зберігаємо в Firestore
+            subscriptionRepository.saveSubscriptionForUser(
+                user.id, user.email ?: "", plan, nextBilling, hasFreeTrial
+            )
+
+            // Зберігаємо локально
+            prefs.edit()
+                .putString("plan", plan)
+                .putString("next_billing", nextBilling)
+                .apply()
+
+            _plan.value = plan
+            _nextBilling.value = formatDate(nextBilling)
         }
-
-        prefs.edit()
-            .putString("plan", plan)
-            .putString("next_billing", nextBillingDate.toString())
-            .commit()
-
-        loadSubscription()
-    }
-
-    fun formatDate(isoDate: String?): String {
-        if (isoDate == null) return ""
-        val date = LocalDate.parse(isoDate)
-        val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.getDefault())
-        return date.format(formatter)
     }
 
     fun loadSubscription() {
-        if (_isAuthenticated.value) {
-            _plan.value = prefs.getString("plan", null)
-            _nextBilling.value = formatDate(prefs.getString("next_billing", null))
+        viewModelScope.launch {
+            val uid = authRepository.getCurrentUser()?.id ?: return@launch
+            try {
+                val subscription = subscriptionRepository.loadSubscriptionForUser(uid)
+
+                val plan = subscription?.get("plan") as? String
+                val nextBilling = subscription?.get("nextBilling") as? String
+
+                if (plan != null && nextBilling != null) {
+                    // Оновлюємо локально
+                    prefs.edit()
+                        .putString("plan", plan)
+                        .putString("next_billing", nextBilling)
+                        .apply()
+
+                    _plan.value = plan
+                    _nextBilling.value = formatDate(nextBilling)
+                }
+            } catch (e: Exception) {
+                Log.e("SubscriptionViewModel", "Не вдалося завантажити підписку: ${e.message}")
+            }
         }
     }
 
-    fun clearSubscription() {
-        prefs.edit().clear().commit()
+    fun cancelSubscription() {
+        viewModelScope.launch {
+            val uid = authRepository.getCurrentUser()?.id ?: return@launch
+
+            subscriptionRepository.cancelSubscription(uid)
+            clearLocalSubscription()
+        }
+    }
+
+    private fun clearLocalSubscription() {
+        prefs.edit().clear().apply()
         _plan.value = null
         _nextBilling.value = null
     }
 
-    fun resetDeleteAccountStatus() {
-        _deleteAccountStatus.value = DeleteAccountStatus.Idle
-    }
-
-    // Для відстеження стану операції видалення акаунта
-    sealed class DeleteAccountStatus {
-        object Idle : DeleteAccountStatus()
-        object InProgress : DeleteAccountStatus()
-        object Success : DeleteAccountStatus()
-        data class Error(val message: String) : DeleteAccountStatus()
+    fun formatDate(isoDate: String?): String {
+        if (isoDate == null) return ""
+        return try {
+            val date = LocalDate.parse(isoDate)
+            val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.getDefault())
+            date.format(formatter)
+        } catch (e: Exception) {
+            ""
+        }
     }
 }

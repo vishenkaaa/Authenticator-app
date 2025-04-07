@@ -63,7 +63,8 @@ fun AccountItem(account: AccountEntity,
                 context: Context,
                 isTimeBased: Boolean,
                 viewModel: AddAccountViewModel = hiltViewModel(),
-                navController: NavController
+                navController: NavController,
+                isLastItem: Boolean = false
 ) {
     var accountExpanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -74,6 +75,7 @@ fun AccountItem(account: AccountEntity,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 6.dp)
+            .then(if(isLastItem) Modifier.padding(bottom = 106.dp) else Modifier)
             .shadow(
                 elevation = 5.dp,
                 shape = RoundedCornerShape(24.dp),

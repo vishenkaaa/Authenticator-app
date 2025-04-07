@@ -156,7 +156,7 @@ fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionView
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = { viewModel.clearSubscription() },
+                    onClick = { showConfirmDialog = true },
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
@@ -184,32 +184,32 @@ fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionView
                 ChoosePlanBox(navController)
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Button(
-                    onClick = { showConfirmDialog = true },
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                        containerColor = colors.background,
-                        contentColor = MainBlue
-                    ),
-                    border = if (!isSystemInDarkTheme()) BorderStroke(
-                        2.dp,
-                        Color(0xFFE33C3C)
-                    ) else BorderStroke(
-                        2.dp,
-                        Gray6
-                    )
-                ) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.cancel_plan),
-                        style = AppTypography.bodyMedium,
-                        color = if (!isSystemInDarkTheme()) Color(0xFFE33C3C) else White
-                    )
-                }
+//                Button(
+//                    onClick = { showConfirmDialog = true },
+//                    modifier = Modifier
+//                        .padding(horizontal = 16.dp)
+//                        .fillMaxWidth()
+//                        .height(50.dp),
+//                    shape = RoundedCornerShape(24.dp),
+//                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+//                        containerColor = colors.background,
+//                        contentColor = MainBlue
+//                    ),
+//                    border = if (!isSystemInDarkTheme()) BorderStroke(
+//                        2.dp,
+//                        Color(0xFFE33C3C)
+//                    ) else BorderStroke(
+//                        2.dp,
+//                        Gray6
+//                    )
+//                ) {
+//                    Spacer(modifier = Modifier.width(8.dp))
+//                    Text(
+//                        text = stringResource(R.string.cancel_plan),
+//                        style = AppTypography.bodyMedium,
+//                        color = if (!isSystemInDarkTheme()) Color(0xFFE33C3C) else White
+//                    )
+//                }
             }
         }
 
@@ -219,7 +219,7 @@ fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionView
                 stringResource(R.string.are_you_sure_you_want_to_cancel_your_premium_subscription),
                 stringResource(R.string.yes),
                 stringResource(R.string.no),
-                { viewModel.clearSubscription()
+                { viewModel.cancelSubscription()
                     showConfirmDialog = false },
                 { showConfirmDialog = false}
             )

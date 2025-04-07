@@ -65,49 +65,16 @@ fun MainScreen(navController: NavController, context: Context, viewModel: HomeVi
 
     val allAccounts by viewModel.accounts.collectAsState(initial = emptyList())
 
-    Box(modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter) {
-
-        Scaffold(
-            bottomBar = {
-                Box{
-                    CustomBottomNavigation(currentScreen) { selectedScreen ->
-                        navigationViewModel.selectTab(selectedScreen)
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .offset(y = (-44).dp)
-                    ) {
-                        FloatingActionButton(
-                            onClick = { isMenuExpanded = !isMenuExpanded },
-                            backgroundColor = MainBlue,
-                            modifier = Modifier.scale(1.25f)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_add),
-                                contentDescription = "Додати",
-                                tint = Color.White,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    }
-                }
-            }
-        ) { paddingValues ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                when (currentScreen) {
-                    Screen.HOME -> HomeScreen(navController, context, viewModel, allAccounts)
-                    Screen.INFO -> InfoScreen(navController, context)
-                }
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Основний контент - не застосовуємо paddingValues з Scaffold
+        Box(modifier = Modifier.fillMaxSize()) {
+            when (currentScreen) {
+                Screen.HOME -> HomeScreen(navController, context, viewModel, allAccounts)
+                Screen.INFO -> InfoScreen(navController, context)
             }
         }
 
+        // Overlay для затемнення при відкритому меню
         if (isMenuExpanded) {
             Box(
                 modifier = Modifier
@@ -115,6 +82,37 @@ fun MainScreen(navController: NavController, context: Context, viewModel: HomeVi
                     .background(Black.copy(alpha = 0.3f))
                     .clickable { isMenuExpanded = false }
             )
+        }
+
+        // Нижнє меню розташоване поверх основного контенту
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+        ) {
+            CustomBottomNavigation(currentScreen) { selectedScreen ->
+                navigationViewModel.selectTab(selectedScreen)
+            }
+
+            // FAB
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-44).dp)
+            ) {
+                FloatingActionButton(
+                    onClick = { isMenuExpanded = !isMenuExpanded },
+                    backgroundColor = MainBlue,
+                    modifier = Modifier.scale(1.25f)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_add),
+                        contentDescription = "Додати",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
         }
 
         if(isMenuExpanded)
