@@ -4,12 +4,14 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.example.authenticatorapp.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -42,6 +44,9 @@ class SubscriptionViewModel @Inject constructor (application: Application, priva
     private val _isAuthenticated = MutableStateFlow(false)
     val isAuthenticated: StateFlow<Boolean> = _isAuthenticated
 
+    private val _deleteAccountStatus = MutableStateFlow<DeleteAccountStatus>(DeleteAccountStatus.Idle)
+    val deleteAccountStatus: StateFlow<DeleteAccountStatus> = _deleteAccountStatus
+
     init {
         checkAuthStatus()
         monitorAuthChanges()
@@ -58,6 +63,27 @@ class SubscriptionViewModel @Inject constructor (application: Application, priva
             _isAuthenticated.value = isLoggedIn
             if (isLoggedIn) {
                 loadSubscription()
+            }
+        }
+    }
+
+    fun signOut(context: Context){
+        authRepository.signOut(context)
+        checkAuthStatus()
+        monitorAuthChanges()
+    }
+
+    fun deleteUserAccount() {
+        _deleteAccountStatus.value = DeleteAccountStatus.InProgress
+
+        viewModelScope.launch {
+            val success = authRepository.deleteAccount(context)
+
+            if (success) {
+                clearSubscription()
+                _deleteAccountStatus.value = DeleteAccountStatus.Success
+            } else {
+                _deleteAccountStatus.value = DeleteAccountStatus.Error("Помилка видалення акаунта")
             }
         }
     }
@@ -96,5 +122,17 @@ class SubscriptionViewModel @Inject constructor (application: Application, priva
         prefs.edit().clear().commit()
         _plan.value = null
         _nextBilling.value = null
+    }
+
+    fun resetDeleteAccountStatus() {
+        _deleteAccountStatus.value = DeleteAccountStatus.Idle
+    }
+
+    // Для відстеження стану операції видалення акаунта
+    sealed class DeleteAccountStatus {
+        object Idle : DeleteAccountStatus()
+        object InProgress : DeleteAccountStatus()
+        object Success : DeleteAccountStatus()
+        data class Error(val message: String) : DeleteAccountStatus()
     }
 }

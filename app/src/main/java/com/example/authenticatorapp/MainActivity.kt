@@ -24,6 +24,7 @@ import com.example.authenticatorapp.presentation.ui.screens.InfoScreen
 import com.example.authenticatorapp.presentation.ui.screens.MainScreen
 import com.example.authenticatorapp.presentation.ui.screens.OnboardingScreen
 import com.example.authenticatorapp.presentation.ui.screens.PaywallScreen
+import com.example.authenticatorapp.presentation.ui.screens.PremiumFeaturesScreen
 import com.example.authenticatorapp.presentation.ui.screens.QRcodeScreen
 import com.example.authenticatorapp.presentation.ui.screens.SigninScreen
 import com.example.authenticatorapp.presentation.ui.screens.SplashScreen
@@ -39,10 +40,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putBoolean("isFinished", false)
-        editor.apply()
+//        val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
+//        val editor = sharedPreferences.edit()
+//        editor.putBoolean("isFinished", false)
+//        editor.apply()
 
         val currentLocale = Locale.getDefault().language
         if (currentLocale == "uk") {
@@ -108,6 +109,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("Subscription") {
                             SubscriptionScreen(navController)
+                        }
+                        composable("PremiumFeatures") {
+                            PremiumFeaturesScreen(navController, this@MainActivity)
                         }
                     }
                 }

@@ -24,6 +24,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -36,6 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.presentation.ui.components.ChoosePlanBox
+import com.example.authenticatorapp.presentation.ui.components.ConfirmationAlertDialog
+import com.example.authenticatorapp.presentation.ui.components.SignInBox
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
@@ -45,6 +51,7 @@ import com.example.authenticatorapp.presentation.viewmodel.SubscriptionViewModel
 @Composable
 fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionViewModel = hiltViewModel()) {
     val colors = MaterialTheme.colorScheme
+    var showConfirmDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.loadSubscription()
@@ -83,56 +90,9 @@ fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionView
         }
 
         if(!isAuthenticated){
-            Box(
-                Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 24.dp)
-                    .background(
-                        color = colors.onPrimaryContainer,
-                        shape = RoundedCornerShape(24.dp)
-                    )
-                    .shadow(
-                        elevation = 8.dp,
-                        shape = RoundedCornerShape(24.dp),
-                        ambientColor = colors.inverseSurface,
-                        spotColor = colors.inverseSurface
-                    )
-                    .background(
-                        color = colors.onPrimaryContainer,
-                        shape = RoundedCornerShape(24.dp)
-                    )
-                    .padding(horizontal = 16.dp, vertical = 20.dp)
-                    .fillMaxWidth()
-                    .clickable { navController.navigate("SignIn") }
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_login),
-                        contentDescription = null,
-                        tint = Color.Unspecified,
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .size(24.dp)
-                    )
-                    Text(
-                        text = "Sign in",
-                        modifier = Modifier.weight(1f),
-                        style = AppTypography.bodyMedium
-                    )
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_right),
-                        contentDescription = null,
-                        tint = Color.Unspecified,
-                        modifier = Modifier
-                            .size(24.dp)
-                    )
-                }
-            }
+            SignInBox(navController)
         }
-
-        if (plan != null) {
+        else if (plan != null) {
             Column {
                 Box(
                     Modifier
@@ -220,77 +180,48 @@ fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionView
                 }
             }
         } else {
-            Box(
-                Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 24.dp)
-                    .background(
-                        color = colors.onPrimaryContainer,
-                        shape = RoundedCornerShape(24.dp)
+            Column {
+                ChoosePlanBox(navController)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = { showConfirmDialog = true },
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = colors.background,
+                        contentColor = MainBlue
+                    ),
+                    border = if (!isSystemInDarkTheme()) BorderStroke(
+                        2.dp,
+                        Color(0xFFE33C3C)
+                    ) else BorderStroke(
+                        2.dp,
+                        Gray6
                     )
-                    .shadow(
-                        elevation = 8.dp,
-                        shape = RoundedCornerShape(24.dp),
-                        ambientColor = colors.inverseSurface,
-                        spotColor = colors.inverseSurface
-                    )
-                    .background(
-                        color = colors.onPrimaryContainer,
-                        shape = RoundedCornerShape(24.dp)
-                    )
-                    .padding(horizontal = 16.dp, vertical = 20.dp)
-                    .fillMaxWidth()
-                    .clickable { navController.navigate("Paywall") }
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_clock_refresh),
-                        contentDescription = null,
-                        tint = Color.Unspecified,
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .size(24.dp)
-                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = stringResource(R.string.choose_a_plan),
-                        modifier = Modifier.weight(1f),
-                        style = AppTypography.bodyMedium
-                    )
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_right),
-                        contentDescription = null,
-                        tint = Color.Unspecified,
-                        modifier = Modifier
-                            .size(24.dp)
+                        text = stringResource(R.string.cancel_plan),
+                        style = AppTypography.bodyMedium,
+                        color = if (!isSystemInDarkTheme()) Color(0xFFE33C3C) else White
                     )
                 }
             }
-
-            Button(
-                onClick = { },
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(24.dp),
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = colors.background,
-                    contentColor = MainBlue
-                ),
-                border = if (!isSystemInDarkTheme()) BorderStroke(2.dp, MainBlue) else BorderStroke(
-                    2.dp,
-                    Gray6
-                )
-            ) {
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.restore_purchases),
-                    style = AppTypography.bodyMedium,
-                    color = if (!isSystemInDarkTheme()) MainBlue else White
-                )
-            }
         }
+
+        if (showConfirmDialog)
+            ConfirmationAlertDialog(
+                stringResource(R.string.confirm_cancellation),
+                stringResource(R.string.are_you_sure_you_want_to_cancel_your_premium_subscription),
+                stringResource(R.string.yes),
+                stringResource(R.string.no),
+                { viewModel.clearSubscription()
+                    showConfirmDialog = false },
+                { showConfirmDialog = false}
+            )
     }
 }

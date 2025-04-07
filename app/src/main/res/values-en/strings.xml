@@ -66,4 +66,15 @@
     <string name="cancel_plan">Cancel Plan</string>
     <string name="choose_a_plan">Choose a plan</string>
     <string name="restore_purchases">Restore Purchases</string>
+    <string name="are_you_sure_you_want_to_delete_your_account">Are you sure you want to delete your account?</string>
+    <string name="confirm_sign_out">Confirm sign out</string>
+    <string name="are_you_sure_you_want_to_log_out">Are you sure you want to log out?</string>
+    <string name="delete_account">Delete account</string>
+    <string name="synchronize">Synchronize</string>
+    <string name="sign_out">Sign out</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm_cancellation">Confirm cancellation</string>
+    <string name="are_you_sure_you_want_to_cancel_your_premium_subscription">Are you sure you want to cancel your premium subscription?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

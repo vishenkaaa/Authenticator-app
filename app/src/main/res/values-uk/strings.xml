@@ -66,4 +66,15 @@
     <string name="cancel_plan">Скасувати план</string>
     <string name="choose_a_plan">Обрати план</string>
     <string name="restore_purchases">Відновити покупки</string>
+    <string name="are_you_sure_you_want_to_delete_your_account">Ви впевнені, що хочете видалити свій обліковий запис?</string>
+    <string name="confirm_sign_out">Підтвердіть вихід</string>
+    <string name="are_you_sure_you_want_to_log_out">Ви впевнені, що хочете вийти?</string>
+    <string name="delete_account">Видалити обліковий запис</string>
+    <string name="synchronize">Синхронізувати</string>
+    <string name="sign_out">Вийти</string>
+    <string name="cancel">Скасувати</string>
+    <string name="confirm_cancellation">Підтвердіть скасування</string>
+    <string name="are_you_sure_you_want_to_cancel_your_premium_subscription">Ви впевнені, що хочете скасувати преміум підписку?</string>
+    <string name="yes">Так</string>
+    <string name="no">Ні</string>
 </resources>

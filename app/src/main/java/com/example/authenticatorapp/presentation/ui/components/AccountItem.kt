@@ -68,6 +68,7 @@ fun AccountItem(account: AccountEntity,
     var accountExpanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     var showConfirmDialog by remember { mutableStateOf(false) }
+    val formattedOtp = otp.chunked(3).joinToString(" ")
 
     Row(
         modifier = Modifier
@@ -106,7 +107,7 @@ fun AccountItem(account: AccountEntity,
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = otp, fontSize = 24.sp, fontWeight = FontWeight.W500, fontFamily = interFontFamily)
+                Text(text = formattedOtp, fontSize = 24.sp, fontWeight = FontWeight.W500, fontFamily = interFontFamily)
                 Spacer(modifier = Modifier.width(16.dp))
                 if (isTimeBased) CustomCircularProgressIndicator(remainingTime)
             }
@@ -227,51 +228,16 @@ fun AccountItem(account: AccountEntity,
                 }
             }
 
-        if (showConfirmDialog) {
-            AlertDialog(
-                onDismissRequest = { showConfirmDialog = false },
-                title = {
-                    Text(
-                        stringResource(R.string.confirm_deletion),
-                        style = AppTypography.titleMedium,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                },
-                text = {
-                    Text(
-                        stringResource(R.string.are_you_sure_you_want_to_delete_this_account),
-                        style = AppTypography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                },
-                confirmButton = {
-                    Text(
-                        text = "Delete",
-                        color = MaterialTheme.colorScheme.error,
-                        style = AppTypography.labelMedium,
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .clickable {
-                                viewModel.deleteAccount(account.id)
-                                showConfirmDialog = false
-                            }
-                    )
-                },
-                dismissButton = {
-                    Text(
-                        text = "Cancel",
-                        color = Blue,
-                        style = AppTypography.labelMedium,
-                        modifier = Modifier.clickable {
-                            showConfirmDialog = false
-                        }
-                    )
-                },
-                containerColor = MaterialTheme.colorScheme.background,
-                shape = RoundedCornerShape(16.dp)
+        if (showConfirmDialog)
+            ConfirmationAlertDialog(
+                stringResource(R.string.confirm_deletion),
+                stringResource(R.string.are_you_sure_you_want_to_delete_this_account),
+                stringResource(R.string.delete),
+                stringResource(R.string.cancel),
+                {viewModel.deleteAccount(account.id)
+                    showConfirmDialog = false },
+                {showConfirmDialog = false}
             )
-        }
-
     }
 }
 
