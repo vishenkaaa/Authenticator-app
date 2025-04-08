@@ -77,4 +77,13 @@
     <string name="are_you_sure_you_want_to_cancel_your_premium_subscription">Ви впевнені, що хочете скасувати преміум підписку?</string>
     <string name="yes">Так</string>
     <string name="no">Ні</string>
+    <string name="yearly">Річна</string>
+    <string name="weekly">Тижнева</string>
+    <string name="what_is_an_authenticator_app">Що таке\nдодаток Автентифікатор?</string>
+    <string name="and_your_account">" та вашим обліковим записом."</string>
+    <string name="is_an_app_that_generates_secure_two_factor_authentication_2fa_codes_for_your_accounts_when_you_set_up_your_account_with_two_factor_authentication_2fa_you_will_receive_a_secret_key_to_enter_into_the_authenticator_usually_the_key_is_in_a_qr_code_form">" — це додаток, який генерує захищені коди двофакторної автентифікації (2FA) для ваших облікових записів. Коли ви налаштовуєте двофакторну автентифікацію (2FA) для свого облікового запису, ви отримаєте секретний ключ для введення в Автентифікатор, зазвичай ключ надається у формі QR-коду."</string>
+    <string name="this_establishes_a_secure_connection_etween_the">"Це встановлює захищене з`єднання між "</string>
+    <string name="once_this_secure_connection_is_established_the_authenticator_will_generate_a_6_8_digit_code_that_is_required_to_access_your_account">Після встановлення цього захищеного з`єднання, Автентифікатор генеруватиме 6-8-значний код, який потрібен для доступу до вашого облікового запису.</string>
+    <string name="even_if_someone_knows_your_password_they_still_need_the_2fa_code_to_access_your_account">Навіть якщо хтось знає ваш пароль, йому все одно потрібен код 2FA для доступу до вашого облікового запису.</string>
+    <string name="no_internet_connection">Немає підключення до інтернету</string>
 </resources>

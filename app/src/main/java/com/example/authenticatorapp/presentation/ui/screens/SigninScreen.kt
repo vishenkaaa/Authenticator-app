@@ -2,6 +2,10 @@ package com.example.authenticatorapp.presentation.ui.screens
 
 import android.app.Activity
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -32,6 +36,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
@@ -47,6 +53,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -54,7 +61,6 @@ import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Blue
-import com.example.authenticatorapp.presentation.ui.theme.Gray4
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -65,7 +71,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.auth
-import org.checkerframework.common.subtyping.qual.Bottom
 
 @Composable
 fun SigninScreen(navController: NavController) {
@@ -74,13 +79,41 @@ fun SigninScreen(navController: NavController) {
     val auth = Firebase.auth
     val context = LocalContext.current
 
+    var isNetworkAvailable by remember { mutableStateOf(false) }
     var agreeToTermsAndPrivacy by remember { mutableStateOf(false)}
     var loginIsPressed by remember { mutableStateOf(false) }
 
+    DisposableEffect(Unit) {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        isNetworkAvailable = isNetworkConnected(connectivityManager)
+
+        val networkCallback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                isNetworkAvailable = true
+            }
+
+            override fun onLost(network: Network) {
+                isNetworkAvailable = false
+            }
+        }
+
+        val networkRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+
+        onDispose {
+            connectivityManager.unregisterNetworkCallback(networkCallback)
+        }
+    }
+
     Box(
         modifier = Modifier
-        .fillMaxSize()
-        .background(colors.background)
+            .fillMaxSize()
+            .background(colors.background)
     ) {
         Column(
             modifier = Modifier
@@ -193,13 +226,8 @@ fun SigninScreen(navController: NavController) {
                                     .firstOrNull()
                             annotation?.let {
                                 when (it.tag) {
-                                    "TERMS" -> {
-
-                                    }
-
-                                    "PRIVACY" -> {
-
-                                    }
+                                    "TERMS" -> {}
+                                    "PRIVACY" -> {}
                                 }
                             }
                         }
@@ -243,6 +271,23 @@ fun SigninScreen(navController: NavController) {
                         colorFilter = ColorFilter.tint(Gray5),
                     )
                 }
+            }
+        }
+
+        if (!isNetworkAvailable) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth()
+                    .background(Color.Red.copy(alpha = 0.7f))
+                    .padding(8.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.no_internet_connection),
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
@@ -290,7 +335,7 @@ fun AppleSignInButton(auth: FirebaseAuth, context: Context, navController: NavCo
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
                 .zIndex(1f)
-                .align(Alignment.Bottom)
+                .align(Alignment.CenterVertically)
         ) {
             Image(
                 painter = painterResource(R.drawable.apple),
@@ -379,17 +424,8 @@ fun firebaseAuthWithGoogle(idToken: String, auth: FirebaseAuth, navController: N
         }
 }
 
-//fun signOutGoogle(auth: FirebaseAuth, context: Context) {
-//    val googleSignInClient = GoogleSignIn.getClient(
-//        context.applicationContext,
-//        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//            .requestIdToken("659133148753-gdeg9eu8k0mffj8nbtptirv2920glm3v.apps.googleusercontent.com")
-//            .requestEmail()
-//            .build()
-//    )
-//
-//    auth.signOut()
-//    googleSignInClient.revokeAccess().addOnCompleteListener {
-//        Log.d("GoogleSignIn", "User fully signed out")
-//    }
-//}
+private fun isNetworkConnected(connectivityManager: ConnectivityManager): Boolean {
+    val activeNetwork = connectivityManager.activeNetwork ?: return false
+    val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+    return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+}

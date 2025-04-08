@@ -13,11 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,10 +25,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
@@ -116,8 +112,13 @@ fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionView
                         .fillMaxWidth()
                 ) {
                     Column() {
+                        val localizedPlanName = when (plan) {
+                            "Weekly" -> stringResource(R.string.weekly)
+                            "Yearly" -> stringResource(R.string.yearly)
+                            else -> plan ?: ""
+                        }
                         Text(
-                            text = stringResource(R.string.your_current_plan_is_a_subscription, plan ?: ""),
+                            text = stringResource(R.string.your_current_plan_is_a_subscription, localizedPlanName ?: ""),
                             Modifier.padding(bottom = 8.dp),
                             style = AppTypography.bodyLarge
                         )
@@ -166,16 +167,13 @@ fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionView
                         containerColor = colors.background,
                         contentColor = MainBlue
                     ),
-                    border = if (!isSystemInDarkTheme()) BorderStroke(2.dp, Red.copy(0.6f)) else BorderStroke(
-                        2.dp,
-                        Gray6
-                    )
+                    border = BorderStroke(2.dp, Red.copy(0.6f))
                 ) {
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = stringResource(R.string.cancel_plan),
                         style = AppTypography.bodyMedium,
-                        color = if (!isSystemInDarkTheme()) Red.copy(0.6f) else White
+                        color = Red.copy(0.6f)
                     )
                 }
             }

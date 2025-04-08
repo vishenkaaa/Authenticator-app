@@ -217,6 +217,12 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
 
         Button(
             onClick = {
+                val base32Regex = Regex("^[A-Z2-7]+=*$")
+                if (!keyText.uppercase().matches(base32Regex)) {
+                    Toast.makeText(context,
+                        "Invalid secret format", Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
                 if (selectedService.isBlank()) {
                     Toast.makeText(context,
                         context.getString(R.string.service_name_is_required), Toast.LENGTH_SHORT).show()

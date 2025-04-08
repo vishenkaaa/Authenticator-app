@@ -54,7 +54,7 @@ class SubscriptionViewModel @Inject constructor(
         monitorAuthChanges()
 
         _plan.value = prefs.getString("plan", null)
-        _nextBilling.value = prefs.getString("next_billing", null)
+        _nextBilling.value = formatDate(prefs.getString("next_billing", null))
     }
 
     fun checkAuthStatus() {

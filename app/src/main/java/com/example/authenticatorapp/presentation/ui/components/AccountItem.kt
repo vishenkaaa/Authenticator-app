@@ -3,10 +3,12 @@ package com.example.authenticatorapp.presentation.ui.components
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,12 +38,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -48,6 +54,7 @@ import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
+import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
 import com.example.authenticatorapp.presentation.viewmodel.AddAccountViewModel
@@ -68,6 +75,8 @@ fun AccountItem(account: AccountEntity,
     var accountExpanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     var showConfirmDialog by remember { mutableStateOf(false) }
+    var showUpdate by remember { mutableStateOf(false) }
+
     var currentOtp by remember { mutableStateOf(otp) }
     val formattedOtp = currentOtp.chunked(3).joinToString(" ")
 
@@ -135,9 +144,7 @@ fun AccountItem(account: AccountEntity,
 
             if (!isTimeBased) {
                 Row(
-                    modifier = Modifier.clickable {
-                        accountViewModel.incrementCounter(account)
-                        currentOtp = homeViewModel.generateOtp(account.copy(counter = account.counter + 1))},
+                    modifier = Modifier.clickable { showUpdate = true },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -231,6 +238,64 @@ fun AccountItem(account: AccountEntity,
                     }
                 }
             }
+
+        if (showUpdate) {
+            ModalBottomSheet(
+                onDismissRequest = { showUpdate = false },
+                sheetState = sheetState,
+                containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                windowInsets = WindowInsets(0, 0, 0, 0)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 86.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    LazyColumn {
+                        item {
+                            Text(
+                                text = "Are you sure you want to update\nthe code?",
+                                style = AppTypography.bodyMedium,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(Modifier.height(16.dp))
+                            Button(
+                                onClick = {
+                                    accountViewModel.incrementCounter(account)
+                                    currentOtp = homeViewModel.generateOtp(account.copy(counter = account.counter + 1))
+                                    showUpdate = false
+                                },
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp)
+                                    .fillMaxWidth()
+                                    .height(50.dp),
+                                shape = RoundedCornerShape(24.dp),
+                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    contentColor = MainBlue
+                                ),
+                                border = if (!isSystemInDarkTheme()) BorderStroke(2.dp, MainBlue) else BorderStroke(2.dp, Gray6)
+                            ) {
+                                androidx.compose.material.Icon(
+                                    painter = painterResource(R.drawable.ic_update),
+                                    contentDescription = "QR",
+                                    tint = if (!isSystemInDarkTheme()) MainBlue else White
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                androidx.compose.material.Text(
+                                    text = "Update code",
+                                    style = AppTypography.bodyMedium,
+                                    color = if (!isSystemInDarkTheme()) MainBlue else White
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         if (showConfirmDialog)
             ConfirmationAlertDialog(

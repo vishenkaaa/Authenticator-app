@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -177,7 +178,7 @@ fun PremiumFeaturesScreen(navController: NavController, context: Context, viewMo
                                 checkedThumbColor = White,
                                 checkedTrackColor = Blue,
                                 uncheckedThumbColor = Gray2,
-                                uncheckedTrackColor = White,
+                                uncheckedTrackColor = if (!isSystemInDarkTheme()) White else colors.background,
                                 checkedBorderColor = MainBlue,
                                 uncheckedBorderColor = Gray5,
                             ),
