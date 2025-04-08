@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -49,11 +48,10 @@ import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
-import com.example.authenticatorapp.presentation.ui.theme.Blue
-import com.example.authenticatorapp.presentation.ui.theme.Gray4
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
 import com.example.authenticatorapp.presentation.viewmodel.AddAccountViewModel
+import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,14 +60,16 @@ fun AccountItem(account: AccountEntity,
                 remainingTime: Int = 0,
                 context: Context,
                 isTimeBased: Boolean,
-                viewModel: AddAccountViewModel = hiltViewModel(),
+                accountViewModel: AddAccountViewModel = hiltViewModel(),
+                homeViewModel: HomeViewModel = hiltViewModel(),
                 navController: NavController,
                 isLastItem: Boolean = false
 ) {
     var accountExpanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     var showConfirmDialog by remember { mutableStateOf(false) }
-    val formattedOtp = otp.chunked(3).joinToString(" ")
+    var currentOtp by remember { mutableStateOf(otp) }
+    val formattedOtp = currentOtp.chunked(3).joinToString(" ")
 
     Row(
         modifier = Modifier
@@ -135,7 +135,9 @@ fun AccountItem(account: AccountEntity,
 
             if (!isTimeBased) {
                 Row(
-                    modifier = Modifier.clickable {},
+                    modifier = Modifier.clickable {
+                        accountViewModel.incrementCounter(account)
+                        currentOtp = homeViewModel.generateOtp(account.copy(counter = account.counter + 1))},
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -236,7 +238,7 @@ fun AccountItem(account: AccountEntity,
                 stringResource(R.string.are_you_sure_you_want_to_delete_this_account),
                 stringResource(R.string.delete),
                 stringResource(R.string.cancel),
-                {viewModel.deleteAccount(account.id)
+                {accountViewModel.deleteAccount(account.id)
                     showConfirmDialog = false },
                 {showConfirmDialog = false}
             )

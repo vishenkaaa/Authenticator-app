@@ -233,6 +233,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                     return@Button
                 }
 
+                val initialCounter = if (selectedTypeOfKey == "Counter-based") 1L else 0L
                 if(oldAccountId == null)
                     viewModel.addAccount(
                         service = selectedService,
@@ -240,9 +241,14 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                         secret = keyText,
                         type = selectedTypeOfKey,
                         algorithm = "HmacSHA1",
-                        digits = 6
+                        digits = 6,
+                        counter = initialCounter
                     )
-                else
+                else {
+                    val account = viewModel.account.value
+                    val newCounter = if (selectedTypeOfKey == "Counter-based" && account?.counter == 0L) 1L
+                    else account?.counter ?: initialCounter
+
                     viewModel.updateAccount(
                         id = oldAccountId,
                         service = selectedService,
@@ -250,8 +256,10 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                         secret = keyText,
                         type = selectedTypeOfKey,
                         algorithm = "HmacSHA1",
-                        digits = 6
+                        digits = 6,
+                        counter = newCounter
                     )
+                }
 
                 navController.popBackStack()
             },

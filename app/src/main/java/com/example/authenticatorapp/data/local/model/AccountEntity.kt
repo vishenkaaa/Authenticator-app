@@ -11,5 +11,6 @@ data class AccountEntity(
     val secret: String,
     val type: String, // "TOTP" або "HOTP"
     val algorithm: String, // "SHA1", "SHA256", "SHA512"
-    val digits: Int = 6
+    val digits: Int = 6,
+    val counter: Long = 0
 )

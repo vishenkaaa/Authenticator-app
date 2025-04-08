@@ -25,7 +25,7 @@ object OtpGenerator {
 
     private fun generateOTP(secret: String, counter: Long, digits: Int, algorithm: String): String {
         val key = decodeSecret(secret)
-        val buffer = ByteBuffer.allocate(8).putLong(counter).array()
+        val buffer = ByteBuffer.allocate(8).putLong(0, counter).array()
 
         val mac = Mac.getInstance(algorithm)
         mac.init(SecretKeySpec(key, algorithm))

@@ -34,7 +34,7 @@ class HomeViewModel @Inject constructor(private val accountDao: AccountDao) : Vi
             if (account.type == "TOTP") {
                 OtpGenerator.generateTOTP(account.secret, 30, account.digits, account.algorithm)
             } else {
-                OtpGenerator.generateHOTP(account.secret, 1, account.digits, account.algorithm)
+                OtpGenerator.generateHOTP(account.secret, account.counter, account.digits, account.algorithm)
             }
         } catch (e: Exception) {
             "Error"

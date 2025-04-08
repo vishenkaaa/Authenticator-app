@@ -21,7 +21,8 @@ class AddAccountViewModel @Inject constructor(
         secret: String,
         type: String,
         algorithm: String = "HmacSHA1",
-        digits: Int = 6
+        digits: Int = 6,
+        counter: Long = 0
     ) {
         if (service.isBlank() || email.isBlank() || secret.isBlank()) return
 
@@ -44,7 +45,8 @@ class AddAccountViewModel @Inject constructor(
             secret = secret.replace(" ", ""),
             type = typeNormalized,
             algorithm = algorithmNormalized,
-            digits = digits
+            digits = digits,
+            counter = counter
         )
 
         viewModelScope.launch {
@@ -59,7 +61,8 @@ class AddAccountViewModel @Inject constructor(
         secret: String,
         type: String,
         algorithm: String = "HmacSHA1",
-        digits: Int = 6
+        digits: Int = 6,
+        counter: Long = 0
     ) {
         if (service.isBlank() || email.isBlank() || secret.isBlank()) return
 
@@ -83,7 +86,8 @@ class AddAccountViewModel @Inject constructor(
             secret = secret.replace(" ", ""),
             type = typeNormalized,
             algorithm = algorithmNormalized,
-            digits = digits
+            digits = digits,
+            counter = counter
         )
 
         viewModelScope.launch {
@@ -94,6 +98,13 @@ class AddAccountViewModel @Inject constructor(
     fun deleteAccount(id: Int) {
         viewModelScope.launch {
             accountDao.deleteAccountById(id)
+        }
+    }
+
+    fun incrementCounter(account: AccountEntity) {
+        val updatedAccount = account.copy(counter = account.counter + 1)
+        viewModelScope.launch {
+            accountDao.updateAccount(updatedAccount)
         }
     }
 
