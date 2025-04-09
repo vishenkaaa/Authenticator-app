@@ -94,4 +94,5 @@ dependencies {
     kapt (libs.androidx.room.compiler)
     implementation (libs.androidx.lifecycle.viewmodel.ktx)
     implementation (libs.androidx.security.crypto)
+    implementation (libs.androidx.biometric)
 }

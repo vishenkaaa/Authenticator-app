@@ -97,4 +97,10 @@
     <string name="terms_of_service">Terms of Service</string>
     <string name="wellcome_to_authenticator">Wellcome to\nAuthenticator</string>
     <string name="enter_code_manually">Enter code manually</string>
+    <string name="biometrics_are_unavailable_on_this_device">Biometrics are unavailable on this device</string>
+    <string name="fingerprint_login">Fingerprint Login</string>
+    <string name="confirm_login_using_your_fingerprint">Confirm login using your fingerprint</string>
+    <string name="use_password">Use password</string>
+    <string name="biometric_authentication_failed">Biometric authentication failed</string>
+    <string name="use_fingerprint">Use fingerprint</string>
 </resources>

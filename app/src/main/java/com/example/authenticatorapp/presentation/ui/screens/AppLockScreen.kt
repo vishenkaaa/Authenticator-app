@@ -1,6 +1,7 @@
 package com.example.authenticatorapp.presentation.ui.screens
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,14 +46,23 @@ import com.example.authenticatorapp.presentation.ui.theme.Gray2
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.lifecycle.MutableLiveData
+import androidx.fragment.app.FragmentActivity
+import com.example.authenticatorapp.data.local.BiometricAuthManager
 
 @Composable
 fun AppLockScreen(navController: NavController, context: Context) {
     val colors = MaterialTheme.colorScheme
     val passcodeManager = remember { PasscodeManager(context) }
     var isPasscode by remember { mutableStateOf(passcodeManager.isPasscodeSet()) }
-    var isTouchID by remember { mutableStateOf(false) }
+    var isTouchID by remember { mutableStateOf(passcodeManager.isTouchIdEnabled()) }
+
+    // Отримуємо менеджер біометрії
+    val fragmentActivity = context as? FragmentActivity
+    val biometricManager = remember {
+        if (fragmentActivity != null) BiometricAuthManager(fragmentActivity) else null
+    }
+
+    val isBiometricAvailable = biometricManager?.isBiometricAvailable() ?: false
 
     val passcodeResult = navController.currentBackStackEntry
         ?.savedStateHandle
@@ -213,14 +223,25 @@ fun AppLockScreen(navController: NavController, context: Context) {
                             .padding(end = 8.dp)
                             .size(24.dp)
                     )
-                    Text(
-                        text = stringResource(R.string.touch_id),
-                        modifier = Modifier.weight(1f),
-                        style = AppTypography.bodyMedium
-                    )
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.touch_id),
+                            style = AppTypography.bodyMedium
+                        )
+                        if (!isBiometricAvailable) {
+                            Text(
+                                text = stringResource(R.string.biometrics_are_unavailable_on_this_device),
+                                style = AppTypography.labelSmall,
+                                color = Color.Gray
+                            )
+                        }
+                    }
                     Switch(
                         checked = isTouchID,
-                        onCheckedChange = { isTouchID = it },
+                        onCheckedChange = { newValue ->
+                            isTouchID = newValue
+                            passcodeManager.setTouchIdEnabled(newValue)
+                        },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = White,
                             checkedTrackColor = Blue,

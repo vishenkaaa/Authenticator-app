@@ -29,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.MainActivity
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.data.local.BiometricAuthManager
 import com.example.authenticatorapp.data.local.PasscodeManager
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
@@ -44,7 +45,7 @@ fun SplashScreen(navController: NavController, context: MainActivity) {
     val isLoading by viewModel.isLoadingAccounts.collectAsState()
 
     val passcodeManager = remember { PasscodeManager(context) }
-    var isPasscode by remember { mutableStateOf(passcodeManager.isPasscodeSet())}
+    var isPasscodeEnabled by remember { mutableStateOf(passcodeManager.isPasscodeSet())}
 
     val alpha = remember {
         Animatable(0f)
@@ -64,22 +65,20 @@ fun SplashScreen(navController: NavController, context: MainActivity) {
 
         delay(500)
 
-        withContext(Dispatchers.Main) {
-            if (onBoardingIsFinished(context = context)) {
-                navController.popBackStack()
-                if (isPasscode) {
-                    navController.navigate("verify_passcode/unlock") {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                    }
-                } else {
-                    navController.navigate("Main") {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                    }
+        if (onBoardingIsFinished(context = context)) {
+            navController.popBackStack()
+            if (isPasscodeEnabled) {
+                navController.navigate("verify_passcode/unlock") {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
                 }
             } else {
-                navController.popBackStack()
-                navController.navigate("Onboarding")
+                navController.navigate("Main") {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                }
             }
+        } else {
+            navController.popBackStack()
+            navController.navigate("Onboarding")
         }
     }
 

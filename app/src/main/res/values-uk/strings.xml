@@ -97,4 +97,10 @@
     <string name="terms_of_service">Умови використання</string>
     <string name="wellcome_to_authenticator">Ласкаво просимо до\nАвтентифікатора</string>
     <string name="enter_code_manually">Ввести код вручну</string>
+    <string name="biometrics_are_unavailable_on_this_device">Біометрія недоступна на цьому пристрої</string>
+    <string name="fingerprint_login">Вхід за відбитком пальця</string>
+    <string name="confirm_login_using_your_fingerprint">Підтвердіть вхід за допомогою відбитка пальця</string>
+    <string name="use_password">Використати пароль</string>
+    <string name="biometric_authentication_failed">Біометрична аутентифікація не вдалася</string>
+    <string name="use_fingerprint">Use fingerprint</string>
 </resources>

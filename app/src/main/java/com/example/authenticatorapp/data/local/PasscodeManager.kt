@@ -36,4 +36,12 @@ class PasscodeManager(private val context: Context) {
     fun isPasscodeSet(): Boolean {
         return getPasscode().isNotEmpty()
     }
+
+    fun isTouchIdEnabled(): Boolean {
+        return encryptedSharedPreferences.getBoolean("touch_id_enabled", false)
+    }
+
+    fun setTouchIdEnabled(enabled: Boolean) {
+        encryptedSharedPreferences.edit().putBoolean("touch_id_enabled", enabled).apply()
+    }
 }

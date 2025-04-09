@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -37,7 +38,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -129,7 +130,8 @@ class MainActivity : ComponentActivity() {
                             val action = backStackEntry.arguments?.getString("action") ?: ""
                             PasscodeScreen(
                                 navController = navController,
-                                isCreatingMode = false
+                                isCreatingMode = false,
+                                action = action
                             ) { _ ->
                                 val passcodeManager = PasscodeManager(this@MainActivity)
 

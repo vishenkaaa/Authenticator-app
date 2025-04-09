@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,11 +39,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.data.local.BiometricAuthManager
 import com.example.authenticatorapp.data.local.PasscodeManager
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Blue
@@ -55,10 +59,18 @@ fun PasscodeScreen(
     navController: NavController,
     isCreatingMode: Boolean = false,
     isEditingMode: Boolean = false,
+    action: String? = null,
     onPasscodeConfirmed: (String) -> Unit
 ) {
     val context = LocalContext.current
     val passcodeManager = remember { PasscodeManager(context) }
+
+    val isTouchIdEnabled = remember { passcodeManager.isTouchIdEnabled() }
+    val biometricManager = remember {
+        if (context is FragmentActivity) BiometricAuthManager(context) else null
+    }
+    val isBiometricAvailable = remember { biometricManager?.isBiometricAvailable() ?: false }
+    val showBiometricPrompt = !isCreatingMode && !isEditingMode && isTouchIdEnabled && isBiometricAvailable
 
     var passcode by remember { mutableStateOf("") }
     var confirmPasscode by remember { mutableStateOf("") }
@@ -69,17 +81,37 @@ fun PasscodeScreen(
     val scope = rememberCoroutineScope()
 
     val headerTitle = when {
-        isCreatingMode -> "Створення коду доступу"
-        isEditingMode -> "Редагування коду доступу"
-        else -> "Підтвердження коду доступу"
+        isCreatingMode -> "Create passcode"
+        isEditingMode -> "Edit passcode"
+        else -> "Confirm passcode"
     }
 
     val instructionText = when {
-        isCreatingMode && !isConfirmStep -> "Введіть новий код доступу"
-        isCreatingMode && isConfirmStep -> "Підтвердьте код доступу"
-        isEditingMode && !isConfirmStep -> "Введіть старий код доступу"
-        isEditingMode && isConfirmStep -> "Введіть новий код доступу"
-        else -> "Введіть код доступу"
+        isCreatingMode && !isConfirmStep -> "Enter a new passcode"
+        isCreatingMode && isConfirmStep -> "Confirm the passcode"
+        isEditingMode && !isConfirmStep -> "Enter the old passcode"
+        isEditingMode && isConfirmStep -> "Enter a new passcode"
+        else -> "Enter the passcode"
+    }
+
+    fun showBiometricAuth() {
+        if (context is FragmentActivity) {
+            biometricManager?.showBiometricPrompt(
+                onSuccess = {
+                    val savedPasscode = passcodeManager.getPasscode()
+                    onPasscodeConfirmed(savedPasscode)
+                },
+                onError = { error -> },
+                onCancel = {}
+            )
+        }
+    }
+
+    LaunchedEffect(showBiometricPrompt) {
+        if (showBiometricPrompt) {
+            delay(300)
+            showBiometricAuth()
+        }
     }
 
     // Перевірка паролю коли він досягає 4 символів
@@ -90,12 +122,12 @@ fun PasscodeScreen(
                 delay(500)
             if (isCreatingMode) {
                 if (!isConfirmStep) {
-                    // Перший крок: запам'ятовуємо код і переходимо до підтвердження
+                    // запам'ятовуємо код і переходимо до підтвердження
                     isConfirmStep = true
                     confirmPasscode = newPasscode
                     passcode = ""
                 } else {
-                    // Другий крок: перевіряємо співпадіння кодів
+                    // перевіряємо співпадіння кодів
                     if (newPasscode == confirmPasscode) {
                         passcodeManager.savePasscode(newPasscode)
                         onPasscodeConfirmed(newPasscode)
@@ -119,7 +151,7 @@ fun PasscodeScreen(
                         isConfirmStep = true
                         passcode = ""
                     } else {
-                        errorMessage = "Невірний пароль. Спробуйте ще раз."
+                        errorMessage = "Невірний код доступу. Спробуйте ще раз"
                         passcode = ""
                     }
                 } else {
@@ -134,7 +166,7 @@ fun PasscodeScreen(
                 if (newPasscode == savedCode) {
                     onPasscodeConfirmed(newPasscode)
                 } else {
-                    errorMessage = "Невірний код. Спробуйте ще раз."
+                    errorMessage = "Невірний код доступу. Спробуйте ще раз"
                     passcode = ""
                 }
             }
@@ -162,32 +194,34 @@ fun PasscodeScreen(
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(top = 48.dp, bottom = 24.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier.size(40.dp)
+        if (action != "unlock") {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 48.dp, bottom = 24.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.back),
-                    contentDescription = "Back",
-                    modifier = Modifier.size(24.dp),
-                    tint = Color.White
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.back),
+                        contentDescription = "Back",
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.White
+                    )
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = headerTitle,
+                    color = Color.White,
+                    style = AppTypography.bodyLarge,
+                    fontWeight = FontWeight.Medium
                 )
+                Spacer(modifier = Modifier.weight(1f))
             }
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(
-                text = headerTitle,
-                color = Color.White,
-                style = AppTypography.bodyLarge,
-                fontWeight = FontWeight.Medium
-            )
-            Spacer(modifier = Modifier.weight(1f))
         }
 
         Spacer(modifier = Modifier.height(180.dp))
@@ -244,7 +278,9 @@ fun PasscodeScreen(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp),
-            modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 56.dp)
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 56.dp)
         ) {
             for (row in 0..3) {
                 Row(
@@ -258,8 +294,27 @@ fun PasscodeScreen(
                             }
                         }
                     } else {
-                        // Останній рядок: порожньо, 0, backspace
-                        Box(modifier = Modifier.size(72.dp)) { /* порожньо */ }
+                        // Останній рядок: порожньо (відбиток), 0, backspace
+                        if (showBiometricPrompt && action == "unlock") {
+                            IconButton(
+                                onClick = { showBiometricAuth() },
+                                modifier = Modifier
+                                    .size(72.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        color = Color.White.copy(alpha = 0.05f),
+                                        shape = CircleShape
+                                    )
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.finger_print),
+                                    contentDescription = "Використати відбиток пальця",
+                                    modifier = Modifier.size(32.dp),
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                        else Box(modifier = Modifier.size(72.dp)) { }
 
                         KeypadButton(number = "0") {
                             addDigit("0")
@@ -269,14 +324,14 @@ fun PasscodeScreen(
                             onClick = {
                                 if (passcode.isNotEmpty()) {
                                     passcode = passcode.dropLast(1)
-                                    errorMessage = "" // Очищуємо помилку при видаленні
+                                    errorMessage = ""
                                 }
                             },
                             modifier = Modifier
                                 .size(72.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    color = Color.White.copy(alpha = 0.1f),
+                                    color = Color.White.copy(alpha = 0.05f),
                                     shape = CircleShape
                                 )
                         ) {
@@ -300,7 +355,7 @@ fun KeypadButton(number: String, onClick: () -> Unit) {
         modifier = Modifier
             .size(72.dp)
             .clip(CircleShape)
-            .background(Color.White.copy(alpha = 0.1f))
+            .background(Color.White.copy(alpha = 0.2f))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true, color = MainBlue),
