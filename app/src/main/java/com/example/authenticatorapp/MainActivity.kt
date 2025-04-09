@@ -16,13 +16,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.authenticatorapp.data.local.PasscodeManager
 import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.screens.AboutAppScreen
 import com.example.authenticatorapp.presentation.ui.screens.AddAccountScreen
+import com.example.authenticatorapp.presentation.ui.screens.AppLockScreen
 import com.example.authenticatorapp.presentation.ui.screens.HomeScreen
 import com.example.authenticatorapp.presentation.ui.screens.InfoScreen
 import com.example.authenticatorapp.presentation.ui.screens.MainScreen
 import com.example.authenticatorapp.presentation.ui.screens.OnboardingScreen
+import com.example.authenticatorapp.presentation.ui.screens.PasscodeScreen
 import com.example.authenticatorapp.presentation.ui.screens.PaywallScreen
 import com.example.authenticatorapp.presentation.ui.screens.PremiumFeaturesScreen
 import com.example.authenticatorapp.presentation.ui.screens.QRcodeScreen
@@ -112,6 +115,45 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("PremiumFeatures") {
                             PremiumFeaturesScreen(navController, this@MainActivity)
+                        }
+                        composable("AppLock") {
+                            AppLockScreen(navController, this@MainActivity)
+                        }
+                        composable("create_passcode") {
+                            PasscodeScreen(
+                                navController = navController,
+                                isCreatingMode = true
+                            ) { newPasscode -> }
+                        }
+                        composable("verify_passcode/{action}") { backStackEntry ->
+                            val action = backStackEntry.arguments?.getString("action") ?: ""
+                            PasscodeScreen(
+                                navController = navController,
+                                isCreatingMode = false
+                            ) { _ ->
+                                val passcodeManager = PasscodeManager(this@MainActivity)
+
+                                when (action) {
+                                    "disable" -> {
+                                        passcodeManager.savePasscode("")
+                                        navController.previousBackStackEntry?.savedStateHandle?.set("passcode_enabled", false)
+                                        navController.popBackStack()
+                                    }
+                                    "change" -> {
+                                        navController.navigate("create_passcode") {
+                                            popUpTo("verify_passcode/{action}") { inclusive = true }
+                                        }
+                                    }
+                                    "unlock" -> {
+                                        navController.navigate("Main") {
+                                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                        }
+                                    }
+                                    else -> {
+                                        navController.popBackStack()
+                                    }
+                                }
+                            }
                         }
                     }
                 }

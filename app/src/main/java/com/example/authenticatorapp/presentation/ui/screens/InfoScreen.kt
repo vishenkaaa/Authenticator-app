@@ -68,6 +68,13 @@ fun InfoScreen(navController: NavController, context: Context){
                 }
             ),
             InfoItem(
+                icon = R.drawable.lock,
+                text = stringResource(R.string.app_lock),
+                onClick = {
+                    navController.navigate("AppLock")
+                }
+            ),
+            InfoItem(
                 icon = R.drawable.ic_calendar,
                 text = stringResource(R.string.subscription),
                 onClick = {

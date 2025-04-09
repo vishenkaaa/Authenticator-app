@@ -40,8 +40,9 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
     var serviceExpanded by remember { mutableStateOf(false) }
     var typesOfKeyExpanded by remember { mutableStateOf(false) }
 
+    val txt_time_based = stringResource(R.string.time_based)
     var selectedService by remember { mutableStateOf("") }
-    var selectedTypeOfKey by remember { mutableStateOf("Time-based") }
+    var selectedTypeOfKey by remember { mutableStateOf(txt_time_based) }
 
     var accountText by remember { mutableStateOf("") }
     var keyText by remember { mutableStateOf("") }
@@ -217,12 +218,12 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
 
         Button(
             onClick = {
-                val base32Regex = Regex("^[A-Z2-7]+=*$")
-                if (!keyText.uppercase().matches(base32Regex)) {
-                    Toast.makeText(context,
-                        "Invalid secret format", Toast.LENGTH_SHORT).show()
-                    return@Button
-                }
+//                val base32Regex = Regex("^[A-Z2-7]+=*$")
+//                if (!keyText.uppercase().matches(base32Regex)) {
+//                    Toast.makeText(context,
+//                        "Invalid secret format", Toast.LENGTH_SHORT).show()
+//                    return@Button
+//                }
                 if (selectedService.isBlank()) {
                     Toast.makeText(context,
                         context.getString(R.string.service_name_is_required), Toast.LENGTH_SHORT).show()

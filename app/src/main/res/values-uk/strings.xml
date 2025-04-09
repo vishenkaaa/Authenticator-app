@@ -86,4 +86,15 @@
     <string name="once_this_secure_connection_is_established_the_authenticator_will_generate_a_6_8_digit_code_that_is_required_to_access_your_account">Після встановлення цього захищеного з`єднання, Автентифікатор генеруватиме 6-8-значний код, який потрібен для доступу до вашого облікового запису.</string>
     <string name="even_if_someone_knows_your_password_they_still_need_the_2fa_code_to_access_your_account">Навіть якщо хтось знає ваш пароль, йому все одно потрібен код 2FA для доступу до вашого облікового запису.</string>
     <string name="no_internet_connection">Немає підключення до інтернету</string>
+    <string name="app_lock">Безпечний доступ</string>
+    <string name="sign_in">Увійти</string>
+    <string name="passcode">Код доступу</string>
+    <string name="change_passcode">Змінити код доступу</string>
+    <string name="touch_id">Touch ID</string>
+    <string name="sign_in_with_apple">Увійти через Apple</string>
+    <string name="sign_in_with_google">Увійти через Google</string>
+    <string name="i_agree_to_authenticator_app">"Я погоджуюсь з умовами додатку Автентифікатор "</string>
+    <string name="terms_of_service">Умови використання</string>
+    <string name="wellcome_to_authenticator">Ласкаво просимо до\nАвтентифікатора</string>
+    <string name="enter_code_manually">Ввести код вручну</string>
 </resources>

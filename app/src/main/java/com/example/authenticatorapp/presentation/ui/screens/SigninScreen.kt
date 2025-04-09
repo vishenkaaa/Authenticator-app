@@ -134,7 +134,7 @@ fun SigninScreen(navController: NavController) {
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = "Sign in",
+                    text = stringResource(R.string.sign_in),
                     color = colors.onPrimary,
                     style = AppTypography.bodyLarge,
                 )
@@ -147,7 +147,7 @@ fun SigninScreen(navController: NavController) {
                 Modifier.padding(horizontal = 16.dp)
             ) {
                 Text(
-                    text = "Wellcome to\nAuthenticator",
+                    text = stringResource(R.string.wellcome_to_authenticator),
                     color = colors.primary,
                     style = AppTypography.titleLarge,
                     modifier = Modifier
@@ -170,7 +170,7 @@ fun SigninScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(170.dp))
 
                 val annotatedText = buildAnnotatedString {
-                    append("I agree to Authenticator App ")
+                    append(stringResource(R.string.i_agree_to_authenticator_app))
 
                     pushStringAnnotation(tag = "TERMS", annotation = "TERMS")
                     withStyle(
@@ -179,7 +179,7 @@ fun SigninScreen(navController: NavController) {
                             fontSize = AppTypography.labelSmall.fontSize
                         )
                     ) {
-                        append("Terms of Service")
+                        append(stringResource(R.string.terms_of_service))
                     }
                     pop()
 
@@ -192,7 +192,7 @@ fun SigninScreen(navController: NavController) {
                             fontSize = AppTypography.labelSmall.fontSize
                         )
                     ) {
-                        append("Privacy Policy")
+                        append(stringResource(R.string.privacy_policy))
                     }
                     pop()
                 }
@@ -343,7 +343,7 @@ fun AppleSignInButton(auth: FirebaseAuth, context: Context, navController: NavCo
             )
             Spacer(modifier = Modifier.width(15.dp))
             Text(
-                text = "Sign In with Apple",
+                text = stringResource(R.string.sign_in_with_apple),
                 color = White,
                 style = AppTypography.bodyLarge,
             )
@@ -399,7 +399,7 @@ fun GoogleSignInButton(auth: FirebaseAuth, context: Context, navController: NavC
         )
         Spacer(modifier = Modifier.width(15.dp))
         Text(
-            text = "Sign In with Google",
+            text = stringResource(R.string.sign_in_with_google),
             color = colors.inversePrimary,
             style = AppTypography.bodyLarge
         )

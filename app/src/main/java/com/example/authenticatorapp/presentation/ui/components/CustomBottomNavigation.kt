@@ -41,7 +41,7 @@ fun CustomBottomNavigation(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 40.dp)
-                .offset(y = (12).dp)
+                .offset(y = (14).dp)
         ) {
             IconButton(onClick = { onScreenSelected(Screen.HOME) }) {
                 Icon(
@@ -49,6 +49,7 @@ fun CustomBottomNavigation(
                         R.drawable.key),
                     contentDescription = "Головна",
                     tint = MainBlue
+
                 )
             }
 

@@ -1,6 +1,7 @@
 package com.example.authenticatorapp.presentation.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +17,7 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.unit.dp
 import com.example.authenticatorapp.presentation.ui.screens.InfoItem
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
-import com.example.authenticatorapp.presentation.ui.theme.Gray4
+import com.example.authenticatorapp.presentation.ui.theme.Gray2
 
 @Composable
 fun InfoBlock(
@@ -61,7 +62,7 @@ fun InfoBlock(
                     if (index < items.size - 1) {
                         Divider(
                             modifier = Modifier.fillMaxWidth(),
-                            color = Black.copy(alpha = 0.1f)
+                            color = if(!isSystemInDarkTheme()) Black.copy(alpha = 0.1f) else Gray2.copy(alpha = 0.1f)
                         )
                     }
                 }

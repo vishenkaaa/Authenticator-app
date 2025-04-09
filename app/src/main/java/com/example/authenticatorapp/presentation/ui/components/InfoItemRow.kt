@@ -15,6 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
+import com.example.authenticatorapp.presentation.ui.theme.Blue
 
 @Composable
 fun InfoItemRow(
@@ -32,7 +33,7 @@ fun InfoItemRow(
         Icon(
             painter = painterResource(id = icon),
             contentDescription = null,
-            tint = Color.Unspecified,
+            tint = Blue,
             modifier = Modifier
                 .padding(end = 8.dp)
                 .size(24.dp)

@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -66,7 +67,6 @@ fun MainScreen(navController: NavController, context: Context, viewModel: HomeVi
     val allAccounts by viewModel.accounts.collectAsState(initial = emptyList())
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Основний контент - не застосовуємо paddingValues з Scaffold
         Box(modifier = Modifier.fillMaxSize()) {
             when (currentScreen) {
                 Screen.HOME -> HomeScreen(navController, context, viewModel, allAccounts)
@@ -74,17 +74,6 @@ fun MainScreen(navController: NavController, context: Context, viewModel: HomeVi
             }
         }
 
-        // Overlay для затемнення при відкритому меню
-        if (isMenuExpanded) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Black.copy(alpha = 0.3f))
-                    .clickable { isMenuExpanded = false }
-            )
-        }
-
-        // Нижнє меню розташоване поверх основного контенту
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -94,7 +83,6 @@ fun MainScreen(navController: NavController, context: Context, viewModel: HomeVi
                 navigationViewModel.selectTab(selectedScreen)
             }
 
-            // FAB
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -123,7 +111,10 @@ fun MainScreen(navController: NavController, context: Context, viewModel: HomeVi
                 windowInsets = WindowInsets(0, 0, 0, 0)
             ) {
                 Column(
-                    modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 60.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 60.dp)
+                        .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     LazyColumn {
@@ -149,7 +140,7 @@ fun MainScreen(navController: NavController, context: Context, viewModel: HomeVi
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "Scan QR-code",
+                                    text = stringResource(R.string.scan_qr_code),
                                     style = AppTypography.bodyMedium,
                                     color = if (!isSystemInDarkTheme()) MainBlue else White
                                 )
@@ -179,7 +170,7 @@ fun MainScreen(navController: NavController, context: Context, viewModel: HomeVi
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "Enter code manually",
+                                    text = stringResource(R.string.enter_code_manually),
                                     style = AppTypography.bodyMedium,
                                     color = if (!isSystemInDarkTheme()) MainBlue else White
                                 )

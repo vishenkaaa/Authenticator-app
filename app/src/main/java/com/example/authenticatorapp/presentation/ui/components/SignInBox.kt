@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
@@ -59,7 +60,7 @@ fun SignInBox(navController: NavController){
                     .size(24.dp)
             )
             Text(
-                text = "Sign in",
+                text = stringResource(R.string.sign_in),
                 modifier = Modifier.weight(1f),
                 style = AppTypography.bodyMedium
             )

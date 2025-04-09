@@ -86,4 +86,15 @@
     <string name="once_this_secure_connection_is_established_the_authenticator_will_generate_a_6_8_digit_code_that_is_required_to_access_your_account">Once this secure connection is established, the Authenticator will generate a 6-8 digit code that is required to access your account.</string>
     <string name="even_if_someone_knows_your_password_they_still_need_the_2fa_code_to_access_your_account">Even, if someone knows your password they still need the 2FA code to access your account.</string>
     <string name="no_internet_connection">No Internet connection</string>
+    <string name="app_lock">App lock</string>
+    <string name="sign_in">Sign in</string>
+    <string name="passcode">Passcode</string>
+    <string name="change_passcode">Change passcode</string>
+    <string name="touch_id">Touch ID</string>
+    <string name="sign_in_with_apple">Sign In with Apple</string>
+    <string name="sign_in_with_google">Sign In with Google</string>
+    <string name="i_agree_to_authenticator_app">"I agree to Authenticator App "</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="wellcome_to_authenticator">Wellcome to\nAuthenticator</string>
+    <string name="enter_code_manually">Enter code manually</string>
 </resources>

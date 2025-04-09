@@ -14,7 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -27,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.MainActivity
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.data.local.PasscodeManager
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +42,9 @@ fun SplashScreen(navController: NavController, context: MainActivity) {
 
     val viewModel: HomeViewModel = hiltViewModel()
     val isLoading by viewModel.isLoadingAccounts.collectAsState()
+
+    val passcodeManager = remember { PasscodeManager(context) }
+    var isPasscode by remember { mutableStateOf(passcodeManager.isPasscodeSet())}
 
     val alpha = remember {
         Animatable(0f)
@@ -57,12 +63,19 @@ fun SplashScreen(navController: NavController, context: MainActivity) {
         }
 
         delay(500)
-        delay(500)
 
         withContext(Dispatchers.Main) {
             if (onBoardingIsFinished(context = context)) {
                 navController.popBackStack()
-                navController.navigate("Main")
+                if (isPasscode) {
+                    navController.navigate("verify_passcode/unlock") {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                    }
+                } else {
+                    navController.navigate("Main") {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                    }
+                }
             } else {
                 navController.popBackStack()
                 navController.navigate("Onboarding")
