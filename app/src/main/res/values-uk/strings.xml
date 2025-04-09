@@ -102,5 +102,5 @@
     <string name="confirm_login_using_your_fingerprint">Підтвердіть вхід за допомогою відбитка пальця</string>
     <string name="use_password">Використати пароль</string>
     <string name="biometric_authentication_failed">Біометрична аутентифікація не вдалася</string>
-    <string name="use_fingerprint">Use fingerprint</string>
+    <string name="use_fingerprint">Використовувати відбиток пальця</string>
 </resources>

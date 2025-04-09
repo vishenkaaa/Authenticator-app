@@ -56,7 +56,6 @@ fun AppLockScreen(navController: NavController, context: Context) {
     var isPasscode by remember { mutableStateOf(passcodeManager.isPasscodeSet()) }
     var isTouchID by remember { mutableStateOf(passcodeManager.isTouchIdEnabled()) }
 
-    // Отримуємо менеджер біометрії
     val fragmentActivity = context as? FragmentActivity
     val biometricManager = remember {
         if (fragmentActivity != null) BiometricAuthManager(fragmentActivity) else null

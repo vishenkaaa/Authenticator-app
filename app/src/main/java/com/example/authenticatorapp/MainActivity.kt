@@ -1,5 +1,7 @@
 package com.example.authenticatorapp
 
+import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
@@ -11,11 +13,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.findNavController
 import androidx.navigation.navArgument
 import com.example.authenticatorapp.data.local.PasscodeManager
 import com.example.authenticatorapp.data.local.model.AccountEntity
@@ -40,6 +46,10 @@ import java.util.Locale
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
 
+    private var isAppLocked = false
+    private var isInBackground = false
+    private lateinit var navHostController: NavController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -58,12 +68,30 @@ class MainActivity : FragmentActivity() {
 
         window?.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
 
+        lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onResume(owner: LifecycleOwner) {
+                if (isInBackground) {
+                    isInBackground = false
+                    val passcodeManager = PasscodeManager(this@MainActivity)
+                    if (passcodeManager.isPasscodeSet() && isAppLocked) {
+                        checkLockAndNavigate()
+                    }
+                }
+            }
+
+            override fun onStop(owner: LifecycleOwner) {
+                isInBackground = true
+                isAppLocked = true
+            }
+        })
+
         setContent {
             AuthenticatorAppTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     val navController = rememberNavController()
+                    navHostController = navController
 
                     NavHost(navController = navController, startDestination = "Splash"){
                         composable("Splash"){
@@ -159,6 +187,15 @@ class MainActivity : FragmentActivity() {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun checkLockAndNavigate() {
+        if (isAppLocked) {
+            isAppLocked = false
+            navHostController.navigate("verify_passcode/unlock") {
+               popUpTo(navHostController.graph.startDestinationId) { saveState = true }
             }
         }
     }
