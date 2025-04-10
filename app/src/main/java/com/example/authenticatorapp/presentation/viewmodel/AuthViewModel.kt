@@ -70,7 +70,6 @@ class AuthViewModel @Inject constructor(
                         user.uid.let { uid ->
                             if(syncRepository.isSynchronizing(uid)){
                                 accountRepository.syncAccountsFromFirebase(uid)
-                                //syncRepository.startSynchronize(uid)
                             }
                         }
                     }
