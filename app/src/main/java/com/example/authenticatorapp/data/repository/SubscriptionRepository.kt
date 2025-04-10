@@ -23,7 +23,7 @@ class SubscriptionRepository  @Inject constructor(){
             "hasFreeTrial" to hasFreeTrial,
             "premium" to true
         )
-        firestore.collection("users").document(uid).set(data).await()
+        firestore.collection("users").document(uid).collection("subscription").document("current").set(data).await()
     }
 
     suspend fun isUserPremium(uid: String): Boolean {
@@ -32,7 +32,13 @@ class SubscriptionRepository  @Inject constructor(){
     }
 
     suspend fun loadSubscriptionForUser(uid: String): Map<String, Any>? {
-        val snapshot = firestore.collection("users").document(uid).get().await()
+        val snapshot = firestore
+            .collection("users")
+            .document(uid)
+            .collection("subscription")
+            .document("current")
+            .get()
+            .await()
         return if (snapshot.exists()) snapshot.data else null
     }
 
@@ -42,6 +48,15 @@ class SubscriptionRepository  @Inject constructor(){
             "nextBilling" to null,
             "premium" to false
         )
-        firestore.collection("users").document(uid).update(data).await()
+        firestore.collection("users")
+            .document(uid)
+            .collection("subscription")
+            .document("current")
+            .update(data)
+            .await()
+    }
+
+    suspend fun deleteUserData(uid: String) {
+        firestore.collection("users").document(uid).delete().await()
     }
 }

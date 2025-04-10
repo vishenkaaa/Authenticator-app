@@ -316,22 +316,23 @@ fun copyToClipboard(text: String, context: Context) {
     clipboard.setPrimaryClip(clip)
 }
 
+@Composable
 fun getServiceIcon(serviceName: String): Int {
-    return when (serviceName.lowercase()) {
-        "banking and finance" -> R.drawable.s_banking_and_finance
-        "website" -> R.drawable.s_website
-        "main" -> R.drawable.s_mail
-        "social" -> R.drawable.s_social
-        "facebook" -> R.drawable.s_facebook
-        "instagram" -> R.drawable.s_instagram
-        "google" -> R.drawable.s_google
-        "linkedin" -> R.drawable.s_linkedin
-        "amazon" -> R.drawable.s_amazon_png
-        "paypal" -> R.drawable.s_paypall_png
-        "microsoft" -> R.drawable.s_microsoft
-        "discord" -> R.drawable.s_discord
-        "reddit" -> R.drawable.s_reddit_png
-        "netflix" -> R.drawable.s_netflix
+    return when (serviceName) {
+        stringResource(R.string.banking_and_finance) -> R.drawable.s_banking_and_finance
+        stringResource(R.string.website) -> R.drawable.s_website
+        stringResource(R.string.mail) -> R.drawable.s_mail
+        stringResource(R.string.social) -> R.drawable.s_social
+        "Facebook" -> R.drawable.s_facebook
+        "Instagram" -> R.drawable.s_instagram
+        "Google" -> R.drawable.s_google
+        "Linkedin" -> R.drawable.s_linkedin
+        "Amazon" -> R.drawable.s_amazon_png
+        "Paypal" -> R.drawable.s_paypall_png
+        "Microsoft" -> R.drawable.s_microsoft
+        "Discord" -> R.drawable.s_discord
+        "Reddit" -> R.drawable.s_reddit_png
+        "Netflix" -> R.drawable.s_netflix
         else -> R.drawable.s_mail
     }
 }

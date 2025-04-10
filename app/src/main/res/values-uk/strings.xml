@@ -103,4 +103,12 @@
     <string name="use_password">Використати пароль</string>
     <string name="biometric_authentication_failed">Біометрична аутентифікація не вдалася</string>
     <string name="use_fingerprint">Використовувати відбиток пальця</string>
+    <string name="create_passcode">Створення коду доступу</string>
+    <string name="edit_passcode">Редагування коду доступу</string>
+    <string name="enter_a_new_passcode">Введіть новий код доступу</string>
+    <string name="confirm_the_passcode">Пдітвеердіть код доступу</string>
+    <string name="enter_the_old_passcode">Введіть старий код доступу</string>
+    <string name="enter_the_passcode">Введіть код доступу</string>
+    <string name="the_codes_do_not_match_please_try_again">Коди не співпадають, спробуйте ще раз</string>
+    <string name="invalid_passcode_please_try_again">Невірний код доступу, спробуйте ще раз</string>
 </resources>

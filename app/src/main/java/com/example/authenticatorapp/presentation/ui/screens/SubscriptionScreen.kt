@@ -42,20 +42,25 @@ import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
+import com.example.authenticatorapp.presentation.viewmodel.AuthViewModel
 import com.example.authenticatorapp.presentation.viewmodel.SubscriptionViewModel
 
 @Composable
-fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionViewModel = hiltViewModel()) {
+fun SubscriptionScreen(
+    navController: NavController,
+    subscriptionViewModel: SubscriptionViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
+    ) {
     val colors = MaterialTheme.colorScheme
     var showConfirmDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.loadSubscription()
+        subscriptionViewModel.loadSubscription()
     }
 
-    val plan by viewModel.plan.collectAsState()
-    val billing by viewModel.nextBilling.collectAsState()
-    val isAuthenticated by viewModel.isAuthenticated.collectAsState()
+    val plan by subscriptionViewModel.plan.collectAsState()
+    val billing by subscriptionViewModel.nextBilling.collectAsState()
+    val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
 
     Column(
         Modifier
@@ -217,7 +222,7 @@ fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionView
                 stringResource(R.string.are_you_sure_you_want_to_cancel_your_premium_subscription),
                 stringResource(R.string.yes),
                 stringResource(R.string.no),
-                { viewModel.cancelSubscription()
+                { subscriptionViewModel.cancelSubscription()
                     showConfirmDialog = false },
                 { showConfirmDialog = false}
             )

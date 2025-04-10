@@ -6,11 +6,6 @@ import androidx.security.crypto.MasterKey
 
 class PasscodeManager(private val context: Context) {
 
-    companion object {
-        private const val PREFS_FILE_NAME = "encrypted_passcode_prefs"
-        private const val PASSCODE_KEY = "passcode"
-    }
-
     private val encryptedSharedPreferences by lazy {
         val masterKey = MasterKey.Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -18,7 +13,7 @@ class PasscodeManager(private val context: Context) {
 
         EncryptedSharedPreferences.create(
             context,
-            PREFS_FILE_NAME,
+            "encrypted_passcode_prefs",
             masterKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
@@ -26,11 +21,11 @@ class PasscodeManager(private val context: Context) {
     }
 
     fun savePasscode(passcode: String) {
-        encryptedSharedPreferences.edit().putString(PASSCODE_KEY, passcode).apply()
+        encryptedSharedPreferences.edit().putString("passcode", passcode).apply()
     }
 
     fun getPasscode(): String {
-        return encryptedSharedPreferences.getString(PASSCODE_KEY, "") ?: ""
+        return encryptedSharedPreferences.getString("passcode", "") ?: ""
     }
 
     fun isPasscodeSet(): Boolean {

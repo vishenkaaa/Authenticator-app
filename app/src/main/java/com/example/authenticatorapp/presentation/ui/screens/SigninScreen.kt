@@ -9,6 +9,7 @@ import android.net.NetworkRequest
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -37,6 +38,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,15 +60,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Blue
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
+import com.example.authenticatorapp.presentation.viewmodel.AuthViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -74,7 +78,6 @@ import com.google.firebase.auth.auth
 
 @Composable
 fun SigninScreen(navController: NavController) {
-
     val colors = MaterialTheme.colorScheme
     val auth = Firebase.auth
     val context = LocalContext.current
@@ -352,17 +355,38 @@ fun AppleSignInButton(auth: FirebaseAuth, context: Context, navController: NavCo
 }
 
 @Composable
-fun GoogleSignInButton(auth: FirebaseAuth, context: Context, navController: NavController, agreeToTermsAndPrivacy: Boolean, onLoginAttempt: () -> Unit) {
+fun GoogleSignInButton(
+    auth: FirebaseAuth,
+    context: Context,
+    navController: NavController,
+    agreeToTermsAndPrivacy: Boolean,
+    authViewModel: AuthViewModel = hiltViewModel(),
+    onLoginAttempt: () -> Unit,
+) {
+    val authState by authViewModel.authState.collectAsState()
+
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthViewModel.AuthState.Success -> {
+                navController.navigate("Main") {
+                    popUpTo("login") { inclusive = true }
+                }
+            }
+            is AuthViewModel.AuthState.Error -> {
+                Toast.makeText(
+                    context,
+                    (authState as AuthViewModel.AuthState.Error).message,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            else -> {}
+        }
+    }
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            val account = task.getResult(ApiException::class.java)
-            firebaseAuthWithGoogle(account.idToken!!, auth, navController)
-        } catch (e: ApiException) {
-            Log.e("GoogleSignIn", "Error: ${e.localizedMessage}")
-        }
+        authViewModel.handleSignInResult(task)
     }
 
     val googleSignInClient = remember {

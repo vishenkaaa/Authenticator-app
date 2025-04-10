@@ -81,17 +81,17 @@ fun PasscodeScreen(
     val scope = rememberCoroutineScope()
 
     val headerTitle = when {
-        isCreatingMode -> "Create passcode"
-        isEditingMode -> "Edit passcode"
-        else -> "Confirm passcode"
+        isCreatingMode -> stringResource(R.string.create_passcode)
+        isEditingMode -> stringResource(R.string.edit_passcode)
+        else -> stringResource(R.string.create_passcode)
     }
 
     val instructionText = when {
-        isCreatingMode && !isConfirmStep -> "Enter a new passcode"
-        isCreatingMode && isConfirmStep -> "Confirm the passcode"
-        isEditingMode && !isConfirmStep -> "Enter the old passcode"
-        isEditingMode && isConfirmStep -> "Enter a new passcode"
-        else -> "Enter the passcode"
+        isCreatingMode && !isConfirmStep -> stringResource(R.string.enter_a_new_passcode)
+        isCreatingMode && isConfirmStep -> stringResource(R.string.confirm_the_passcode)
+        isEditingMode && !isConfirmStep -> stringResource(R.string.enter_the_old_passcode)
+        isEditingMode && isConfirmStep -> stringResource(R.string.enter_a_new_passcode)
+        else -> stringResource(R.string.enter_the_passcode)
     }
 
     fun showBiometricAuth() {
@@ -122,12 +122,10 @@ fun PasscodeScreen(
                 delay(500)
             if (isCreatingMode) {
                 if (!isConfirmStep) {
-                    // запам'ятовуємо код і переходимо до підтвердження
                     isConfirmStep = true
                     confirmPasscode = newPasscode
                     passcode = ""
                 } else {
-                    // перевіряємо співпадіння кодів
                     if (newPasscode == confirmPasscode) {
                         passcodeManager.savePasscode(newPasscode)
                         onPasscodeConfirmed(newPasscode)
@@ -137,7 +135,8 @@ fun PasscodeScreen(
                         )
                         navController.popBackStack()
                     } else {
-                        errorMessage = "Коди не співпадають. Спробуйте ще раз."
+                        errorMessage =
+                            context.getString(R.string.the_codes_do_not_match_please_try_again)
                         passcode = ""
                         confirmPasscode = ""
                         isConfirmStep = false
@@ -151,22 +150,20 @@ fun PasscodeScreen(
                         isConfirmStep = true
                         passcode = ""
                     } else {
-                        errorMessage = "Невірний код доступу. Спробуйте ще раз"
+                        errorMessage = context.getString(R.string.invalid_passcode_please_try_again)
                         passcode = ""
                     }
                 } else {
-                    // Зберегти новий пароль
                     passcodeManager.savePasscode(newPasscode)
                     onPasscodeConfirmed(newPasscode)
                     navController.popBackStack()
                 }
             } else {
-                // Перевірка існуючого коду
                 val savedCode = passcodeManager.getPasscode()
                 if (newPasscode == savedCode) {
                     onPasscodeConfirmed(newPasscode)
                 } else {
-                    errorMessage = "Невірний код доступу. Спробуйте ще раз"
+                    errorMessage = context.getString(R.string.invalid_passcode_please_try_again)
                     passcode = ""
                 }
             }

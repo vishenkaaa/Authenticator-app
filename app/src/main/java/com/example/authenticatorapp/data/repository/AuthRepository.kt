@@ -14,7 +14,6 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.google.firebase.firestore.FirebaseFirestore
 
 @Singleton
 class AuthRepository @Inject constructor(private val accountDao: AccountDao) {

@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.authenticatorapp.data.local.dao.AccountDao
 import com.example.authenticatorapp.data.local.model.AccountEntity
+import com.example.authenticatorapp.data.repository.AccountRepository
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,8 +14,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddAccountViewModel @Inject constructor(
-    private val accountDao: AccountDao
+    private val accountDao: AccountDao,
+    private val accountRepository: AccountRepository
 ) : ViewModel() {
+
+    private val auth = FirebaseAuth.getInstance()
+    private val currentUserId: String?
+        get() = auth.currentUser?.uid
 
     fun addAccount(
         service: String,
@@ -50,7 +57,12 @@ class AddAccountViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            accountDao.insertAccount(account)
+            val insertedId = accountDao.insertAccount(account)
+
+            currentUserId?.let { uid ->
+                val savedAccount = account.copy(id = insertedId.toInt())
+                accountRepository.saveAccount(uid, savedAccount)
+            }
         }
     }
 
@@ -92,12 +104,20 @@ class AddAccountViewModel @Inject constructor(
 
         viewModelScope.launch {
             accountDao.updateAccount(account)
+
+            currentUserId?.let { uid ->
+                accountRepository.saveAccount(uid, account)
+            }
         }
     }
 
     fun deleteAccount(id: Int) {
         viewModelScope.launch {
             accountDao.deleteAccountById(id)
+
+            currentUserId?.let { uid ->
+                accountRepository.deleteAccount(uid, id)
+            }
         }
     }
 
@@ -105,6 +125,10 @@ class AddAccountViewModel @Inject constructor(
         val updatedAccount = account.copy(counter = account.counter + 1)
         viewModelScope.launch {
             accountDao.updateAccount(updatedAccount)
+
+            currentUserId?.let { uid ->
+                accountRepository.saveAccount(uid, updatedAccount)
+            }
         }
     }
 

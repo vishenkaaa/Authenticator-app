@@ -48,21 +48,25 @@ import com.example.authenticatorapp.presentation.ui.theme.Blue
 import com.example.authenticatorapp.presentation.ui.theme.Gray2
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
+import com.example.authenticatorapp.presentation.viewmodel.AuthViewModel
 import com.example.authenticatorapp.presentation.viewmodel.SubscriptionViewModel
+import com.example.authenticatorapp.presentation.viewmodel.SyncViewModel
 
 @Composable
-fun PremiumFeaturesScreen(navController: NavController, context: Context, viewModel: SubscriptionViewModel = hiltViewModel()){
+fun PremiumFeaturesScreen(navController: NavController, context: Context, authViewModel: AuthViewModel = hiltViewModel(), subscriptionViewModel: SubscriptionViewModel = hiltViewModel(), syncViewModel: SyncViewModel = hiltViewModel()){
     val colors = MaterialTheme.colorScheme
-    var synchronized by remember { mutableStateOf(false) }
+    val isSyncEnabled by syncViewModel.isSyncEnabled.collectAsState()
+
     var showConfirmDeleteDialog by remember { mutableStateOf(false) }
     var showConfirmSignOutDialog by remember { mutableStateOf(false) }
 
+
     LaunchedEffect(Unit) {
-        viewModel.loadSubscription()
+        subscriptionViewModel.loadSubscription()
     }
 
-    val plan by viewModel.plan.collectAsState()
-    val isAuthenticated by viewModel.isAuthenticated.collectAsState()
+    val plan by subscriptionViewModel.plan.collectAsState()
+    val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
 
     Column(
         Modifier
@@ -172,8 +176,8 @@ fun PremiumFeaturesScreen(navController: NavController, context: Context, viewMo
                         )
 
                         Switch(
-                            checked = synchronized,
-                            onCheckedChange = { synchronized = it },
+                            checked = isSyncEnabled,
+                            onCheckedChange = { syncViewModel.setSyncEnabled(it)},
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = White,
                                 checkedTrackColor = Blue,
@@ -225,7 +229,7 @@ fun PremiumFeaturesScreen(navController: NavController, context: Context, viewMo
                 stringResource(R.string.are_you_sure_you_want_to_delete_your_account),
                 stringResource(R.string.delete),
                 stringResource(R.string.cancel),
-                { viewModel.deleteUserAccount()
+                { authViewModel.deleteUserAccount(context)
                     showConfirmDeleteDialog = false },
                 {showConfirmDeleteDialog = false})
 
@@ -235,7 +239,7 @@ fun PremiumFeaturesScreen(navController: NavController, context: Context, viewMo
                 stringResource(R.string.are_you_sure_you_want_to_log_out),
                 stringResource(R.string.sign_out),
                 stringResource(R.string.cancel),
-                { viewModel.signOut(context)
+                { authViewModel.signOut(context)
                     showConfirmSignOutDialog = false },
                 {showConfirmSignOutDialog = false})
     }

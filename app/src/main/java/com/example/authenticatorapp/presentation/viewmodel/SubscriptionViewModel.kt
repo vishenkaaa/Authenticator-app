@@ -12,6 +12,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.example.authenticatorapp.data.repository.AuthRepository
 import com.example.authenticatorapp.data.repository.SubscriptionRepository
+import com.example.authenticatorapp.data.repository.SyncRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -23,7 +24,8 @@ import javax.inject.Inject
 class SubscriptionViewModel @Inject constructor(
     application: Application,
     private val authRepository: AuthRepository,
-    private val subscriptionRepository: SubscriptionRepository
+    private val subscriptionRepository: SubscriptionRepository,
+    private val syncRepository: SyncRepository
 ) : AndroidViewModel(application) {
 
     @SuppressLint("StaticFieldLeak")
@@ -46,40 +48,16 @@ class SubscriptionViewModel @Inject constructor(
     private val _nextBilling = MutableStateFlow<String?>(null)
     val nextBilling: StateFlow<String?> = _nextBilling
 
-    private val _isAuthenticated = MutableStateFlow(false)
-    val isAuthenticated: StateFlow<Boolean> = _isAuthenticated
-
     init {
-        checkAuthStatus()
         monitorAuthChanges()
 
         _plan.value = prefs.getString("plan", null)
         _nextBilling.value = formatDate(prefs.getString("next_billing", null))
     }
 
-    fun checkAuthStatus() {
-        _isAuthenticated.value = authRepository.isUserLoggedIn()
-    }
-
     private fun monitorAuthChanges() {
         authRepository.monitorAuthState { isLoggedIn ->
-            _isAuthenticated.value = isLoggedIn
             if (isLoggedIn) loadSubscription()
-        }
-    }
-
-    fun signOut(context: Context) {
-        authRepository.signOut(context)
-        clearLocalSubscription()
-        checkAuthStatus()
-    }
-
-    fun deleteUserAccount() {
-        viewModelScope.launch {
-            val success = authRepository.deleteAccount(context)
-            if (!success) {
-                Log.d("SubscriptionViewModel", "User account successfully deleted")
-            }
         }
     }
 
@@ -139,6 +117,7 @@ class SubscriptionViewModel @Inject constructor(
         viewModelScope.launch {
             val uid = authRepository.getCurrentUser()?.id ?: return@launch
 
+            syncRepository.cancelSynchronize(uid)
             subscriptionRepository.cancelSubscription(uid)
             clearLocalSubscription()
         }

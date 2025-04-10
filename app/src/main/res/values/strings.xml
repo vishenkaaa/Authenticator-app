@@ -102,4 +102,12 @@
     <string name="use_password">Use password</string>
     <string name="biometric_authentication_failed">Biometric authentication failed</string>
     <string name="use_fingerprint">Use fingerprint</string>
+    <string name="create_passcode">Create passcode</string>
+    <string name="edit_passcode">Edit passcode</string>
+    <string name="enter_a_new_passcode">Enter a new passcode</string>
+    <string name="confirm_the_passcode">Confirm the passcode</string>
+    <string name="enter_the_old_passcode">Enter the old passcode</string>
+    <string name="enter_the_passcode">Enter the passcode</string>
+    <string name="the_codes_do_not_match_please_try_again">The codes do not match, please try again</string>
+    <string name="invalid_passcode_please_try_again">Invalid passcode, please try again</string>
 </resources>
