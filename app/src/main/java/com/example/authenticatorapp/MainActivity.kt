@@ -113,9 +113,7 @@ class MainActivity : FragmentActivity() {
                             HomeScreen(navController, this@MainActivity, accounts = emptyList<AccountEntity>())
                         }
                         composable("QrScanner") {
-                            QRcodeScreen(navController) { scannedData ->
-                                navController.popBackStack()
-                            }
+                            QRcodeScreen(navController)
                         }
                         composable("AddAccount") {
                             AddAccountScreen(navController, this@MainActivity)

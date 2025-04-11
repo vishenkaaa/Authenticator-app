@@ -1,11 +1,11 @@
 package com.example.authenticatorapp.presentation.ui.screens
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -24,11 +24,15 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults.buttonColors
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,7 +41,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -48,16 +51,27 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.presentation.ui.components.FlashToggleButton
+import com.example.authenticatorapp.presentation.ui.components.GalleryButton
+import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.utils.QRCodeAnalyzer
+import com.example.authenticatorapp.presentation.viewmodel.AddAccountViewModel
 
 @Composable
-fun QRcodeScreen(navController: NavController, onQRCodeScanned: (String) -> Unit){
+fun QRcodeScreen(navController: NavController){
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val previewView = remember{PreviewView(context)}
+
     var hasCameraPermission by remember { mutableStateOf(false) }
+    var showInvalidQrDialog by remember { mutableStateOf(false) }
+
+    val camera = remember { mutableStateOf<Camera?>(null) }
+
+    val viewModel: AddAccountViewModel = hiltViewModel()
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -93,14 +107,18 @@ fun QRcodeScreen(navController: NavController, onQRCodeScanned: (String) -> Unit
                         .also {
                             it.setAnalyzer(
                                 ContextCompat.getMainExecutor(context),
-                                QRCodeAnalyzer { qrCode ->
-                                    onQRCodeScanned(qrCode)
-                                })
+                                QRCodeAnalyzer(
+                                    viewModel = viewModel,
+                                    navController = navController,
+                                    context = context,
+                                    onDismiss = {showInvalidQrDialog = true}
+                                )
+                            )
                         }
 
                     try {
                         cameraProvider.unbindAll()
-                        cameraProvider.bindToLifecycle(
+                        camera.value = cameraProvider.bindToLifecycle(
                             lifecycleOwner, cameraSelector, preview, imageAnalyzer
                         )
                     } catch (exc: Exception) {
@@ -144,11 +162,34 @@ fun QRcodeScreen(navController: NavController, onQRCodeScanned: (String) -> Unit
                     .align(Alignment.BottomCenter),
             ) {
                 Spacer(Modifier.weight(1f))
-                FlashToggleButton(context)
+                FlashToggleButton(camera)
                 Spacer(Modifier.width(60.dp))
-                GalleryButton()
+                GalleryButton(viewModel, navController)
                 Spacer(Modifier.weight(1f))
             }
+        }
+
+        if (showInvalidQrDialog) {
+            AlertDialog(
+                onDismissRequest = { showInvalidQrDialog = false },
+                title = { Text(stringResource(R.string.scanning_error_), color = MaterialTheme.colorScheme.onPrimary) },
+                text = { Text(
+                    stringResource(R.string.qr_code_does_not_contain_valid_authenticator_data_make_sure_you_are_scanning_the_correct_qr_code),
+                    color = MaterialTheme.colorScheme.onPrimary) },
+                confirmButton = {
+                    Button(
+                        onClick = { showInvalidQrDialog = false },
+                        colors = buttonColors(
+                            backgroundColor = MainBlue,
+                            contentColor = Color.White
+                        )) {
+                        Text("ОК")
+                    }
+                },
+
+                backgroundColor = MaterialTheme.colorScheme.background,
+                shape = RoundedCornerShape(16.dp)
+            )
         }
     }
 }
@@ -283,47 +324,6 @@ fun ScannerCorners(modifier: Modifier = Modifier) {
             end = Offset(size.width - cornerLength, size.height),
             strokeWidth = strokeWidth,
             cap = StrokeCap.Round
-        )
-    }
-}
-
-@Composable
-fun FlashToggleButton(context: Context) {
-    var isFlashOn by remember { mutableStateOf(false) }
-
-    IconButton(
-        onClick = {
-            isFlashOn = !isFlashOn
-            // toggleFlashlight(context, isFlashOn)
-        },
-        modifier = Modifier
-            .size(48.dp)
-            .clip(CircleShape)
-            .background(Color.White.copy(alpha = 0.3f))
-    ) {
-        Icon(
-            painter = painterResource(
-                if (isFlashOn) R.drawable.flash else R.drawable.flash_off
-            ),
-            contentDescription = "Flash",
-            tint = Color.White,
-        )
-    }
-}
-
-@Composable
-fun GalleryButton() {
-    IconButton(
-        onClick = {},
-        modifier = Modifier
-            .size(48.dp)
-            .clip(CircleShape)
-            .background(Color.White.copy(alpha = 0.3f))
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.gallery),
-            contentDescription = "Gallery",
-            tint = Color.White,
         )
     }
 }

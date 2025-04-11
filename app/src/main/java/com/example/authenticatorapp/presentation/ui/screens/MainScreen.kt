@@ -128,7 +128,8 @@ fun MainScreen(navController: NavController, context: Context, viewModel: HomeVi
                                     .height(50.dp),
                                 shape = RoundedCornerShape(24.dp),
                                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                                    containerColor = colors.onPrimaryContainer,
+                                    containerColor = if (isSystemInDarkTheme()) colors.onPrimaryContainer
+                                    else colors.background,
                                     contentColor = MainBlue
                                 ),
                                 border = if (!isSystemInDarkTheme()) BorderStroke(2.dp, MainBlue) else BorderStroke(2.dp, Gray6)

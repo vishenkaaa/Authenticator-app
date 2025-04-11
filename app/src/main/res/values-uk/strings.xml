@@ -111,4 +111,11 @@
     <string name="enter_the_passcode">Введіть код доступу</string>
     <string name="the_codes_do_not_match_please_try_again">Коди не співпадають, спробуйте ще раз</string>
     <string name="invalid_passcode_please_try_again">Невірний код доступу, спробуйте ще раз</string>
+    <string name="account_successfully_added">Акаунт успішно додано</string>
+    <string name="invalid_qr_code_format">Неправильний формат QR-коду</string>
+    <string name="qr_code_not_found_in_the_image">QR-код не знайдено на зображенні</string>
+    <string name="scanning_error">Помилка сканування: %1$s</string>
+    <string name="account_successfully_updated">Акаунт успішно оновлено</string>
+    <string name="qr_code_does_not_contain_valid_authenticator_data_make_sure_you_are_scanning_the_correct_qr_code">QR-код не містить дійсних даних для автентифікатора. Переконайтеся, що ви скануєте коректний QR-код.</string>
+    <string name="scanning_error_">Помилка сканування</string>
 </resources>

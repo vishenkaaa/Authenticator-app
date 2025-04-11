@@ -5,26 +5,48 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
-import com.example.authenticatorapp.presentation.ui.theme.AppTypography
-import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.components.ServiceItem
 import com.example.authenticatorapp.presentation.ui.components.SimpleServiceItem
+import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.viewmodel.AddAccountViewModel
@@ -241,7 +263,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                 }
 
                 val initialCounter = if (selectedTypeOfKey == "Counter-based") 1L else 0L
-                if(oldAccountId == null)
+                if(oldAccountId == null){
                     viewModel.addAccount(
                         service = selectedService,
                         email = accountText,
@@ -251,6 +273,8 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                         digits = 6,
                         counter = initialCounter
                     )
+                    Toast.makeText(context, context.getString(R.string.account_successfully_added), Toast.LENGTH_SHORT).show()
+                }
                 else {
                     val account = viewModel.account.value
                     val newCounter = if (selectedTypeOfKey == "Counter-based" && account?.counter == 0L) 1L
@@ -266,6 +290,8 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                         digits = 6,
                         counter = newCounter
                     )
+                    Toast.makeText(context,
+                        context.getString(R.string.account_successfully_updated), Toast.LENGTH_SHORT).show()
                 }
 
                 navController.popBackStack()

@@ -111,4 +111,11 @@
     <string name="enter_the_passcode">Enter the passcode</string>
     <string name="the_codes_do_not_match_please_try_again">The codes do not match, please try again</string>
     <string name="invalid_passcode_please_try_again">Invalid passcode, please try again</string>
+    <string name="account_successfully_added">Account successfully added</string>
+    <string name="invalid_qr_code_format">Invalid QR code format</string>
+    <string name="qr_code_not_found_in_the_image">QR code not found in the image</string>
+    <string name="scanning_error">Scanning error: %1$s</string>
+    <string name="account_successfully_updated">Account successfully updated</string>
+    <string name="qr_code_does_not_contain_valid_authenticator_data_make_sure_you_are_scanning_the_correct_qr_code">QR code does not contain valid authenticator data. Make sure you are scanning the correct QR code.</string>
+    <string name="scanning_error_">Scanning Error</string>
 </resources>
