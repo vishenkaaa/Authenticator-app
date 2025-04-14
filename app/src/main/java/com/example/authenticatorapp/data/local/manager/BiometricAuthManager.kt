@@ -1,7 +1,6 @@
-package com.example.authenticatorapp.data.local
+package com.example.authenticatorapp.data.local.manager
 
 import android.content.Context
-import android.util.Log
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
@@ -58,7 +57,7 @@ class BiometricAuthManager(private val activity: FragmentActivity) {
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(activity.getString(R.string.fingerprint_login))
             .setSubtitle(activity.getString(R.string.confirm_login_using_your_fingerprint))
-            .setNegativeButtonText(activity.getString(R.string.use_password))
+            .setNegativeButtonText(activity.getString(R.string.use_passcode))
             .setAllowedAuthenticators(authenticators)
             .build()
 

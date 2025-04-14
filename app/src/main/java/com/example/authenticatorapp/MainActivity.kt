@@ -1,12 +1,9 @@
 package com.example.authenticatorapp
 
-import android.app.Activity
-import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,15 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.findNavController
 import androidx.navigation.navArgument
-import com.example.authenticatorapp.data.local.PasscodeManager
+import com.example.authenticatorapp.data.local.manager.PasscodeManager
 import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.screens.AboutAppScreen
 import com.example.authenticatorapp.presentation.ui.screens.AddAccountScreen
@@ -54,10 +49,10 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-//        val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
-//        val editor = sharedPreferences.edit()
-//        editor.putBoolean("isFinished", false)
-//        editor.apply()
+        val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("isFinished", false)
+        editor.apply()
 
         val currentLocale = Locale.getDefault().language
         if (currentLocale == "uk") {

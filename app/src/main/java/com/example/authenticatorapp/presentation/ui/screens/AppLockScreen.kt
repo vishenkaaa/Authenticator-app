@@ -1,7 +1,6 @@
 package com.example.authenticatorapp.presentation.ui.screens
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,7 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
-import com.example.authenticatorapp.data.local.PasscodeManager
+import com.example.authenticatorapp.data.local.manager.PasscodeManager
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Blue
 import com.example.authenticatorapp.presentation.ui.theme.Gray2
@@ -47,7 +46,7 @@ import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.fragment.app.FragmentActivity
-import com.example.authenticatorapp.data.local.BiometricAuthManager
+import com.example.authenticatorapp.data.local.manager.BiometricAuthManager
 
 @Composable
 fun AppLockScreen(navController: NavController, context: Context) {

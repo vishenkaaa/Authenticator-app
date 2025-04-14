@@ -121,7 +121,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
             value = selectedService,
             onValueChange = { selectedService = it },
             readOnly = true,
-            textStyle = AppTypography.bodyMedium,
+            textStyle = AppTypography.labelMedium,
             label = { Text(text = stringResource(R.string.service), style = AppTypography.labelMedium) },
             trailingIcon = {
                 Icon(
