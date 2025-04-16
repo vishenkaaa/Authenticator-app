@@ -60,6 +60,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
     val colors = MaterialTheme.colorScheme
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
+    val base32Regex = Regex("^[A-Z2-7]+=*$")
 
     var serviceExpanded by remember { mutableStateOf(false) }
     var typesOfKeyExpanded by remember { mutableStateOf(false) }
@@ -261,25 +262,26 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
 
         Button(
             onClick = {
-//                val base32Regex = Regex("^[A-Z2-7]+=*$")
-//                if (!keyText.uppercase().matches(base32Regex)) {
-//                    Toast.makeText(context,
-//                        "Invalid secret format", Toast.LENGTH_SHORT).show()
-//                    return@Button
-//                }
+                val sanitizedKey = keyText.trim().replace(" ", "").uppercase()
+
+                if (!base32Regex.matches(sanitizedKey)) {
+                    Toast.makeText(context,
+                        context.getString(R.string.invalid_secret_format), Toast.LENGTH_LONG).show()
+                    return@Button
+                }
                 if (selectedService.isBlank()) {
                     Toast.makeText(context,
-                        context.getString(R.string.service_name_is_required), Toast.LENGTH_SHORT).show()
+                        context.getString(R.string.service_name_is_required), Toast.LENGTH_LONG).show()
                     return@Button
                 }
                 if (accountText.isBlank()) {
                     Toast.makeText(context,
-                        context.getString(R.string.account_name_is_required), Toast.LENGTH_SHORT).show()
+                        context.getString(R.string.account_name_is_required), Toast.LENGTH_LONG).show()
                     return@Button
                 }
                 if (keyText.isBlank()) {
                     Toast.makeText(context,
-                        context.getString(R.string.secret_key_is_required), Toast.LENGTH_SHORT).show()
+                        context.getString(R.string.secret_key_is_required), Toast.LENGTH_LONG).show()
                     return@Button
                 }
 
@@ -294,7 +296,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                         digits = 6,
                         counter = initialCounter
                     )
-                    Toast.makeText(context, context.getString(R.string.account_successfully_added), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.account_successfully_added), Toast.LENGTH_LONG).show()
                 }
                 else {
                     val account = viewModel.account.value
@@ -312,7 +314,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                         counter = newCounter
                     )
                     Toast.makeText(context,
-                        context.getString(R.string.account_successfully_updated), Toast.LENGTH_SHORT).show()
+                        context.getString(R.string.account_successfully_updated), Toast.LENGTH_LONG).show()
                 }
 
                 navController.popBackStack()
