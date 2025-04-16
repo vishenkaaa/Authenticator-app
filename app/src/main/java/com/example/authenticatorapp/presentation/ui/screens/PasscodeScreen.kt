@@ -46,8 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
-import com.example.authenticatorapp.data.local.manager.BiometricAuthManager
-import com.example.authenticatorapp.data.local.manager.PasscodeManager
+import com.example.authenticatorapp.presentation.utils.BiometricAuthManager
+import com.example.authenticatorapp.data.local.preferences.PasscodeManager
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Blue
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue

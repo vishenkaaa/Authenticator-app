@@ -108,7 +108,7 @@ fun OnboardingScreen(navController: NavController){
                     color = White,
                     style = AppTypography.bodySmall,
                     modifier = Modifier
-                        .padding(start = 5.dp, top = 5.dp, bottom = 5.dp)
+                        .padding(start = 10.dp, top = 10.dp, bottom = 10.dp)
                         .clickable {
                             coroutineScope.launch {
                                 pagerState.animateScrollToPage(0)
