@@ -48,7 +48,9 @@ fun InfoScreen(navController: NavController, context: Context){
             InfoItem(
                 icon = R.drawable.ic_file,
                 text = stringResource(R.string.privacy_policy),
-                onClick = { }
+                onClick = {
+                    navController.navigate("PrivacyPolicy")
+                }
             ),
             InfoItem(
                 icon = R.drawable.ic_file,

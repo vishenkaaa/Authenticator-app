@@ -30,6 +30,7 @@ import com.example.authenticatorapp.presentation.ui.screens.OnboardingScreen
 import com.example.authenticatorapp.presentation.ui.screens.PasscodeScreen
 import com.example.authenticatorapp.presentation.ui.screens.PaywallScreen
 import com.example.authenticatorapp.presentation.ui.screens.PremiumFeaturesScreen
+import com.example.authenticatorapp.presentation.ui.screens.PrivacyPolicyScreen
 import com.example.authenticatorapp.presentation.ui.screens.QRcodeScreen
 import com.example.authenticatorapp.presentation.ui.screens.SigninScreen
 import com.example.authenticatorapp.presentation.ui.screens.SplashScreen
@@ -48,11 +49,6 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-//        val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
-//        val editor = sharedPreferences.edit()
-//        editor.putBoolean("isFinished", false)
-//        editor.apply()
 
         val currentLocale = Locale.getDefault().language
         if (currentLocale == "uk") {
@@ -177,6 +173,9 @@ class MainActivity : FragmentActivity() {
                                     }
                                 }
                             }
+                        }
+                        composable("PrivacyPolicy") {
+                            PrivacyPolicyScreen(navController)
                         }
                     }
                 }

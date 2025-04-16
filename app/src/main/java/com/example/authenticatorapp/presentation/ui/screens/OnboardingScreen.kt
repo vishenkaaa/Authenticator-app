@@ -225,6 +225,8 @@ fun OnboardingScreen(navController: NavController){
                     fontSize = 12.sp,
                     fontFamily = interFontFamily,
                     textDecoration = TextDecoration.Underline,
+                    modifier = Modifier.clickable { }
+                        .padding(vertical = 4.dp)
                 )
                 Text(
                     text = "\u2022",
@@ -239,6 +241,8 @@ fun OnboardingScreen(navController: NavController){
                     fontWeight = FontWeight.W400,
                     fontSize = 12.sp,
                     textDecoration = TextDecoration.Underline,
+                    modifier = Modifier.clickable { navController.navigate("PrivacyPolicy") }
+                        .padding(vertical = 4.dp)
                 )
             }
         }
