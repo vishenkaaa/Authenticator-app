@@ -117,4 +117,7 @@
     <string name="account_successfully_updated">Account successfully updated</string>
     <string name="qr_code_does_not_contain_valid_authenticator_data_make_sure_you_are_scanning_the_correct_qr_code">QR code does not contain valid authenticator data. Make sure you are scanning the correct QR code.</string>
     <string name="scanning_error_">Scanning Error</string>
+    <string name="feedback">Feedback</string>
+    <string name="choose_email_client">Choose email client</string>
+    <string name="no_email_client_found">No email client found</string>
 </resources>

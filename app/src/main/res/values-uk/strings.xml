@@ -118,4 +118,7 @@
     <string name="account_successfully_updated">Акаунт успішно оновлено</string>
     <string name="qr_code_does_not_contain_valid_authenticator_data_make_sure_you_are_scanning_the_correct_qr_code">QR-код не містить дійсних даних для автентифікатора. Переконайтеся, що ви скануєте коректний QR-код.</string>
     <string name="scanning_error_">Помилка сканування</string>
+    <string name="feedback">Зворотній зв`язок</string>
+    <string name="choose_email_client">Виберіть поштовий клієнт</string>
+    <string name="no_email_client_found">Не знайдено поштового клієнта</string>
 </resources>
