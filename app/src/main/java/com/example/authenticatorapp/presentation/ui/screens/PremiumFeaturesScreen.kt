@@ -159,7 +159,7 @@ fun PremiumFeaturesScreen(navController: NavController, context: Context, authVi
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable(onClick = {})
-                            .padding(vertical = 12.dp)
+                            .padding(vertical = 3.dp)
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_synchronize),

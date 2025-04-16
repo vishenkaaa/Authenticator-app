@@ -16,7 +16,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AuthRepository @Inject constructor(private val accountDao: AccountDao) {
+class AuthRepository @Inject constructor(
+    private val accountDao: AccountDao,
+    private val syncRepository: SyncRepository) {
     private val auth: FirebaseAuth = Firebase.auth
 
     fun isUserLoggedIn(): Boolean {
@@ -33,7 +35,7 @@ class AuthRepository @Inject constructor(private val accountDao: AccountDao) {
         }
     }
 
-    fun signOut(context: Context) {
+    suspend fun signOut(context: Context) {
         val googleSignInClient = GoogleSignIn.getClient(
             context.applicationContext,
             GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -41,6 +43,13 @@ class AuthRepository @Inject constructor(private val accountDao: AccountDao) {
                 .requestEmail()
                 .build()
         )
+
+        withContext(Dispatchers.IO) {
+            val uid = getCurrentUser()?.id
+            if (uid != null && syncRepository.isSynchronizing(uid)) {
+                clearLocalDatabase()
+            }
+        }
 
         auth.signOut()
         googleSignInClient.revokeAccess().addOnCompleteListener {

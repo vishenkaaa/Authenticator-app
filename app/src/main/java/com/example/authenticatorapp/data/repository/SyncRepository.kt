@@ -8,6 +8,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.example.authenticatorapp.data.local.dao.AccountDao
 import com.example.authenticatorapp.data.local.model.toFirebaseMap
+import com.example.authenticatorapp.data.local.preferences.SyncPreferences
 import com.example.authenticatorapp.presentation.viewmodel.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -18,26 +19,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SyncRepository  @Inject constructor(private val accountDao: AccountDao, application: Application){
+class SyncRepository @Inject constructor(private val accountDao: AccountDao, application: Application){
     private val firestore = FirebaseFirestore.getInstance()
-
     private val context: Context = application.applicationContext
-    private val prefs by lazy {
-        EncryptedSharedPreferences.create(
-            context,
-            "sync_prefs",
-            MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build(),
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
-    }
+    private val pref = SyncPreferences(context)
 
     suspend fun startSynchronize(uid: String) {
-        prefs.edit()
-            .putBoolean("isSyncEnabled", true)
-            .apply()
+        pref.setSync(true)
 
         val data = mapOf("sync" to true)
         firestore.collection("users").document(uid).set(data, SetOptions.merge()).await()
@@ -75,26 +63,23 @@ class SyncRepository  @Inject constructor(private val accountDao: AccountDao, ap
     }
 
     suspend fun cancelSynchronize(uid: String) {
-        prefs.edit()
-            .putBoolean("isSyncEnabled", false)
-            .apply()
+        pref.setSync(false)
 
         val data = mapOf("sync" to false)
         firestore.collection("users").document(uid).set(data, SetOptions.merge()).await()
     }
 
     suspend fun isSynchronizing(uid: String): Boolean {
-        if (prefs.contains("isSyncEnabled")) {
-            return prefs.getBoolean("isSyncEnabled", false)
-        }
+        pref.isSync()?.let { return it }
+        return isSynchronizingFromDb(uid)
+    }
 
+    suspend fun isSynchronizingFromDb(uid: String): Boolean{
         return try {
             val snapshot = firestore.collection("users").document(uid).get().await()
             val syncStatus = snapshot.getBoolean("sync") ?: false
 
-            prefs.edit()
-                .putBoolean("isSyncEnabled", syncStatus)
-                .apply()
+            pref.setSync(syncStatus)
 
             syncStatus
         } catch (e: Exception) {

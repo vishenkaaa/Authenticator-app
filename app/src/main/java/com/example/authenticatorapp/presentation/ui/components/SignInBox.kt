@@ -40,13 +40,13 @@ fun SignInBox(navController: NavController){
                 ambientColor = colors.inverseSurface,
                 spotColor = colors.inverseSurface
             )
+            .clickable { navController.navigate("SignIn") }
             .background(
                 color = colors.onPrimaryContainer,
                 shape = RoundedCornerShape(24.dp)
             )
             .padding(horizontal = 16.dp, vertical = 20.dp)
             .fillMaxWidth()
-            .clickable { navController.navigate("SignIn") }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
