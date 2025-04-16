@@ -55,7 +55,9 @@ fun InfoScreen(navController: NavController, context: Context){
             InfoItem(
                 icon = R.drawable.ic_file,
                 text = stringResource(R.string.terms_of_use),
-                onClick = { }
+                onClick = {
+                    navController.navigate("TermsOfUse")
+                }
             )
         )
 

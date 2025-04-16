@@ -223,9 +223,8 @@ fun OnboardingScreen(navController: NavController){
                     color = White,
                     fontWeight = FontWeight.W400,
                     fontSize = 12.sp,
-                    fontFamily = interFontFamily,
                     textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.clickable { }
+                    modifier = Modifier.clickable { navController.navigate("TermsOfUse") }
                         .padding(vertical = 4.dp)
                 )
                 Text(

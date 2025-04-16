@@ -129,4 +129,5 @@
     <string name="all_accounts_and_otp_codes_are_stored_locally_on_your_device">Усі облікові записи і OTP-коди зберігаються локально на вашому пристрої.</string>
     <string name="we_use_encrypted_storage_to_protect_your_accounts_you_are_responsible_for_the_security_of_your_device">Ми використовуємо зашифроване збереження даних, щоб захистити ваші облікові записи. Ви відповідальні за безпеку свого пристрою</string>
     <string name="security">Безпека:</string>
+    <string name="this_app_is_provided_as_is_you_use_it_at_your_own_risk_we_are_not_responsible_for_any_losses_related_to_the_use_of_this_app">Цей застосунок надається "як є". Ви використовуєте його на власний ризик. Ми не несемо відповідальності за будь-які втрати, пов'язані з використанням цього застосунку.</string>
 </resources>

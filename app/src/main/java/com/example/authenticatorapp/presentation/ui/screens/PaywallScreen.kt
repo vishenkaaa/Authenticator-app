@@ -270,7 +270,8 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
                     fontWeight = FontWeight.W400,
                     fontSize = 12.sp,
                     textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    modifier = Modifier.clickable { navController.navigate("TermsOfUse") }
+                        .padding(vertical = 4.dp)
                 )
                 Text(
                     text = "\u2022",
