@@ -66,6 +66,7 @@ import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
 import com.example.authenticatorapp.presentation.viewmodel.SubscriptionViewModel
 import kotlinx.coroutines.launch
+import androidx.core.content.edit
 
 @Composable
 fun PaywallScreen(navController: NavController, context: MainActivity, viewModel: SubscriptionViewModel = hiltViewModel()){
@@ -290,9 +291,9 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
 }
 
 @SuppressLint("CommitPrefEdits")
-private fun onBoardingIsDone(context: MainActivity){
+private fun onBoardingIsDone(context: Context){
     val sharedPreferences = context.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
-    val editor = sharedPreferences.edit()
-    editor.putBoolean("isFinished", true)
-    editor.apply()
+    sharedPreferences.edit {
+        putBoolean("isFinished", true)
+    }
 }
