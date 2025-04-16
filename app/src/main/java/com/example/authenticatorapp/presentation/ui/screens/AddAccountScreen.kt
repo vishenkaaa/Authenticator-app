@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
@@ -117,35 +119,44 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
 
         Spacer(modifier = Modifier.height(28.dp))
 
-        OutlinedTextField(
-            value = selectedService,
-            onValueChange = { selectedService = it },
-            readOnly = true,
-            textStyle = AppTypography.labelMedium,
-            label = { Text(text = stringResource(R.string.service), style = AppTypography.labelMedium) },
-            trailingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.drop_down),
-                    contentDescription = "Dropdown",
-                    modifier = Modifier.clickable {
-                        serviceExpanded = true
-                    },
-                    tint = Color.Unspecified
-                )
-            },
-            shape = RoundedCornerShape(20.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = colors.onPrimaryContainer,
-                focusedContainerColor = colors.onPrimaryContainer,
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                focusedLabelColor = Gray5,
-                unfocusedLabelColor = Color.Gray,
-            ),
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
                 .clickable { serviceExpanded = true }
-        )
+        ) {
+            OutlinedTextField(
+                value = selectedService,
+                onValueChange = { selectedService = it },
+                readOnly = true,
+                enabled = false,
+                textStyle = AppTypography.labelMedium,
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.service),
+                        style = AppTypography.labelMedium
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.drop_down),
+                        contentDescription = "Dropdown",
+                        tint = Color.Unspecified
+                    )
+                },
+                shape = RoundedCornerShape(20.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedContainerColor = colors.onPrimaryContainer,
+                    focusedContainerColor = colors.onPrimaryContainer,
+                    disabledContainerColor = colors.onPrimaryContainer,
+                    disabledBorderColor = Color.Transparent,
+                    disabledTextColor = colors.onPrimary,
+                    disabledPlaceholderColor = Color.Gray
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -154,8 +165,8 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
             onValueChange = {newText ->
                 accountText = newText  },
             readOnly = false,
-            label = { Text(text = stringResource(R.string.account), style = AppTypography.labelMedium) },
-            textStyle = AppTypography.bodyMedium,
+            placeholder = { Text(text = stringResource(R.string.account), style = AppTypography.labelMedium) },
+            textStyle = AppTypography.labelMedium,
             leadingIcon = {
                 Icon(
                     painter = painterResource(R.drawable.person),
@@ -183,8 +194,8 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                 keyText = newText
             },
             readOnly = false,
-            label = { Text(text = stringResource(R.string.key), style = AppTypography.labelMedium) },
-            textStyle = AppTypography.bodyMedium,
+            placeholder = { Text(text = stringResource(R.string.key), style = AppTypography.labelMedium) },
+            textStyle = AppTypography.labelMedium,
             leadingIcon = {
                 Icon(
                     painter = painterResource(R.drawable.key),
@@ -206,35 +217,45 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
-            value = selectedTypeOfKey,
-            onValueChange = { selectedTypeOfKey = it },
-            readOnly = true,
-            textStyle = AppTypography.labelMedium,
-            label = { Text(text = stringResource(R.string.type_of_key), style = AppTypography.bodyMedium) },
-            trailingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.drop_down),
-                    contentDescription = "Dropdown",
-                    modifier = Modifier.clickable {
-                        typesOfKeyExpanded = true
-                    },
-                    tint = Color.Unspecified
-                )
-            },
-            shape = RoundedCornerShape(20.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = colors.onPrimaryContainer,
-                focusedContainerColor = colors.onPrimaryContainer,
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                focusedLabelColor = Gray5,
-                unfocusedLabelColor = Color.Gray,
-            ),
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
                 .clickable { typesOfKeyExpanded = true }
-        )
+        ) {
+            OutlinedTextField(
+                value = selectedTypeOfKey,
+                onValueChange = { selectedTypeOfKey = it },
+                readOnly = true,
+                enabled = false,
+                textStyle = AppTypography.labelMedium,
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.type_of_key),
+                        style = AppTypography.bodyMedium
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.drop_down),
+                        contentDescription = "Dropdown",
+                        tint = Color.Unspecified
+                    )
+                },
+                shape = RoundedCornerShape(20.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedContainerColor = colors.onPrimaryContainer,
+                    focusedContainerColor = colors.onPrimaryContainer,
+                    disabledContainerColor = colors.onPrimaryContainer,
+                    disabledBorderColor = Color.Transparent,
+                    disabledTextColor = colors.onPrimary,
+                    disabledPlaceholderColor = Color.Gray
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { typesOfKeyExpanded = true },
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -313,7 +334,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
             Text(
                 text = if(oldAccountId==null) stringResource(R.string.add)
                 else stringResource(R.string.save),
-                style = AppTypography.bodyMedium,
+                style = AppTypography.labelMedium,
                 color = White
             )
         }
