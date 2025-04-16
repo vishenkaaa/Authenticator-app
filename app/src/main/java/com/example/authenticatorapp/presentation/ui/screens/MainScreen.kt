@@ -1,4 +1,3 @@
-//package com.juraj.fluid
 package com.example.authenticatorapp.presentation.ui.screens
 
 import android.content.Context

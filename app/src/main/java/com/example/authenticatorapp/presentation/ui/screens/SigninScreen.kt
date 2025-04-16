@@ -79,7 +79,6 @@ import com.google.firebase.auth.auth
 @Composable
 fun SigninScreen(navController: NavController) {
     val colors = MaterialTheme.colorScheme
-    val auth = Firebase.auth
     val context = LocalContext.current
 
     var isNetworkAvailable by remember { mutableStateOf(false) }
@@ -161,12 +160,7 @@ fun SigninScreen(navController: NavController) {
                 )
 
                 Spacer(modifier = Modifier.height(60.dp))
-                GoogleSignInButton(auth, context, navController, agreeToTermsAndPrivacy) {
-                    loginIsPressed = true
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-                AppleSignInButton(auth, context, navController, agreeToTermsAndPrivacy){
+                GoogleSignInButton(context, navController, agreeToTermsAndPrivacy) {
                     loginIsPressed = true
                 }
 
@@ -200,15 +194,12 @@ fun SigninScreen(navController: NavController) {
                     pop()
                 }
 
-                var isChecked by remember { mutableStateOf(false) }
-
                 Row(
                     verticalAlignment = Alignment.Top
                 ) {
                     Checkbox(
-                        checked = isChecked,
+                        checked = agreeToTermsAndPrivacy,
                         onCheckedChange = {
-                            isChecked = it
                             agreeToTermsAndPrivacy = it
                         },
                         modifier = Modifier.size(18.dp),
@@ -297,66 +288,7 @@ fun SigninScreen(navController: NavController) {
 }
 
 @Composable
-fun AppleSignInButton(auth: FirebaseAuth, context: Context, navController: NavController, agreeToTermsAndPrivacy: Boolean, onLoginAttempt: () -> Unit) {
-
-    Button(
-        onClick = {
-            if(agreeToTermsAndPrivacy){
-                val provider = OAuthProvider.newBuilder("apple.com")
-                val pending = auth.pendingAuthResult
-                if (pending != null) {
-                    pending.addOnSuccessListener { result ->
-                        Log.d("AppleSignIn", "Success: ${result.user?.email}")
-                        navController.navigate("Main")
-                    }
-                        .addOnFailureListener { e ->
-                            Log.e("AppleSignIn", "Error: ${e.localizedMessage}")
-                        }
-                } else {
-                    auth.startActivityForSignInWithProvider(context as Activity, provider.build())
-                        .addOnSuccessListener { result ->
-                            Log.d("AppleSignIn", "Success: ${result.user?.email}")
-                            navController.navigate("Main")
-                        }
-                        .addOnFailureListener { e ->
-                            Log.e("AppleSignIn", "Error: ${e.localizedMessage}")
-                        }
-                }
-            }
-            else onLoginAttempt()
-        },
-        modifier = Modifier
-            .height(50.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(27.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Black
-        )
-    ) {
-        Row(
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .zIndex(1f)
-                .align(Alignment.CenterVertically)
-        ) {
-            Image(
-                painter = painterResource(R.drawable.apple),
-                contentDescription = "Apple",
-            )
-            Spacer(modifier = Modifier.width(15.dp))
-            Text(
-                text = stringResource(R.string.sign_in_with_apple),
-                color = White,
-                style = AppTypography.bodyLarge,
-            )
-        }
-    }
-}
-
-@Composable
 fun GoogleSignInButton(
-    auth: FirebaseAuth,
     context: Context,
     navController: NavController,
     agreeToTermsAndPrivacy: Boolean,
@@ -428,24 +360,6 @@ fun GoogleSignInButton(
             style = AppTypography.bodyLarge
         )
     }
-}
-
-fun firebaseAuthWithGoogle(idToken: String, auth: FirebaseAuth, navController: NavController) {
-    val credential = GoogleAuthProvider.getCredential(idToken, null)
-    auth.signOut()
-    Log.d("GoogleSignIn", "Success: ${auth.currentUser?.displayName}")
-    auth.signInWithCredential(credential)
-        .addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d("GoogleSignIn", "Success: ${auth.currentUser?.displayName}")
-
-                Handler(Looper.getMainLooper()).post {
-                    navController.navigate("Main")
-                }
-            } else {
-                Log.e("GoogleSignIn", "Error: ${task.exception?.message}")
-            }
-        }
 }
 
 private fun isNetworkConnected(connectivityManager: ConnectivityManager): Boolean {
