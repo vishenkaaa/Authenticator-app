@@ -49,10 +49,10 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putBoolean("isFinished", false)
-        editor.apply()
+//        val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
+//        val editor = sharedPreferences.edit()
+//        editor.putBoolean("isFinished", false)
+//        editor.apply()
 
         val currentLocale = Locale.getDefault().language
         if (currentLocale == "uk") {
