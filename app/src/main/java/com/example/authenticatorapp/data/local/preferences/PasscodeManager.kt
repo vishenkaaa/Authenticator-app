@@ -1,4 +1,4 @@
-package com.example.authenticatorapp.data.local.manager
+package com.example.authenticatorapp.data.local.preferences
 
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences

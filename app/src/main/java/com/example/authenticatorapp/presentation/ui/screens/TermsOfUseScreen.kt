@@ -8,11 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,8 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
-import com.example.authenticatorapp.presentation.ui.components.BulletText
-import com.example.authenticatorapp.presentation.ui.components.StyledParagraph
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 
 @Composable
@@ -58,7 +52,7 @@ fun TermsOfUseScreen(navController: NavController) {
         }
 
         Text(
-            text = stringResource(R.string.this_app_is_provided_as_is_you_use_it_at_your_own_risk_we_are_not_responsible_for_any_losses_related_to_the_use_of_this_app),
+            text = stringResource(R.string.this_app_is_provided_as_is_you_use_it_at_your_own_risk),
             style = AppTypography.labelMedium,
             color = colors.onPrimary,
             modifier = Modifier.padding(horizontal = 16.dp)

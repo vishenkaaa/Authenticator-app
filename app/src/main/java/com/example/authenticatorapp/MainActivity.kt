@@ -18,7 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.authenticatorapp.data.local.manager.PasscodeManager
+import com.example.authenticatorapp.data.local.preferences.PasscodeManager
 import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.screens.AboutAppScreen
 import com.example.authenticatorapp.presentation.ui.screens.AddAccountScreen
