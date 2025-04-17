@@ -1,8 +1,11 @@
 package com.example.authenticatorapp.presentation.ui.components
 
+import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Vibrator
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
@@ -61,6 +63,9 @@ import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
 import com.example.authenticatorapp.presentation.viewmodel.AddAccountViewModel
 import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
 import kotlinx.coroutines.launch
+import android.os.VibrationEffect
+import androidx.annotation.RequiresPermission
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,22 +80,20 @@ fun AccountItem(account: AccountEntity,
                 isLastItem: Boolean = false
 ) {
     var showConfirmDialog by remember { mutableStateOf(false) }
-    var showUpdate by remember { mutableStateOf(false) }
 
-    val sheetState = rememberModalBottomSheetState()
+    val editSheetState = rememberModalBottomSheetState()
+    val updateSheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
 
-    fun openSheet() {
-        coroutineScope.launch {
-            sheetState.show()
-        }
-    }
+    fun openEditSheet() {
+        coroutineScope.launch { editSheetState.show() } }
+    fun closeEditSheet() {
+        coroutineScope.launch { editSheetState.hide() } }
 
-    fun closeSheet() {
-        coroutineScope.launch {
-            sheetState.hide()
-        }
-    }
+    fun openUpdateSheet() {
+        coroutineScope.launch { updateSheetState.show() } }
+    fun closeUpdateSheet() {
+        coroutineScope.launch { updateSheetState.hide() } }
 
     var formattedOtp = otp.chunked(3).joinToString(" ")
 
@@ -111,7 +114,7 @@ fun AccountItem(account: AccountEntity,
             .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = {
-                        openSheet()
+                        openEditSheet()
                     }
                 )
             },
@@ -158,7 +161,7 @@ fun AccountItem(account: AccountEntity,
 
             if (!isTimeBased) {
                 Row(
-                    modifier = Modifier.clickable { showUpdate = true },
+                    modifier = Modifier.clickable { openUpdateSheet() },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -173,10 +176,10 @@ fun AccountItem(account: AccountEntity,
             }
         }
 
-        if(sheetState.isVisible)
+        if(editSheetState.isVisible)
             ModalBottomSheet(
-                onDismissRequest = { closeSheet() },
-                sheetState = sheetState,
+                onDismissRequest = { closeEditSheet() },
+                sheetState = editSheetState,
                 containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 windowInsets = WindowInsets(0, 0, 0, 0)
             ) {
@@ -186,77 +189,70 @@ fun AccountItem(account: AccountEntity,
                         .padding(horizontal = 16.dp)
                         .padding(bottom = 41.dp)
                 ) {
-                    LazyColumn {
-                        item {
-                            Column {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable(onClick = {
-                                            closeSheet()
-                                            navController.navigate("EditAccount/${account.id}")
-                                        })
-                                        .padding(vertical = 12.dp)
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.edit),
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onPrimary,
-                                        modifier = Modifier
-                                            .padding(horizontal = 16.dp)
-                                            .size(24.dp)
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.edit),
-                                        style = AppTypography.labelMedium
-                                    )
-                                }
-                                Divider(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    color = Black.copy(alpha = 0.1f)
-                                )
-                            }
+                    Column {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(onClick = {
+                                    closeEditSheet()
+                                    navController.navigate("EditAccount/${account.id}")
+                                })
+                                .padding(vertical = 12.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.edit),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp)
+                                    .size(24.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.edit),
+                                style = AppTypography.labelMedium
+                            )
                         }
-                        item {
-                            Column {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable(onClick = {
-                                            closeSheet()
-                                            showConfirmDialog = true
-                                        })
-                                        .padding(vertical = 12.dp)
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_delete),
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onPrimary,
-                                        modifier = Modifier
-                                            .padding(horizontal = 16.dp)
-                                            .size(24.dp)
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.delete),
-                                        style = AppTypography.labelMedium
-                                    )
-                                }
-                                Divider(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    color = Black.copy(alpha = 0.1f)
-                                )
-                            }
+                        Divider(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = Black.copy(alpha = 0.1f)
+                        )
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(onClick = {
+                                    closeEditSheet()
+                                    showConfirmDialog = true
+                                })
+                                .padding(vertical = 12.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_delete),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp)
+                                    .size(24.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.delete),
+                                style = AppTypography.labelMedium
+                            )
                         }
+                        Divider(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = Black.copy(alpha = 0.1f)
+                        )
                     }
                 }
             }
 
-        if (showUpdate) {
+        if (updateSheetState.isVisible) {
             ModalBottomSheet(
-                onDismissRequest = { showUpdate = false },
-                sheetState = sheetState,
+                onDismissRequest = { closeUpdateSheet() },
+                sheetState = updateSheetState,
                 containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 windowInsets = WindowInsets(0, 0, 0, 0)
             ) {
@@ -264,7 +260,7 @@ fun AccountItem(account: AccountEntity,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .padding(bottom = 86.dp),
+                        .padding(bottom = 72.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -281,13 +277,12 @@ fun AccountItem(account: AccountEntity,
                                 val updatedOtp =
                                     homeViewModel.generateOtp(account.copy(counter = account.counter + 1))
                                 formattedOtp = updatedOtp.chunked(3).joinToString(" ")
-                                showUpdate = false
+                                closeUpdateSheet()
                             }
                         },
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
-                            .fillMaxWidth()
-                            .height(50.dp),
+                            .fillMaxWidth(),
                         shape = RoundedCornerShape(24.dp),
                         colors = androidx.compose.material3.ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -301,11 +296,12 @@ fun AccountItem(account: AccountEntity,
                         androidx.compose.material.Icon(
                             painter = painterResource(R.drawable.ic_update),
                             contentDescription = "QR",
+                            modifier = Modifier.padding(vertical = 8.dp),
                             tint = if (!isSystemInDarkTheme()) MainBlue else White
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         androidx.compose.material.Text(
-                            text = "Update code",
+                            text = stringResource(R.string.update_code),
                             style = AppTypography.bodyMedium,
                             color = if (!isSystemInDarkTheme()) MainBlue else White
                         )
@@ -320,17 +316,26 @@ fun AccountItem(account: AccountEntity,
                 stringResource(R.string.are_you_sure_you_want_to_delete_this_account),
                 stringResource(R.string.delete),
                 stringResource(R.string.cancel),
-                {accountViewModel.deleteAccount(account.id)
+                {
+                    accountViewModel.deleteAccount(account.id)
                     showConfirmDialog = false },
-                {showConfirmDialog = false}
+                {
+                    showConfirmDialog = false
+                }
             )
     }
 }
 
+@RequiresPermission(Manifest.permission.VIBRATE)
 fun copyToClipboard(text: String, context: Context) {
     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val clip = ClipData.newPlainText("OTP", text)
     clipboard.setPrimaryClip(clip)
+
+    Toast.makeText(context, context.getString(R.string.code_copied_to_clipboard), Toast.LENGTH_LONG).show()
+
+    val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
 }
 
 @Composable
