@@ -170,15 +170,20 @@ fun AppLockScreen(navController: NavController, context: Context) {
                         modifier = Modifier.fillMaxWidth(),
                         color = if(!isSystemInDarkTheme()) Black.copy(alpha = 0.1f) else Gray2.copy(alpha = 0.1f)
                     )
-                    Text(
-                        text = stringResource(R.string.change_passcode),
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 18.dp)
                             .clickable { navController.navigate("verify_passcode/change") },
-                        style = AppTypography.bodyMedium,
-                        color = if(isSystemInDarkTheme()) Blue else MainBlue,
-                    )
+                    ){
+                        Text(
+                            text = stringResource(R.string.change_passcode),
+                            style = AppTypography.bodyMedium,
+                            color = if(isSystemInDarkTheme()) Blue else MainBlue,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 18.dp)
+                        )
+                    }
                 }
             }
         }

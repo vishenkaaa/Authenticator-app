@@ -168,7 +168,7 @@ fun SigninScreen(navController: NavController) {
                     }
                     pop()
 
-                    append(" and ")
+                    append(stringResource(R.string.and))
 
                     pushStringAnnotation(tag = "PRIVACY", annotation = "PRIVACY")
                     withStyle(
@@ -208,8 +208,8 @@ fun SigninScreen(navController: NavController) {
                                     .firstOrNull()
                             annotation?.let {
                                 when (it.tag) {
-                                    "TERMS" -> {}
-                                    "PRIVACY" -> {}
+                                    "TERMS" -> { navController.navigate("TermsOfUse") }
+                                    "PRIVACY" -> { navController.navigate("PrivacyPolicy")}
                                 }
                             }
                         }
@@ -318,7 +318,6 @@ fun GoogleSignInButton(
         )
     }
 
-    val colors = MaterialTheme.colorScheme
     Button(
         onClick = {
             if(agreeToTermsAndPrivacy){ launcher.launch(googleSignInClient.signInIntent) }
@@ -326,15 +325,17 @@ fun GoogleSignInButton(
         modifier = Modifier
             .height(50.dp)
             .fillMaxWidth()
-            .shadow(4.dp, shape = RoundedCornerShape(27.dp))
+            .shadow(3.dp, shape = RoundedCornerShape(27.dp))
             .border(
                 1.dp,
                 color = if (isSystemInDarkTheme()) Gray6 else White,
                 RoundedCornerShape(30.dp)
             ),
+        enabled = agreeToTermsAndPrivacy,
         shape = RoundedCornerShape(27.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = colors.onPrimaryContainer
+            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            disabledContainerColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
     ) {
         Image(
@@ -344,7 +345,7 @@ fun GoogleSignInButton(
         Spacer(modifier = Modifier.width(15.dp))
         Text(
             text = stringResource(R.string.sign_in_with_google),
-            color = colors.inversePrimary,
+            color = MaterialTheme.colorScheme.inversePrimary,
             style = AppTypography.bodyLarge
         )
     }
