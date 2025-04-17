@@ -74,19 +74,31 @@ fun AccountItem(account: AccountEntity,
                 navController: NavController,
                 isLastItem: Boolean = false
 ) {
-    var accountExpanded by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showUpdate by remember { mutableStateOf(false) }
 
-    val formattedOtp = otp.chunked(3).joinToString(" ")
+    val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
+
+    fun openSheet() {
+        coroutineScope.launch {
+            sheetState.show()
+        }
+    }
+
+    fun closeSheet() {
+        coroutineScope.launch {
+            sheetState.hide()
+        }
+    }
+
+    var formattedOtp = otp.chunked(3).joinToString(" ")
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 6.dp)
-            .then(if(isLastItem) Modifier.padding(bottom = 106.dp) else Modifier)
+            .then(if (isLastItem) Modifier.padding(bottom = 106.dp) else Modifier)
             .shadow(
                 elevation = 5.dp,
                 shape = RoundedCornerShape(24.dp),
@@ -99,7 +111,7 @@ fun AccountItem(account: AccountEntity,
             .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = {
-                        accountExpanded = true
+                        openSheet()
                     }
                 )
             },
@@ -161,9 +173,9 @@ fun AccountItem(account: AccountEntity,
             }
         }
 
-        if(accountExpanded)
+        if(sheetState.isVisible)
             ModalBottomSheet(
-                onDismissRequest = { accountExpanded = false },
+                onDismissRequest = { closeSheet() },
                 sheetState = sheetState,
                 containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 windowInsets = WindowInsets(0, 0, 0, 0)
@@ -182,7 +194,7 @@ fun AccountItem(account: AccountEntity,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable(onClick = {
-                                            accountExpanded = false
+                                            closeSheet()
                                             navController.navigate("EditAccount/${account.id}")
                                         })
                                         .padding(vertical = 12.dp)
@@ -213,7 +225,7 @@ fun AccountItem(account: AccountEntity,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable(onClick = {
-                                            accountExpanded = false
+                                            closeSheet()
                                             showConfirmDialog = true
                                         })
                                         .padding(vertical = 12.dp)
@@ -255,49 +267,48 @@ fun AccountItem(account: AccountEntity,
                         .padding(bottom = 86.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    LazyColumn {
-                        item {
-                            Text(
-                                text = "Are you sure you want to update\nthe code?",
-                                style = AppTypography.bodyMedium,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Spacer(Modifier.height(16.dp))
-                            Button(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        accountViewModel.incrementCounter(account)
-
-                                        val updatedOtp = homeViewModel.generateOtp(account.copy(counter = account.counter + 1))
-
-                                        showUpdate = false
-                                    }
-                                },
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-                                    .fillMaxWidth()
-                                    .height(50.dp),
-                                shape = RoundedCornerShape(24.dp),
-                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    contentColor = MainBlue
-                                ),
-                                border = if (!isSystemInDarkTheme()) BorderStroke(2.dp, MainBlue) else BorderStroke(2.dp, Gray6)
-                            ) {
-                                androidx.compose.material.Icon(
-                                    painter = painterResource(R.drawable.ic_update),
-                                    contentDescription = "QR",
-                                    tint = if (!isSystemInDarkTheme()) MainBlue else White
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                androidx.compose.material.Text(
-                                    text = "Update code",
-                                    style = AppTypography.bodyMedium,
-                                    color = if (!isSystemInDarkTheme()) MainBlue else White
-                                )
+                    Text(
+                        text = stringResource(R.string.are_you_sure_you_want_to_update_the_code),
+                        style = AppTypography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                accountViewModel.incrementCounter(account)
+                                val updatedOtp =
+                                    homeViewModel.generateOtp(account.copy(counter = account.counter + 1))
+                                formattedOtp = updatedOtp.chunked(3).joinToString(" ")
+                                showUpdate = false
                             }
-                        }
+                        },
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(24.dp),
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            contentColor = MainBlue
+                        ),
+                        border = if (!isSystemInDarkTheme()) BorderStroke(
+                            2.dp,
+                            MainBlue
+                        ) else BorderStroke(2.dp, Gray6)
+                    ) {
+                        androidx.compose.material.Icon(
+                            painter = painterResource(R.drawable.ic_update),
+                            contentDescription = "QR",
+                            tint = if (!isSystemInDarkTheme()) MainBlue else White
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        androidx.compose.material.Text(
+                            text = "Update code",
+                            style = AppTypography.bodyMedium,
+                            color = if (!isSystemInDarkTheme()) MainBlue else White
+                        )
                     }
                 }
             }
