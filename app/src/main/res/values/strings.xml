@@ -117,4 +117,19 @@
     <string name="account_successfully_updated">Account successfully updated</string>
     <string name="qr_code_does_not_contain_valid_authenticator_data_make_sure_you_are_scanning_the_correct_qr_code">QR code does not contain valid authenticator data. Make sure you are scanning the correct QR code.</string>
     <string name="scanning_error_">Scanning Error</string>
+    <string name="feedback">Feedback</string>
+    <string name="choose_email_client">Choose email client</string>
+    <string name="no_email_client_found">No email client found</string>
+    <string name="last_updated_april_2025">Last updated: April 2025</string>
+    <string name="your_privacy_is_very_important_to_us_the_otp_authenticator_app_does_not_collect_store_or_share_any_personal_user_data">Your privacy is very important to us. The OTP Authenticator app does not collect, store, or share any personal user data.</string>
+    <string name="what_we_do_not_do">What we do not do:</string>
+    <string name="we_do_not_collect_personal_information_name_email_etc">We do not collect personal information (name, email, etc.).</string>
+    <string name="we_do_not_share_your_data_with_third_parties">We do not share your data with third parties.</string>
+    <string name="all_accounts_and_otp_codes_are_stored_locally_on_your_device">All accounts and OTP codes are stored locally on your device.</string>
+    <string name="we_use_encrypted_storage_to_protect_your_accounts_you_are_responsible_for_the_security_of_your_device">We use encrypted storage to protect your accounts. You are responsible for the security of your device.</string>
+    <string name="security">Security:</string>
+    <string name="this_app_is_provided_as_is_you_use_it_at_your_own_risk">
+        This app is provided &quot;as is&quot;. You use it at your own risk. We are not responsible for any losses related to the use of this app.
+    </string>
+    <string name="invalid_secret_format">Invalid secret format</string>
 </resources>

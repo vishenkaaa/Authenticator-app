@@ -8,6 +8,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -18,7 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.authenticatorapp.data.local.manager.PasscodeManager
+import com.example.authenticatorapp.data.local.preferences.PasscodeManager
 import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.screens.AboutAppScreen
 import com.example.authenticatorapp.presentation.ui.screens.AddAccountScreen
@@ -30,10 +32,12 @@ import com.example.authenticatorapp.presentation.ui.screens.OnboardingScreen
 import com.example.authenticatorapp.presentation.ui.screens.PasscodeScreen
 import com.example.authenticatorapp.presentation.ui.screens.PaywallScreen
 import com.example.authenticatorapp.presentation.ui.screens.PremiumFeaturesScreen
+import com.example.authenticatorapp.presentation.ui.screens.PrivacyPolicyScreen
 import com.example.authenticatorapp.presentation.ui.screens.QRcodeScreen
 import com.example.authenticatorapp.presentation.ui.screens.SigninScreen
 import com.example.authenticatorapp.presentation.ui.screens.SplashScreen
 import com.example.authenticatorapp.presentation.ui.screens.SubscriptionScreen
+import com.example.authenticatorapp.presentation.ui.screens.TermsOfUseScreen
 import com.example.authenticatorapp.presentation.ui.theme.AuthenticatorAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
@@ -44,15 +48,20 @@ class MainActivity : FragmentActivity() {
     private var isAppLocked = false
     private var isInBackground = false
     private lateinit var navHostController: NavController
+    private var backgroundStartTime: Long = 0
+    private var wasSplashShown = false
+
+    override fun onBackPressed() {
+        val currentRoute = navHostController.currentDestination?.route
+
+        if (currentRoute == "Home" || currentRoute == "Main") {
+            finish()
+        } else super.onBackPressed()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putBoolean("isFinished", false)
-        editor.apply()
 
         val currentLocale = Locale.getDefault().language
         if (currentLocale == "uk") {
@@ -64,19 +73,23 @@ class MainActivity : FragmentActivity() {
         window?.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
 
         lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStop(owner: LifecycleOwner) {
+                isInBackground = true
+                backgroundStartTime = System.currentTimeMillis()
+            }
+
             override fun onResume(owner: LifecycleOwner) {
                 if (isInBackground) {
                     isInBackground = false
+                    val timeInBackground = System.currentTimeMillis() - backgroundStartTime
                     val passcodeManager = PasscodeManager(this@MainActivity)
-                    if (passcodeManager.isPasscodeSet() && isAppLocked) {
+
+                    isAppLocked = timeInBackground > 5_000 && passcodeManager.isPasscodeSet()
+
+                    if (isAppLocked) {
                         checkLockAndNavigate()
                     }
                 }
-            }
-
-            override fun onStop(owner: LifecycleOwner) {
-                isInBackground = true
-                isAppLocked = true
             }
         })
 
@@ -88,8 +101,15 @@ class MainActivity : FragmentActivity() {
                     val navController = rememberNavController()
                     navHostController = navController
 
-                    NavHost(navController = navController, startDestination = "Splash"){
+                    val startDestination = if (wasSplashShown) {
+                        if (PasscodeManager(this@MainActivity).isPasscodeSet() && isAppLocked) {
+                            "verify_passcode/unlock"
+                        } else "Main"
+                    } else "Splash"
+
+                    NavHost(navController = navController, startDestination = startDestination){
                         composable("Splash"){
+                            wasSplashShown = true
                             SplashScreen(navController, this@MainActivity)
                         }
                         composable("Onboarding") {
@@ -177,6 +197,12 @@ class MainActivity : FragmentActivity() {
                                     }
                                 }
                             }
+                        }
+                        composable("PrivacyPolicy") {
+                            PrivacyPolicyScreen(navController)
+                        }
+                        composable("TermsOfUse") {
+                            TermsOfUseScreen(navController)
                         }
                     }
                 }

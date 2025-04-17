@@ -17,6 +17,7 @@ import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.components.InfoBlock
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
+import com.example.authenticatorapp.presentation.utils.sendFeedbackEmail
 
 @Composable
 fun InfoScreen(navController: NavController, context: Context){
@@ -40,17 +41,23 @@ fun InfoScreen(navController: NavController, context: Context){
             InfoItem(
                 icon = R.drawable.ic_message,
                 text = stringResource(R.string.contact_us),
-                onClick = { }
+                onClick = {
+                    sendFeedbackEmail(context)
+                }
             ),
             InfoItem(
                 icon = R.drawable.ic_file,
                 text = stringResource(R.string.privacy_policy),
-                onClick = { }
+                onClick = {
+                    navController.navigate("PrivacyPolicy")
+                }
             ),
             InfoItem(
                 icon = R.drawable.ic_file,
                 text = stringResource(R.string.terms_of_use),
-                onClick = { }
+                onClick = {
+                    navController.navigate("TermsOfUse")
+                }
             )
         )
 

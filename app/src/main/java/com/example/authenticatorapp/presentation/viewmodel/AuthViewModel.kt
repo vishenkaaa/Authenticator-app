@@ -98,7 +98,9 @@ class AuthViewModel @Inject constructor(
     }
 
     fun signOut(context: Context) {
-        authRepository.signOut(context)
+        viewModelScope.launch {
+            authRepository.signOut(context)
+        }
         _authState.value = AuthState.SignedOut
         checkAuthStatus()
     }

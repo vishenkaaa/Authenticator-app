@@ -1,13 +1,9 @@
 package com.example.authenticatorapp.presentation.ui.screens
 
-import android.annotation.SuppressLint
-import android.content.ClipDescription
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,16 +12,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -38,7 +29,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -51,25 +41,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.MainActivity
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.data.local.preferences.OnBoardingPreferences
 import com.example.authenticatorapp.presentation.ui.components.SubscriptionOption
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
-import com.example.authenticatorapp.presentation.ui.theme.Blue
 import com.example.authenticatorapp.presentation.ui.theme.Gray1
 import com.example.authenticatorapp.presentation.ui.theme.Gray2
-import com.example.authenticatorapp.presentation.ui.theme.Gray3
 import com.example.authenticatorapp.presentation.ui.theme.LightBlue
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
-import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
 import com.example.authenticatorapp.presentation.viewmodel.SubscriptionViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun PaywallScreen(navController: NavController, context: MainActivity, viewModel: SubscriptionViewModel = hiltViewModel()){
-
+    val prefs = OnBoardingPreferences(context)
     Box(
         modifier = Modifier.fillMaxSize()
     ){
@@ -98,23 +84,24 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
-                            if(onBoardingIsFinished(context)) navController.popBackStack()
+                            if(prefs.isFinished()) navController.popBackStack()
                             else navController.navigate("Main")
-                            onBoardingIsDone(context)
+                            prefs.setFinished()
                         }
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = stringResource(R.string.restore),
-                    color = White,
-                    style = AppTypography.bodySmall,
-                    modifier = Modifier
-                        .padding(start = 5.dp, top = 5.dp, bottom = 5.dp)
-                        .clickable {
-                            navController.popBackStack()
-                            navController.navigate("Onboarding")
-                        }
-                )
+                if(!prefs.isFinished())
+                    Text(
+                        text = stringResource(R.string.restore),
+                        color = White,
+                        style = AppTypography.bodySmall,
+                        modifier = Modifier
+                            .padding(start = 10.dp, top = 10.dp, bottom = 10.dp)
+                            .clickable {
+                                navController.popBackStack()
+                                navController.navigate("Onboarding")
+                            }
+                    )
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -210,9 +197,9 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
                             hasFreeTrial = freeTrialIsSelected
                         )
 
-                    if(onBoardingIsFinished(context)) navController.popBackStack()
+                    if(prefs.isFinished()) navController.popBackStack()
                     else navController.navigate("Main")
-                    onBoardingIsDone(context)
+                    prefs.setFinished()
                 },
                 modifier = Modifier
                     .height(50.dp)
@@ -269,6 +256,8 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
                     fontWeight = FontWeight.W400,
                     fontSize = 12.sp,
                     textDecoration = TextDecoration.Underline,
+                    modifier = Modifier.clickable { navController.navigate("TermsOfUse") }
+                        .padding(vertical = 4.dp)
                 )
                 Text(
                     text = "\u2022",
@@ -283,16 +272,10 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
                     fontWeight = FontWeight.W400,
                     fontSize = 12.sp,
                     textDecoration = TextDecoration.Underline,
+                    modifier = Modifier.clickable { navController.navigate("PrivacyPolicy") }
+                        .padding(vertical = 4.dp)
                 )
             }
         }
     }
-}
-
-@SuppressLint("CommitPrefEdits")
-private fun onBoardingIsDone(context: MainActivity){
-    val sharedPreferences = context.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
-    val editor = sharedPreferences.edit()
-    editor.putBoolean("isFinished", true)
-    editor.apply()
 }

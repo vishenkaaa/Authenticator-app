@@ -1,4 +1,4 @@
-package com.example.authenticatorapp.data.local.manager
+package com.example.authenticatorapp.presentation.utils
 
 import android.content.Context
 import androidx.biometric.BiometricManager

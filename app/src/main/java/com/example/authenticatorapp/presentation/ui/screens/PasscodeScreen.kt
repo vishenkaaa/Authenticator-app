@@ -1,5 +1,7 @@
 package com.example.authenticatorapp.presentation.ui.screens
 
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -46,8 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
-import com.example.authenticatorapp.data.local.manager.BiometricAuthManager
-import com.example.authenticatorapp.data.local.manager.PasscodeManager
+import com.example.authenticatorapp.presentation.utils.BiometricAuthManager
+import com.example.authenticatorapp.data.local.preferences.PasscodeManager
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Blue
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
@@ -111,6 +113,12 @@ fun PasscodeScreen(
         if (showBiometricPrompt) {
             delay(300)
             showBiometricAuth()
+        }
+    }
+
+    if (!isCreatingMode && !isEditingMode && action == "unlock") {
+        BackHandler {
+            (context as? Activity)?.finish()
         }
     }
 

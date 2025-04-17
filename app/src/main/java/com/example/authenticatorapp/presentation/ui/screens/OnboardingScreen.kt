@@ -108,7 +108,7 @@ fun OnboardingScreen(navController: NavController){
                     color = White,
                     style = AppTypography.bodySmall,
                     modifier = Modifier
-                        .padding(start = 5.dp, top = 5.dp, bottom = 5.dp)
+                        .padding(start = 10.dp, top = 10.dp, bottom = 10.dp)
                         .clickable {
                             coroutineScope.launch {
                                 pagerState.animateScrollToPage(0)
@@ -223,8 +223,9 @@ fun OnboardingScreen(navController: NavController){
                     color = White,
                     fontWeight = FontWeight.W400,
                     fontSize = 12.sp,
-                    fontFamily = interFontFamily,
                     textDecoration = TextDecoration.Underline,
+                    modifier = Modifier.clickable { navController.navigate("TermsOfUse") }
+                        .padding(vertical = 4.dp)
                 )
                 Text(
                     text = "\u2022",
@@ -239,6 +240,8 @@ fun OnboardingScreen(navController: NavController){
                     fontWeight = FontWeight.W400,
                     fontSize = 12.sp,
                     textDecoration = TextDecoration.Underline,
+                    modifier = Modifier.clickable { navController.navigate("PrivacyPolicy") }
+                        .padding(vertical = 4.dp)
                 )
             }
         }

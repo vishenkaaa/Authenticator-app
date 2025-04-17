@@ -1,6 +1,5 @@
 package com.example.authenticatorapp.presentation.ui.screens
 
-import android.content.Context
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -29,7 +28,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.MainActivity
 import com.example.authenticatorapp.R
-import com.example.authenticatorapp.data.local.manager.PasscodeManager
+import com.example.authenticatorapp.data.local.preferences.PasscodeManager
+import com.example.authenticatorapp.data.local.preferences.OnBoardingPreferences
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
 import kotlinx.coroutines.delay
@@ -43,6 +43,8 @@ fun SplashScreen(navController: NavController, context: MainActivity) {
 
     val passcodeManager = remember { PasscodeManager(context) }
     var isPasscodeEnabled by remember { mutableStateOf(passcodeManager.isPasscodeSet())}
+
+    val prefs = OnBoardingPreferences(context)
 
     val alpha = remember {
         Animatable(0f)
@@ -62,7 +64,7 @@ fun SplashScreen(navController: NavController, context: MainActivity) {
 
         delay(500)
 
-        if (onBoardingIsFinished(context = context)) {
+        if (prefs.isFinished()) {
             navController.popBackStack()
             if (isPasscodeEnabled) {
                 navController.navigate("verify_passcode/unlock") {
@@ -116,9 +118,4 @@ fun SplashScreen(navController: NavController, context: MainActivity) {
             )
         }
     }
-}
-
-fun onBoardingIsFinished(context: MainActivity): Boolean{
-    val sharedPreferences = context.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
-    return sharedPreferences.getBoolean("isFinished", false)
 }
