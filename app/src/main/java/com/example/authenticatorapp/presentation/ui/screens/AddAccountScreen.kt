@@ -58,12 +58,21 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddAccountScreen(navController: NavController, context: Context, viewModel: AddAccountViewModel = hiltViewModel(), oldAccountId: Int? = null) {
     val colors = MaterialTheme.colorScheme
-    val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
-    val base32Regex = Regex("^[A-Z2-7]+=*$")
+    val serviceSheetState = rememberModalBottomSheetState()
+    val keySheetState = rememberModalBottomSheetState()
+    val coroutineScope = rememberCoroutineScope()
 
-    var serviceExpanded by remember { mutableStateOf(false) }
-    var typesOfKeyExpanded by remember { mutableStateOf(false) }
+    fun openSheetService() {
+        coroutineScope.launch { serviceSheetState.show() } }
+    fun closeSheetService() {
+        coroutineScope.launch { serviceSheetState.hide() } }
+
+    fun openSheetKey() {
+        coroutineScope.launch { keySheetState.show() } }
+    fun closeSheetKey() {
+        coroutineScope.launch { keySheetState.hide() } }
+
+    val base32Regex = Regex("^[A-Z2-7]+=*$")
 
     val txt_time_based = stringResource(R.string.time_based)
     var selectedService by remember { mutableStateOf("") }
@@ -124,7 +133,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(20.dp))
-                .clickable { serviceExpanded = true }
+                .clickable { openSheetService() }
         ) {
             OutlinedTextField(
                 value = selectedService,
@@ -222,7 +231,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(20.dp))
-                .clickable { typesOfKeyExpanded = true }
+                .clickable { openSheetKey() }
         ) {
             OutlinedTextField(
                 value = selectedTypeOfKey,
@@ -254,7 +263,6 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { typesOfKeyExpanded = true },
             )
         }
 
@@ -342,10 +350,10 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
         }
     }
 
-    if (serviceExpanded) {
+    if (serviceSheetState.isVisible) {
         ModalBottomSheet(
-            onDismissRequest = { serviceExpanded = false },
-            sheetState = sheetState,
+            onDismissRequest = { closeSheetService() },
+            sheetState = serviceSheetState,
             containerColor = colors.onPrimaryContainer,
             windowInsets = WindowInsets(0, 0, 0, 0)
         ) {
@@ -373,9 +381,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             iconResId = R.drawable.s_banking_and_finance
                         ) {
                             selectedService = txt_banking
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) serviceExpanded = false
-                            }
+                            closeSheetService()
                         }
                     }
 
@@ -385,9 +391,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             iconResId = R.drawable.s_website
                         ) {
                             selectedService = txt_website
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) serviceExpanded = false
-                            }
+                            closeSheetService()
                         }
                     }
 
@@ -397,9 +401,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             iconResId = R.drawable.s_mail
                         ) {
                             selectedService = txt_mail
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) serviceExpanded = false
-                            }
+                            closeSheetService()
                         }
                     }
 
@@ -409,9 +411,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             iconResId = R.drawable.s_social
                         ) {
                             selectedService = txt_social
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) serviceExpanded = false
-                            }
+                            closeSheetService()
                         }
                     }
 
@@ -430,9 +430,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             iconResId = R.drawable.s_google
                         ) {
                             selectedService = "Google"
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) serviceExpanded = false
-                            }
+                            closeSheetService()
                         }
                     }
 
@@ -442,9 +440,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             iconResId = R.drawable.s_instagram
                         ) {
                             selectedService = "Instagram"
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) serviceExpanded = false
-                            }
+                            closeSheetService()
                         }
                     }
 
@@ -454,9 +450,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             iconResId = R.drawable.s_facebook
                         ) {
                             selectedService = "Facebook"
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) serviceExpanded = false
-                            }
+                            closeSheetService()
                         }
                     }
 
@@ -466,9 +460,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             iconResId = R.drawable.s_linkedin
                         ) {
                             selectedService = "LinkedIn"
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) serviceExpanded = false
-                            }
+                            closeSheetService()
                         }
                     }
 
@@ -478,9 +470,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             iconResId = R.drawable.s_amazon_png
                         ) {
                             selectedService = "Amazon"
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) serviceExpanded = false
-                            }
+                            closeSheetService()
                         }
                     }
 
@@ -490,9 +480,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             iconResId = R.drawable.s_paypall_png
                         ) {
                             selectedService = "PayPal"
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) serviceExpanded = false
-                            }
+                            closeSheetService()
                         }
                     }
 
@@ -502,9 +490,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             iconResId = R.drawable.s_microsoft
                         ) {
                             selectedService = "Microsoft"
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) serviceExpanded = false
-                            }
+                            closeSheetService()
                         }
                     }
 
@@ -514,9 +500,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             iconResId = R.drawable.s_discord
                         ) {
                             selectedService = "Discord"
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) serviceExpanded = false
-                            }
+                            closeSheetService()
                         }
                     }
 
@@ -526,9 +510,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             iconResId = R.drawable.s_reddit_png
                         ) {
                             selectedService = "Reddit"
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) serviceExpanded = false
-                            }
+                            closeSheetService()
                         }
                     }
 
@@ -538,9 +520,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             iconResId = R.drawable.s_netflix
                         ) {
                             selectedService = "Netflix"
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) serviceExpanded = false
-                            }
+                            closeSheetService()
                         }
                     }
                 }
@@ -548,10 +528,10 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
         }
     }
 
-    if (typesOfKeyExpanded) {
+    if (keySheetState.isVisible) {
         ModalBottomSheet(
-            onDismissRequest = { typesOfKeyExpanded = false },
-            sheetState = sheetState,
+            onDismissRequest = { openSheetKey() },
+            sheetState = keySheetState,
             containerColor = colors.onPrimaryContainer,
             windowInsets = WindowInsets(0, 0, 0, 0)
         ) {
@@ -566,16 +546,12 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
 
                 SimpleServiceItem(text = stringResource(R.string.time_based)) {
                     selectedTypeOfKey = txt_time_based
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) typesOfKeyExpanded = false
-                    }
+                    closeSheetKey()
                 }
 
                 SimpleServiceItem(text = stringResource(R.string.counter_based)) {
                     selectedTypeOfKey = txt_counter_based
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) typesOfKeyExpanded = false
-                    }
+                    closeSheetKey()
                 }
             }
         }

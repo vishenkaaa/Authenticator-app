@@ -74,13 +74,25 @@ fun AccountItem(account: AccountEntity,
                 navController: NavController,
                 isLastItem: Boolean = false
 ) {
-    var accountExpanded by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showUpdate by remember { mutableStateOf(false) }
 
-    var formattedOtp = otp.chunked(3).joinToString(" ")
+    val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
+
+    fun openSheet() {
+        coroutineScope.launch {
+            sheetState.show()
+        }
+    }
+
+    fun closeSheet() {
+        coroutineScope.launch {
+            sheetState.hide()
+        }
+    }
+
+    var formattedOtp = otp.chunked(3).joinToString(" ")
 
     Row(
         modifier = Modifier
@@ -99,7 +111,7 @@ fun AccountItem(account: AccountEntity,
             .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = {
-                        accountExpanded = true
+                        openSheet()
                     }
                 )
             },
@@ -161,9 +173,9 @@ fun AccountItem(account: AccountEntity,
             }
         }
 
-        if(accountExpanded)
+        if(sheetState.isVisible)
             ModalBottomSheet(
-                onDismissRequest = { accountExpanded = false },
+                onDismissRequest = { closeSheet() },
                 sheetState = sheetState,
                 containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 windowInsets = WindowInsets(0, 0, 0, 0)
@@ -182,7 +194,7 @@ fun AccountItem(account: AccountEntity,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable(onClick = {
-                                            accountExpanded = false
+                                            closeSheet()
                                             navController.navigate("EditAccount/${account.id}")
                                         })
                                         .padding(vertical = 12.dp)
@@ -213,7 +225,7 @@ fun AccountItem(account: AccountEntity,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable(onClick = {
-                                            accountExpanded = false
+                                            closeSheet()
                                             showConfirmDialog = true
                                         })
                                         .padding(vertical = 12.dp)
