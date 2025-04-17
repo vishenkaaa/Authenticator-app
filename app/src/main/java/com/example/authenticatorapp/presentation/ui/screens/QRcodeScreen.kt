@@ -61,136 +61,130 @@ import com.example.authenticatorapp.presentation.utils.QRCodeAnalyzer
 import com.example.authenticatorapp.presentation.viewmodel.AddAccountViewModel
 
 @Composable
-fun QRcodeScreen(navController: NavController){
+fun QRcodeScreen(navController: NavController) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val previewView = remember{PreviewView(context)}
-
-    var hasCameraPermission by remember { mutableStateOf(false) }
+    val previewView = remember { PreviewView(context) }
     var showInvalidQrDialog by remember { mutableStateOf(false) }
-
     val camera = remember { mutableStateOf<Camera?>(null) }
-
     val viewModel: AddAccountViewModel = hiltViewModel()
 
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { granted ->
-            hasCameraPermission = granted
-        }
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView(
+            factory = { previewView },
+            modifier = Modifier.fillMaxSize()
+        ) { view ->
+            val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+            cameraProviderFuture.addListener({
+                val cameraProvider = cameraProviderFuture.get()
+                val preview = Preview.Builder().build().also {
+                    it.setSurfaceProvider(view.surfaceProvider)
+                }
+                val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+                val imageAnalyzer = ImageAnalysis.Builder()
+                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                    .build()
+                    .also {
+                        it.setAnalyzer(
+                            ContextCompat.getMainExecutor(context),
+                            QRCodeAnalyzer(
+                                viewModel = viewModel,
+                                navController = navController,
+                                context = context,
+                                onDismiss = { showInvalidQrDialog = true }
+                            )
+                        )
+                    }
 
-    LaunchedEffect(Unit) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            hasCameraPermission = true
-        } else {
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                try {
+                    cameraProvider.unbindAll()
+                    camera.value = cameraProvider.bindToLifecycle(
+                        lifecycleOwner, cameraSelector, preview, imageAnalyzer
+                    )
+                } catch (exc: Exception) {
+                    Log.e("QRcodeScreen", "Camera binding failed", exc)
+                }
+            }, ContextCompat.getMainExecutor(context))
+
+        }
+
+        QRScannerLayout()
+
+        TopAppBar(
+            backgroundColor = Color.Transparent,
+            elevation = 0.dp,
+            modifier = Modifier.padding(top = 52.dp),
+            contentColor = Color.White,
+            title = {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) { Text(stringResource(R.string.scan_qr_code)) }
+            },
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        painterResource(R.drawable.back),
+                        contentDescription = "Back",
+                        tint = Color.White
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = { navController.navigate("Main") }) {
+                    Icon(
+                        painterResource(R.drawable.close),
+                        contentDescription = "Close",
+                        tint = Color.White
+                    )
+                }
+            }
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 80.dp)
+                .align(Alignment.BottomCenter),
+        ) {
+            Spacer(Modifier.weight(1f))
+            FlashToggleButton(camera)
+            Spacer(Modifier.width(60.dp))
+            GalleryButton(viewModel, navController)
+            Spacer(Modifier.weight(1f))
         }
     }
 
-    if (hasCameraPermission) {
-        Box(modifier = Modifier.fillMaxSize()){
-            AndroidView(
-                factory = { previewView },
-                modifier = Modifier.fillMaxSize()
-            ) { view ->
-                val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-                cameraProviderFuture.addListener({
-                    val cameraProvider = cameraProviderFuture.get()
-                    val preview = Preview.Builder().build().also {
-                        it.setSurfaceProvider(view.surfaceProvider)
-                    }
-                    val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-                    val imageAnalyzer = ImageAnalysis.Builder()
-                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                        .build()
-                        .also {
-                            it.setAnalyzer(
-                                ContextCompat.getMainExecutor(context),
-                                QRCodeAnalyzer(
-                                    viewModel = viewModel,
-                                    navController = navController,
-                                    context = context,
-                                    onDismiss = {showInvalidQrDialog = true}
-                                )
-                            )
-                        }
-
-                    try {
-                        cameraProvider.unbindAll()
-                        camera.value = cameraProvider.bindToLifecycle(
-                            lifecycleOwner, cameraSelector, preview, imageAnalyzer
-                        )
-                    } catch (exc: Exception) {
-                        Log.e("QRcodeScreen", "Camera binding failed", exc)
-                    }
-                }, ContextCompat.getMainExecutor(context))
-
-            }
-
-            QRScannerLayout()
-
-            TopAppBar(
-                backgroundColor = Color.Transparent,
-                elevation = 0.dp,
-                modifier = Modifier.padding(top = 52.dp),
-                contentColor = Color.White,
-                title = { Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) { Text(stringResource(R.string.scan_qr_code)) }},
-                navigationIcon = {
-                    IconButton(onClick = {navController.popBackStack()}) {
-                        Icon(painterResource(R.drawable.back),
-                            contentDescription = "Back",
-                            tint = Color.White)
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {navController.navigate("Main")}) {
-                        Icon(painterResource(R.drawable.close),
-                            contentDescription = "Close",
-                            tint = Color.White)
-                    }
-                }
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 80.dp)
-                    .align(Alignment.BottomCenter),
-            ) {
-                Spacer(Modifier.weight(1f))
-                FlashToggleButton(camera)
-                Spacer(Modifier.width(60.dp))
-                GalleryButton(viewModel, navController)
-                Spacer(Modifier.weight(1f))
-            }
-        }
-
-        if (showInvalidQrDialog) {
-            AlertDialog(
-                onDismissRequest = { showInvalidQrDialog = false },
-                title = { Text(stringResource(R.string.scanning_error_), color = MaterialTheme.colorScheme.onPrimary) },
-                text = { Text(
+    if (showInvalidQrDialog) {
+        AlertDialog(
+            onDismissRequest = { showInvalidQrDialog = false },
+            title = {
+                Text(
+                    stringResource(R.string.scanning_error_),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            },
+            text = {
+                Text(
                     stringResource(R.string.qr_code_does_not_contain_valid_authenticator_data_make_sure_you_are_scanning_the_correct_qr_code),
-                    color = MaterialTheme.colorScheme.onPrimary) },
-                confirmButton = {
-                    Button(
-                        onClick = { showInvalidQrDialog = false },
-                        colors = buttonColors(
-                            backgroundColor = MainBlue,
-                            contentColor = Color.White
-                        )) {
-                        Text("ОК")
-                    }
-                },
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showInvalidQrDialog = false },
+                    colors = buttonColors(
+                        backgroundColor = MainBlue,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("ОК")
+                }
+            },
 
-                backgroundColor = MaterialTheme.colorScheme.background,
-                shape = RoundedCornerShape(16.dp)
-            )
-        }
+            backgroundColor = MaterialTheme.colorScheme.background,
+            shape = RoundedCornerShape(16.dp)
+        )
     }
 }
 
