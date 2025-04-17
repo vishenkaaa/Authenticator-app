@@ -95,4 +95,6 @@ dependencies {
     implementation (libs.androidx.lifecycle.viewmodel.ktx)
     implementation (libs.androidx.security.crypto)
     implementation (libs.androidx.biometric)
+
+    implementation("commons-net:commons-net:3.9.0")
 }

@@ -29,7 +29,7 @@ class HomeViewModel @Inject constructor(private val accountDao: AccountDao) : Vi
             initialValue = emptyList()
         )
 
-    fun generateOtp(account: AccountEntity): String {
+    suspend fun generateOtp(account: AccountEntity): String {
         return try {
             if (account.type == "TOTP") {
                 OtpGenerator.generateTOTP(account.secret, 30, account.digits, account.algorithm)
