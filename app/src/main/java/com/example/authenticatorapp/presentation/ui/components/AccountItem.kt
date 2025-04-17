@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +60,7 @@ import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
 import com.example.authenticatorapp.presentation.viewmodel.AddAccountViewModel
 import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,8 +79,8 @@ fun AccountItem(account: AccountEntity,
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showUpdate by remember { mutableStateOf(false) }
 
-    var currentOtp by remember { mutableStateOf(otp) }
-    val formattedOtp = currentOtp.chunked(3).joinToString(" ")
+    val formattedOtp = otp.chunked(3).joinToString(" ")
+    val coroutineScope = rememberCoroutineScope()
 
     Row(
         modifier = Modifier
@@ -264,9 +266,13 @@ fun AccountItem(account: AccountEntity,
                             Spacer(Modifier.height(16.dp))
                             Button(
                                 onClick = {
-                                    accountViewModel.incrementCounter(account)
-                                    currentOtp = homeViewModel.generateOtp(account.copy(counter = account.counter + 1))
-                                    showUpdate = false
+                                    coroutineScope.launch {
+                                        accountViewModel.incrementCounter(account)
+
+                                        val updatedOtp = homeViewModel.generateOtp(account.copy(counter = account.counter + 1))
+
+                                        showUpdate = false
+                                    }
                                 },
                                 modifier = Modifier
                                     .padding(horizontal = 16.dp)

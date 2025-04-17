@@ -55,6 +55,7 @@ import com.example.authenticatorapp.presentation.ui.theme.Gray3
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
+import com.example.authenticatorapp.presentation.utils.NtpTimeProvider.getNtpTime
 import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
 import kotlinx.coroutines.delay
 
@@ -161,16 +162,28 @@ fun HomeScreen(
                 LazyColumn() {
                     itemsIndexed(filteredAccounts) { index, account ->
                         val isLastItem = index == filteredAccounts.size - 1
-                        val otp = remember { mutableStateOf(viewModel.generateOtp(account)) }
-                        val remainingTime = remember { mutableStateOf(calculateRemainingTime()) }
 
-                        LaunchedEffect(Unit) {
+                        val otp = remember { mutableStateOf("...") }
+                        val remainingTime = remember { mutableStateOf(30) }
+
+                        LaunchedEffect(account.id) {
+                            var lastCounter: Long = -1L
+                            val timeStep = 30L
+
                             while (true) {
-                                delay(1000)
-                                remainingTime.value = calculateRemainingTime()
-                                if (remainingTime.value <= 1) {
+                                val ntpTime = getNtpTime() ?: System.currentTimeMillis()
+                                val currentTimeSeconds = ntpTime / 1000
+                                val currentCounter = currentTimeSeconds / timeStep
+                                val remaining = (timeStep - (currentTimeSeconds % timeStep)).toInt()
+
+                                remainingTime.value = remaining
+
+                                if (currentCounter != lastCounter) {
                                     otp.value = viewModel.generateOtp(account)
+                                    lastCounter = currentCounter
                                 }
+
+                                delay(1000)
                             }
                         }
 
@@ -280,8 +293,9 @@ private fun matchesSearchQuery(account: AccountEntity, query: String): Boolean {
             account.email.lowercase().contains(searchLower)
 }
 
-private fun calculateRemainingTime(): Int {
+private suspend fun calculateRemainingTime(): Int {
     val periodSeconds = 30
-    val currentTimeSeconds = System.currentTimeMillis() / 1000
+    val ntpTime = getNtpTime() ?: System.currentTimeMillis()
+    val currentTimeSeconds = ntpTime / 1000
     return periodSeconds - (currentTimeSeconds % periodSeconds).toInt()
 }

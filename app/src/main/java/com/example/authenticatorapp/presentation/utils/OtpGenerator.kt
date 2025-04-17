@@ -1,3 +1,5 @@
+
+import com.example.authenticatorapp.presentation.utils.NtpTimeProvider.getNtpTime
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.commons.codec.binary.Base32
 import java.nio.ByteBuffer
 import javax.crypto.Mac
@@ -13,8 +15,10 @@ object OtpGenerator {
         }
     }
 
-    fun generateTOTP(secret: String, timeStepSeconds: Long = 30, digits: Int = 6, algorithm: String = "HmacSHA1"): String {
-        val currentTimeSeconds = System.currentTimeMillis() / 1000
+    suspend fun generateTOTP(secret: String, timeStepSeconds: Long = 30, digits: Int = 6, algorithm: String = "HmacSHA1"
+    ): String {
+        val ntpTime = getNtpTime() ?: System.currentTimeMillis()
+        val currentTimeSeconds = ntpTime / 1000
         val counter = currentTimeSeconds / timeStepSeconds
         return generateOTP(secret, counter, digits, algorithm)
     }
