@@ -79,14 +79,14 @@ fun AccountItem(account: AccountEntity,
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showUpdate by remember { mutableStateOf(false) }
 
-    val formattedOtp = otp.chunked(3).joinToString(" ")
+    var formattedOtp = otp.chunked(3).joinToString(" ")
     val coroutineScope = rememberCoroutineScope()
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 6.dp)
-            .then(if(isLastItem) Modifier.padding(bottom = 106.dp) else Modifier)
+            .then(if (isLastItem) Modifier.padding(bottom = 106.dp) else Modifier)
             .shadow(
                 elevation = 5.dp,
                 shape = RoundedCornerShape(24.dp),
@@ -255,49 +255,48 @@ fun AccountItem(account: AccountEntity,
                         .padding(bottom = 86.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    LazyColumn {
-                        item {
-                            Text(
-                                text = "Are you sure you want to update\nthe code?",
-                                style = AppTypography.bodyMedium,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Spacer(Modifier.height(16.dp))
-                            Button(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        accountViewModel.incrementCounter(account)
-
-                                        val updatedOtp = homeViewModel.generateOtp(account.copy(counter = account.counter + 1))
-
-                                        showUpdate = false
-                                    }
-                                },
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-                                    .fillMaxWidth()
-                                    .height(50.dp),
-                                shape = RoundedCornerShape(24.dp),
-                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    contentColor = MainBlue
-                                ),
-                                border = if (!isSystemInDarkTheme()) BorderStroke(2.dp, MainBlue) else BorderStroke(2.dp, Gray6)
-                            ) {
-                                androidx.compose.material.Icon(
-                                    painter = painterResource(R.drawable.ic_update),
-                                    contentDescription = "QR",
-                                    tint = if (!isSystemInDarkTheme()) MainBlue else White
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                androidx.compose.material.Text(
-                                    text = "Update code",
-                                    style = AppTypography.bodyMedium,
-                                    color = if (!isSystemInDarkTheme()) MainBlue else White
-                                )
+                    Text(
+                        text = stringResource(R.string.are_you_sure_you_want_to_update_the_code),
+                        style = AppTypography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                accountViewModel.incrementCounter(account)
+                                val updatedOtp =
+                                    homeViewModel.generateOtp(account.copy(counter = account.counter + 1))
+                                formattedOtp = updatedOtp.chunked(3).joinToString(" ")
+                                showUpdate = false
                             }
-                        }
+                        },
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(24.dp),
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            contentColor = MainBlue
+                        ),
+                        border = if (!isSystemInDarkTheme()) BorderStroke(
+                            2.dp,
+                            MainBlue
+                        ) else BorderStroke(2.dp, Gray6)
+                    ) {
+                        androidx.compose.material.Icon(
+                            painter = painterResource(R.drawable.ic_update),
+                            contentDescription = "QR",
+                            tint = if (!isSystemInDarkTheme()) MainBlue else White
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        androidx.compose.material.Text(
+                            text = "Update code",
+                            style = AppTypography.bodyMedium,
+                            color = if (!isSystemInDarkTheme()) MainBlue else White
+                        )
                     }
                 }
             }

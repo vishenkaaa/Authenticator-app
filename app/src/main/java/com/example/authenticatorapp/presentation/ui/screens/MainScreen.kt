@@ -116,65 +116,72 @@ fun MainScreen(navController: NavController, context: Context, viewModel: HomeVi
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    LazyColumn {
-                        item {
-                            Button(
-                                onClick = {isMenuExpanded = false
-                                    navController.navigate("QrScanner")},
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-                                    .fillMaxWidth()
-                                    .height(50.dp),
-                                shape = RoundedCornerShape(24.dp),
-                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                                    containerColor = if (isSystemInDarkTheme()) colors.onPrimaryContainer
-                                    else colors.background,
-                                    contentColor = MainBlue
-                                ),
-                                border = if (!isSystemInDarkTheme()) BorderStroke(2.dp, MainBlue) else BorderStroke(2.dp, Gray6)
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.qr_code),
-                                    contentDescription = "QR",
-                                    tint = if (!isSystemInDarkTheme()) MainBlue else White
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = stringResource(R.string.scan_qr_code),
-                                    style = AppTypography.bodyMedium,
-                                    color = if (!isSystemInDarkTheme()) MainBlue else White
-                                )
-                            }
-                            Spacer(Modifier.height(16.dp))
+                    Column {
+                        Button(
+                            onClick = {
+                                isMenuExpanded = false
+                                navController.navigate("QrScanner")
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            shape = RoundedCornerShape(24.dp),
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                containerColor = if (isSystemInDarkTheme()) colors.onPrimaryContainer
+                                else colors.background,
+                                contentColor = MainBlue
+                            ),
+                            border = if (!isSystemInDarkTheme()) BorderStroke(
+                                2.dp,
+                                MainBlue
+                            ) else BorderStroke(2.dp, Gray6)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.qr_code),
+                                contentDescription = "QR",
+                                tint = if (!isSystemInDarkTheme()) MainBlue else White
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.scan_qr_code),
+                                style = AppTypography.bodyMedium,
+                                color = if (!isSystemInDarkTheme()) MainBlue else White
+                            )
                         }
+                        Spacer(Modifier.height(16.dp))
 
-                        item {
-                            Button(
-                                onClick = {isMenuExpanded = false
-                                    navController.navigate("AddAccount")},
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-                                    .fillMaxWidth()
-                                    .height(50.dp),
-                                shape = RoundedCornerShape(24.dp),
-                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                                    containerColor = colors.onPrimaryContainer,
-                                    contentColor = MainBlue
-                                ),
-                                border = if (!isSystemInDarkTheme()) BorderStroke(2.dp, MainBlue) else BorderStroke(2.dp, Gray6)
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.edit),
-                                    contentDescription = "Edit",
-                                    tint = if (!isSystemInDarkTheme()) MainBlue else White
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = stringResource(R.string.enter_code_manually),
-                                    style = AppTypography.bodyMedium,
-                                    color = if (!isSystemInDarkTheme()) MainBlue else White
-                                )
-                            }
+                        Button(
+                            onClick = {
+                                isMenuExpanded = false
+                                navController.navigate("AddAccount")
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            shape = RoundedCornerShape(24.dp),
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                containerColor = if (isSystemInDarkTheme()) colors.onPrimaryContainer
+                                else colors.background,
+                                contentColor = MainBlue
+                            ),
+                            border = if (!isSystemInDarkTheme()) BorderStroke(
+                                2.dp,
+                                MainBlue
+                            ) else BorderStroke(2.dp, Gray6)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.edit),
+                                contentDescription = "Edit",
+                                tint = if (!isSystemInDarkTheme()) MainBlue else White
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.enter_code_manually),
+                                style = AppTypography.bodyMedium,
+                                color = if (!isSystemInDarkTheme()) MainBlue else White
+                            )
                         }
                     }
                 }

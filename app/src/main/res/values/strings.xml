@@ -132,4 +132,5 @@
         This app is provided &quot;as is&quot;. You use it at your own risk. We are not responsible for any losses related to the use of this app.
     </string>
     <string name="invalid_secret_format">Invalid secret format</string>
+    <string name="are_you_sure_you_want_to_update_the_code">Are you sure you want to update\nthe code?</string>
 </resources>
