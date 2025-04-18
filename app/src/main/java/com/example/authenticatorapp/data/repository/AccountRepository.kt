@@ -16,12 +16,17 @@ class AccountRepository @Inject constructor(
     private val syncRepository: SyncRepository,
     private val accountDao: AccountDao
 ) {
+    companion object{
+        private const val USERS_COLLECTION = "users"
+        private const val ACCOUNTS_COLLECTION = "accounts"
+    }
+
     private val firestore = FirebaseFirestore.getInstance()
 
     suspend fun getAllAccounts(uid: String): List<AccountEntity> {
-        val snapshot = firestore.collection("users")
+        val snapshot = firestore.collection(USERS_COLLECTION)
             .document(uid)
-            .collection("accounts")
+            .collection(ACCOUNTS_COLLECTION)
             .get()
             .await()
 
@@ -44,9 +49,9 @@ class AccountRepository @Inject constructor(
         val isSyncing = syncRepository.isSynchronizing(uid)
 
         if (isSyncing) {
-            val docRef = firestore.collection("users")
+            val docRef = firestore.collection(USERS_COLLECTION)
                 .document(uid)
-                .collection("accounts")
+                .collection(ACCOUNTS_COLLECTION)
                 .document(account.id.toString())
 
             docRef.set(account.toFirebaseMap(), SetOptions.merge()).await()
@@ -59,9 +64,9 @@ class AccountRepository @Inject constructor(
         val isSyncing = syncRepository.isSynchronizing(uid)
 
         if (isSyncing) {
-            val docRef = firestore.collection("users")
+            val docRef = firestore.collection(USERS_COLLECTION)
                 .document(uid)
-                .collection("accounts")
+                .collection(ACCOUNTS_COLLECTION)
                 .document(accountId.toString())
 
             docRef.delete().await()

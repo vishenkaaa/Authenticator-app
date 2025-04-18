@@ -42,7 +42,7 @@ fun SplashScreen(navController: NavController, context: MainActivity) {
     val isLoading by viewModel.isLoadingAccounts.collectAsState()
 
     val passcodeManager = remember { PasscodeManager(context) }
-    var isPasscodeEnabled by remember { mutableStateOf(passcodeManager.isPasscodeSet())}
+    var isPasscodeEnabled by remember { mutableStateOf(passcodeManager.getPasscodeIsSet())}
 
     val prefs = OnBoardingPreferences(context)
 
@@ -64,7 +64,7 @@ fun SplashScreen(navController: NavController, context: MainActivity) {
 
         delay(500)
 
-        if (prefs.isFinished()) {
+        if (prefs.getStatus()) {
             navController.popBackStack()
             if (isPasscodeEnabled) {
                 navController.navigate("verify_passcode/unlock") {

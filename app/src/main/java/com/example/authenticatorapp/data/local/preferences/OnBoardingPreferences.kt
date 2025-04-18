@@ -6,16 +6,21 @@ import androidx.core.content.edit
 
 class OnBoardingPreferences(context: Context) {
 
-    private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
-
-    fun isFinished(): Boolean {
-        return sharedPreferences.getBoolean("isFinished", false)
+    companion object {
+        private const val PREF_NAME = "onboarding_prefs"
+        private const val KEY_IS_FINISHED = "is_finished"
     }
 
-    fun setFinished() {
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+
+    fun getStatus(): Boolean {
+        return sharedPreferences.getBoolean(KEY_IS_FINISHED, false)
+    }
+
+    fun setFinishedStatus() {
         sharedPreferences.edit {
-            putBoolean("isFinished", true)
+            putBoolean(KEY_IS_FINISHED, true)
         }
     }
 }

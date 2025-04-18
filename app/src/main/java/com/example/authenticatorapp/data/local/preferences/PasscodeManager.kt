@@ -3,8 +3,15 @@ package com.example.authenticatorapp.data.local.preferences
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import androidx.core.content.edit
 
 class PasscodeManager(private val context: Context) {
+
+    companion object {
+        private const val PREF_NAME = "passcode_prefs"
+        private const val KEY_PASSCODE = "passcode"
+        private const val KEY_TOUCH_ID_ENABLED = "touch_id_enabled"
+    }
 
     private val encryptedSharedPreferences by lazy {
         val masterKey = MasterKey.Builder(context)
@@ -13,7 +20,7 @@ class PasscodeManager(private val context: Context) {
 
         EncryptedSharedPreferences.create(
             context,
-            "encrypted_passcode_prefs",
+            PREF_NAME,
             masterKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
@@ -21,22 +28,22 @@ class PasscodeManager(private val context: Context) {
     }
 
     fun savePasscode(passcode: String) {
-        encryptedSharedPreferences.edit().putString("passcode", passcode).apply()
+        encryptedSharedPreferences.edit() { putString(KEY_PASSCODE, passcode) }
     }
 
     fun getPasscode(): String {
-        return encryptedSharedPreferences.getString("passcode", "") ?: ""
+        return encryptedSharedPreferences.getString(KEY_PASSCODE, "") ?: ""
     }
 
-    fun isPasscodeSet(): Boolean {
+    fun getPasscodeIsSet(): Boolean {
         return getPasscode().isNotEmpty()
     }
 
-    fun isTouchIdEnabled(): Boolean {
-        return encryptedSharedPreferences.getBoolean("touch_id_enabled", false)
+    fun getTouchIdEnabled(): Boolean {
+        return encryptedSharedPreferences.getBoolean(KEY_TOUCH_ID_ENABLED, false)
     }
 
     fun setTouchIdEnabled(enabled: Boolean) {
-        encryptedSharedPreferences.edit().putBoolean("touch_id_enabled", enabled).apply()
+        encryptedSharedPreferences.edit() { putBoolean(KEY_TOUCH_ID_ENABLED, enabled) }
     }
 }

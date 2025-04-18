@@ -8,8 +8,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -84,7 +82,7 @@ class MainActivity : FragmentActivity() {
                     val timeInBackground = System.currentTimeMillis() - backgroundStartTime
                     val passcodeManager = PasscodeManager(this@MainActivity)
 
-                    isAppLocked = timeInBackground > 5_000 && passcodeManager.isPasscodeSet()
+                    isAppLocked = timeInBackground > 5_000 && passcodeManager.getPasscodeIsSet()
 
                     if (isAppLocked) {
                         checkLockAndNavigate()
@@ -102,7 +100,7 @@ class MainActivity : FragmentActivity() {
                     navHostController = navController
 
                     val startDestination = if (wasSplashShown) {
-                        if (PasscodeManager(this@MainActivity).isPasscodeSet() && isAppLocked) {
+                        if (PasscodeManager(this@MainActivity).getPasscodeIsSet() && isAppLocked) {
                             "verify_passcode/unlock"
                         } else "Main"
                     } else "Splash"

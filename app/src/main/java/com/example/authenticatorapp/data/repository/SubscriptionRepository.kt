@@ -6,8 +6,20 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SubscriptionRepository  @Inject constructor(){
+class SubscriptionRepository @Inject constructor() {
     private val firestore = FirebaseFirestore.getInstance()
+
+    companion object {
+        private const val USERS_COLLECTION = "users"
+        private const val SUBSCRIPTION_COLLECTION = "subscription"
+        private const val CURRENT_DOCUMENT = "current"
+
+        private const val FIELD_EMAIL = "email"
+        private const val FIELD_PLAN = "plan"
+        private const val FIELD_NEXT_BILLING = "nextBilling"
+        private const val FIELD_HAS_FREE_TRIAL = "hasFreeTrial"
+        private const val FIELD_PREMIUM = "premium"
+    }
 
     suspend fun saveSubscriptionForUser(
         uid: String,
@@ -17,26 +29,26 @@ class SubscriptionRepository  @Inject constructor(){
         hasFreeTrial: Boolean
     ) {
         val data = hashMapOf(
-            "email" to email,
-            "plan" to plan,
-            "nextBilling" to nextBilling,
-            "hasFreeTrial" to hasFreeTrial,
-            "premium" to true
+            FIELD_EMAIL to email,
+            FIELD_PLAN to plan,
+            FIELD_NEXT_BILLING to nextBilling,
+            FIELD_HAS_FREE_TRIAL to hasFreeTrial,
+            FIELD_PREMIUM to true
         )
-        firestore.collection("users").document(uid).collection("subscription").document("current").set(data).await()
-    }
-
-    suspend fun isUserPremium(uid: String): Boolean {
-        val doc = firestore.collection("users").document(uid).get().await()
-        return doc.getBoolean("premium") ?: false
+        firestore.collection(USERS_COLLECTION)
+            .document(uid)
+            .collection(SUBSCRIPTION_COLLECTION)
+            .document(CURRENT_DOCUMENT)
+            .set(data)
+            .await()
     }
 
     suspend fun loadSubscriptionForUser(uid: String): Map<String, Any>? {
         val snapshot = firestore
-            .collection("users")
+            .collection(USERS_COLLECTION)
             .document(uid)
-            .collection("subscription")
-            .document("current")
+            .collection(SUBSCRIPTION_COLLECTION)
+            .document(CURRENT_DOCUMENT)
             .get()
             .await()
         return if (snapshot.exists()) snapshot.data else null
@@ -44,19 +56,15 @@ class SubscriptionRepository  @Inject constructor(){
 
     suspend fun cancelSubscription(uid: String) {
         val data = mapOf<String, Any?>(
-            "plan" to null,
-            "nextBilling" to null,
-            "premium" to false
+            FIELD_PLAN to null,
+            FIELD_NEXT_BILLING to null,
+            FIELD_PREMIUM to false
         )
-        firestore.collection("users")
+        firestore.collection(USERS_COLLECTION)
             .document(uid)
-            .collection("subscription")
-            .document("current")
+            .collection(SUBSCRIPTION_COLLECTION)
+            .document(CURRENT_DOCUMENT)
             .update(data)
             .await()
-    }
-
-    suspend fun deleteUserData(uid: String) {
-        firestore.collection("users").document(uid).delete().await()
     }
 }

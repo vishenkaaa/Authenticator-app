@@ -90,13 +90,13 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
-                            if(prefs.isFinished()) navController.popBackStack()
+                            if(prefs.getStatus()) navController.popBackStack()
                             else navController.navigate("Main")
-                            prefs.setFinished()
+                            prefs.setFinishedStatus()
                         }
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                if(!prefs.isFinished())
+                if(!prefs.getStatus())
                     Text(
                         text = stringResource(R.string.restore),
                         color = White,
@@ -200,9 +200,9 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
                             hasFreeTrial = freeTrialIsSelected
                         )
 
-                    if(prefs.isFinished()) navController.popBackStack()
+                    if(prefs.getStatus()) navController.popBackStack()
                     else navController.navigate("Main")
-                    prefs.setFinished()
+                    prefs.setFinishedStatus()
                 },
                 modifier = Modifier
                     .height(50.dp)

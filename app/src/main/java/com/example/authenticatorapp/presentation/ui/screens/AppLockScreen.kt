@@ -52,8 +52,8 @@ import com.example.authenticatorapp.presentation.utils.BiometricAuthManager
 fun AppLockScreen(navController: NavController, context: Context) {
     val colors = MaterialTheme.colorScheme
     val passcodeManager = remember { PasscodeManager(context) }
-    var isPasscode by remember { mutableStateOf(passcodeManager.isPasscodeSet()) }
-    var isTouchID by remember { mutableStateOf(passcodeManager.isTouchIdEnabled()) }
+    var isPasscode by remember { mutableStateOf(passcodeManager.getPasscodeIsSet()) }
+    var isTouchID by remember { mutableStateOf(passcodeManager.getTouchIdEnabled()) }
 
     val fragmentActivity = context as? FragmentActivity
     val biometricManager = remember {

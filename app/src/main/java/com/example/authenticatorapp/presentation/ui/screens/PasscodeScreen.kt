@@ -67,7 +67,7 @@ fun PasscodeScreen(
     val context = LocalContext.current
     val passcodeManager = remember { PasscodeManager(context) }
 
-    val isTouchIdEnabled = remember { passcodeManager.isTouchIdEnabled() }
+    val isTouchIdEnabled = remember { passcodeManager.getTouchIdEnabled() }
     val biometricManager = remember {
         if (context is FragmentActivity) BiometricAuthManager(context) else null
     }

@@ -3,14 +3,9 @@ package com.example.authenticatorapp.data.repository
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import com.example.authenticatorapp.data.local.dao.AccountDao
 import com.example.authenticatorapp.data.local.model.toFirebaseMap
 import com.example.authenticatorapp.data.local.preferences.SyncPreferences
-import com.example.authenticatorapp.presentation.viewmodel.AuthViewModel
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.flow.first
@@ -20,21 +15,27 @@ import javax.inject.Singleton
 
 @Singleton
 class SyncRepository @Inject constructor(private val accountDao: AccountDao, application: Application){
+    companion object {
+        private const val USERS_COLLECTION = "users"
+        private const val ACCOUNTS_COLLECTION = "accounts"
+        private const val FIELD_SYNC = "sync"
+    }
+
     private val firestore = FirebaseFirestore.getInstance()
     private val context: Context = application.applicationContext
     private val pref = SyncPreferences(context)
 
     suspend fun startSynchronize(uid: String) {
-        pref.setSync(true)
+        pref.setSyncEnabled(true)
 
-        val data = mapOf("sync" to true)
-        firestore.collection("users").document(uid).set(data, SetOptions.merge()).await()
+        val data = mapOf(FIELD_SYNC to true)
+        firestore.collection(USERS_COLLECTION).document(uid).set(data, SetOptions.merge()).await()
 
         val accounts = accountDao.getAllAccounts().first()
 
-        val existingAccountsSnapshot = firestore.collection("users")
+        val existingAccountsSnapshot = firestore.collection(USERS_COLLECTION)
             .document(uid)
-            .collection("accounts")
+            .collection(ACCOUNTS_COLLECTION)
             .get()
             .await()
 
@@ -50,9 +51,9 @@ class SyncRepository @Inject constructor(private val accountDao: AccountDao, app
             val batch = firestore.batch()
 
             accounts.forEach { account ->
-                val docRef = firestore.collection("users")
+                val docRef = firestore.collection(USERS_COLLECTION)
                     .document(uid)
-                    .collection("accounts")
+                    .collection(ACCOUNTS_COLLECTION)
                     .document(account.id.toString())
 
                 batch.set(docRef, account.toFirebaseMap())
@@ -63,23 +64,23 @@ class SyncRepository @Inject constructor(private val accountDao: AccountDao, app
     }
 
     suspend fun cancelSynchronize(uid: String) {
-        pref.setSync(false)
+        pref.setSyncEnabled(false)
 
-        val data = mapOf("sync" to false)
-        firestore.collection("users").document(uid).set(data, SetOptions.merge()).await()
+        val data = mapOf(ACCOUNTS_COLLECTION to false)
+        firestore.collection(USERS_COLLECTION).document(uid).set(data, SetOptions.merge()).await()
     }
 
     suspend fun isSynchronizing(uid: String): Boolean {
-        pref.isSync()?.let { return it }
+        pref.getSyncEnabled()?.let { return it }
         return isSynchronizingFromDb(uid)
     }
 
     suspend fun isSynchronizingFromDb(uid: String): Boolean{
         return try {
-            val snapshot = firestore.collection("users").document(uid).get().await()
-            val syncStatus = snapshot.getBoolean("sync") ?: false
+            val snapshot = firestore.collection(USERS_COLLECTION).document(uid).get().await()
+            val syncStatus = snapshot.getBoolean(ACCOUNTS_COLLECTION) ?: false
 
-            pref.setSync(syncStatus)
+            pref.setSyncEnabled(syncStatus)
 
             syncStatus
         } catch (e: Exception) {
