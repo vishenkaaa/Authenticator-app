@@ -56,6 +56,12 @@ import com.example.authenticatorapp.presentation.viewmodel.SubscriptionViewModel
 @Composable
 fun PaywallScreen(navController: NavController, context: MainActivity, viewModel: SubscriptionViewModel = hiltViewModel()){
     val prefs = OnBoardingPreferences(context)
+    var selectedPlan by remember { mutableStateOf("") }
+    var freeTrialIsSelected by remember { mutableStateOf(false) }
+
+    val oneYearText = stringResource(id = R.string._1_year)
+    val freeTrialText = stringResource(id = R.string._3_days_free_trial)
+
     Box(
         modifier = Modifier.fillMaxSize()
     ){
@@ -106,12 +112,6 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
 
             Spacer(modifier = Modifier.weight(1f))
 
-            var selectedPlan by remember { mutableStateOf("") }
-            var freeTrialIsSelected by remember { mutableStateOf(false) }
-
-            val oneYearText = stringResource(id = R.string._1_year)
-            val freeTrialText = stringResource(id = R.string._3_days_free_trial)
-
             LaunchedEffect(Locale.current) {
                 selectedPlan = oneYearText
             }
@@ -140,7 +140,7 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
                         color = if (freeTrialIsSelected) MainBlue else Gray2,
                         RoundedCornerShape(30.dp)
                     )
-                    .padding(start = 24.dp, end = 16.dp, top = 11.dp, bottom = 11.dp),
+                    .padding(start = 24.dp, end = 16.dp, top = 5.dp, bottom = 5.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -152,7 +152,10 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
                 )
                 Switch(
                     checked = freeTrialIsSelected,
-                    onCheckedChange = null,
+                    onCheckedChange = {
+                        freeTrialIsSelected = it
+                        if(freeTrialIsSelected) selectedPlan = freeTrialText
+                        else selectedPlan = oneYearText },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = Color.White,
                         checkedTrackColor = Color(0xFF00CF00),
