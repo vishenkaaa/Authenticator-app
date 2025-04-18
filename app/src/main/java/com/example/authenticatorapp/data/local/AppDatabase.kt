@@ -18,6 +18,7 @@ abstract class AppDatabase : RoomDatabase() {
         private var INSTANCE: AppDatabase? = null
 
         private val MIGRATION_1_2 = object : Migration(1, 2) {
+            //FIXME варнінг
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE accounts ADD COLUMN counter INTEGER NOT NULL DEFAULT 0")
             }
@@ -28,6 +29,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
+                    //FIXME літерал
                     "authenticator_db"
                 )
                     .addMigrations(MIGRATION_1_2)

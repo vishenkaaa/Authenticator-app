@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
+//FIXME коментарі тут мають відношення до решти viewModels теж, тому аналізуй і роби правки
 @HiltViewModel
 class AddAccountViewModel @Inject constructor(
     private val accountDao: AccountDao,
@@ -33,12 +33,13 @@ class AddAccountViewModel @Inject constructor(
     ) {
         if (service.isBlank() || email.isBlank() || secret.isBlank()) return
 
+        //TODO Винести в enum/sealed class
         val typeNormalized = when (type.lowercase()) {
             "time-based" -> "TOTP"
             "counter-based" -> "HOTP"
             else -> "TOTP"
         }
-
+        //TODO Винести в enum/sealed class
         val algorithmNormalized = when (algorithm.uppercase()) {
             "SHA1" -> "HmacSHA1"
             "SHA256" -> "HmacSHA256"
@@ -57,6 +58,7 @@ class AddAccountViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
+            //FIXME ут лише викликаємо метод з репозиторію. Всю цю логіку з базою даних винести туди
             val insertedId = accountDao.insertAccount(account)
 
             currentUserId?.let { uid ->
@@ -78,6 +80,8 @@ class AddAccountViewModel @Inject constructor(
     ) {
         if (service.isBlank() || email.isBlank() || secret.isBlank()) return
 
+        //FIXME ті ж самі три правки, що в попередньому методі
+        
         val typeNormalized = when (type.lowercase()) {
             "time-based" -> "TOTP"
             "counter-based" -> "HOTP"
@@ -113,6 +117,7 @@ class AddAccountViewModel @Inject constructor(
 
     fun deleteAccount(id: Int) {
         viewModelScope.launch {
+            //FIXME ті ж самі правки
             accountDao.deleteAccountById(id)
 
             currentUserId?.let { uid ->
@@ -122,6 +127,7 @@ class AddAccountViewModel @Inject constructor(
     }
 
     fun incrementCounter(account: AccountEntity) {
+        //FIXME ті ж самі правки
         val updatedAccount = account.copy(counter = account.counter + 1)
         viewModelScope.launch {
             accountDao.updateAccount(updatedAccount)
@@ -135,6 +141,7 @@ class AddAccountViewModel @Inject constructor(
     private val _account = MutableStateFlow<AccountEntity?>(null)
     val account = _account.asStateFlow()
 
+    //FIXME викликаємо лише метод з репозиторію. Доступу до dao ми тут не маємо мати. Репозиторій опвинен цим керувати
     fun getAccountById(accountId: Int) {
         viewModelScope.launch {
             _account.value = accountDao.getAccountById(accountId)

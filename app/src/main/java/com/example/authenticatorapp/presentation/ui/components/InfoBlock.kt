@@ -24,6 +24,7 @@ fun InfoBlock(
     headerText: String,
     items: List<InfoItem>,
 ) {
+    //FIXME не потрібно присвоювати змінну
     val colors = MaterialTheme.colorScheme
     Column {
         Text(
@@ -34,6 +35,7 @@ fun InfoBlock(
 
         Box(
             Modifier
+                //FIXME двіччі використовуєш background
                 .background(
                     color = colors.onPrimaryContainer,
                     shape = RoundedCornerShape(24.dp)
@@ -60,6 +62,7 @@ fun InfoBlock(
                     )
 
                     if (index < items.size - 1) {
+                        //FIXME deprecated
                         Divider(
                             modifier = Modifier.fillMaxWidth(),
                             color = if(!isSystemInDarkTheme()) Black.copy(alpha = 0.1f) else Gray2.copy(alpha = 0.1f)

@@ -56,6 +56,7 @@ import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+//TODO помилки ті ж самі, що на інших екранах, зроби ревʼю сама на базі тих правок, що я вже дала і відредагуй. Також екрани PremiumFeature, PrivacyPolicy, QRcodeScanner, SignIn, TermsOfUse я теж не переглядала 
 @Composable
 fun PasscodeScreen(
     navController: NavController,

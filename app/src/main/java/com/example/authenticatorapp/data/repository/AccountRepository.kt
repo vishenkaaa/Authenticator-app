@@ -11,6 +11,8 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
+//FIXME летерали
+//FIXME взагалі немає хендлінгу помилок
 @Singleton
 class AccountRepository @Inject constructor(
     private val syncRepository: SyncRepository,
@@ -50,6 +52,7 @@ class AccountRepository @Inject constructor(
                 .document(account.id.toString())
 
             docRef.set(account.toFirebaseMap(), SetOptions.merge()).await()
+            //FIXME нащо вертати тут true, false? Це action функція яка тільки щось виконує і не віддає ніякого корисного результату, вона може нічого не вертати
             return true
         }
         return false
@@ -65,6 +68,7 @@ class AccountRepository @Inject constructor(
                 .document(accountId.toString())
 
             docRef.delete().await()
+            //FIXME так само тут
             return true
         }
         return false

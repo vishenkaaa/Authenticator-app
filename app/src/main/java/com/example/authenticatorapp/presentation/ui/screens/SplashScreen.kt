@@ -41,6 +41,7 @@ fun SplashScreen(navController: NavController, context: MainActivity) {
     val viewModel: HomeViewModel = hiltViewModel()
     val isLoading by viewModel.isLoadingAccounts.collectAsState()
 
+    //FIXME винести цю логіку в viewModel
     val passcodeManager = remember { PasscodeManager(context) }
     var isPasscodeEnabled by remember { mutableStateOf(passcodeManager.isPasscodeSet())}
 
@@ -85,6 +86,7 @@ fun SplashScreen(navController: NavController, context: MainActivity) {
         modifier = Modifier.fillMaxSize()
     ){
         Image(
+            //FIXME splash bg повинен бути лише фон, іконка повинна бути додана як окремe фото тут
             painter = painterResource(id = R.drawable.splash_bg),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),

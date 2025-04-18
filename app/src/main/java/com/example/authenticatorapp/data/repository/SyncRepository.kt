@@ -18,12 +18,17 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
+//TODO винести літерали, хендлінг помилок
 @Singleton
 class SyncRepository @Inject constructor(private val accountDao: AccountDao, application: Application){
     private val firestore = FirebaseFirestore.getInstance()
+    //TODO якщо я не помиляюсь, контекст теж можна заінджектити в конструкторі, спробуй, чи працюватиме
     private val context: Context = application.applicationContext
     private val pref = SyncPreferences(context)
 
+    
+    //FIXME переписати логіку хендлінгу синхронізації
+    //FIXME змінити неймінг. setShouldSynchronize
     suspend fun startSynchronize(uid: String) {
         pref.setSync(true)
 
@@ -69,11 +74,13 @@ class SyncRepository @Inject constructor(private val accountDao: AccountDao, app
         firestore.collection("users").document(uid).set(data, SetOptions.merge()).await()
     }
 
+    //FIXME змінити неймінг. getShouldSynchronize
     suspend fun isSynchronizing(uid: String): Boolean {
         pref.isSync()?.let { return it }
         return isSynchronizingFromDb(uid)
     }
 
+    //FIXME single source of truth. Зберігати значення лише в одному місці
     suspend fun isSynchronizingFromDb(uid: String): Boolean{
         return try {
             val snapshot = firestore.collection("users").document(uid).get().await()

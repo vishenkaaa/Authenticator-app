@@ -53,6 +53,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun OnboardingScreen(navController: NavController){
 
+    //TODO створити sealed class OnboardingPage та нащадків PageOne, PageTwo...
+    // В companion object створити функцію getPageById, яка приймає int id і повертає 0->PageOne, 1->PageTwo...
+    // Створити клас OnboardingPageData з полями title, description, image
+    // Створити extension функцію, OnboardingPage.getData():OnboardingPageData, і використати when(this) і вернути обʼєкт з необхідними даними
     val titles = listOf(
         stringResource(R.string.safer_account),
         stringResource(R.string.simple_camera_code_setting),
@@ -81,6 +85,7 @@ fun OnboardingScreen(navController: NavController){
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
+        //FIXME використати !pagerState.canScrollForward замість цієї умови
         if (currentPage == titles.size - 1) {
             Row(
                 modifier = Modifier
@@ -127,6 +132,8 @@ fun OnboardingScreen(navController: NavController){
                 modifier = Modifier.fillMaxSize()
             ) {
                 Image(
+                    //TODO після всіх змін що я описала зверху ти зможеш зробити щось накшталт 
+                    // OnboardingPage.getPageById(currentPage).getData().image 
                     painter = painterResource(id = images[currentPage]),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
@@ -140,12 +147,14 @@ fun OnboardingScreen(navController: NavController){
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
+                        //TODO OnboardingPage.getPageById(currentPage).getData().title
                         text = titles[currentPage],
                         textAlign = TextAlign.Center,
                         color = White,
                         style = AppTypography.titleMedium
                     )
                     Text(
+                        //TODO OnboardingPage.getPageById(currentPage).getData().description
                         text = descriptions[currentPage],
                         Modifier.padding(16.dp),
                         color = Gray2,
@@ -207,7 +216,7 @@ fun OnboardingScreen(navController: NavController){
                 )
             }
         }
-
+        //FIXME використати !pagerState.canScrollForward замість цієї умови
         if (currentPage == titles.size - 1) {
             Row(
                 modifier = Modifier
@@ -228,6 +237,7 @@ fun OnboardingScreen(navController: NavController){
                         .padding(vertical = 4.dp)
                 )
                 Text(
+                    //FIXME винести це кудись, я не знаю, що таке u2022
                     text = "\u2022",
                     color = White,
                     style = AppTypography.labelMedium,

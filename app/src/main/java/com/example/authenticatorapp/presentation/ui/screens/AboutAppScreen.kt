@@ -30,6 +30,7 @@ fun AboutAppScreen(navController: NavController) {
             .background(colors.background)
             .fillMaxSize()
     ) {
+        //TODO давай ми винесемо цю логіку тулбару в окремий компонент щоб ми могли його перевикористати пізніше або заюзаємо вже готовий Toolbar чи AppBar composable
         Row(
             Modifier
                 .fillMaxWidth()
@@ -61,6 +62,7 @@ fun AboutAppScreen(navController: NavController) {
         )
 
         Spacer(modifier = Modifier.height(16.dp))
+        //TODO(optional) почитай про buildAnnotatedString і спробуй замінити
         StyledParagraph(
             startText = "",
             boldText = stringResource(R.string.authenticator),

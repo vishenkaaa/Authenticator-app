@@ -39,12 +39,14 @@ class BiometricAuthManager(private val activity: FragmentActivity) {
                     errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
                     onCancel()
                 } else {
+                    //FIXME якщо сталася помилка, то було б непогано викликати return, щоб функція не продовжувала виконання
                     onError(errString.toString())
                 }
             }
 
             override fun onAuthenticationFailed() {
                 super.onAuthenticationFailed()
+                //FIXME так само, return
                 onError(activity.getString(R.string.biometric_authentication_failed))
             }
         }
@@ -68,6 +70,7 @@ class BiometricAuthManager(private val activity: FragmentActivity) {
         }
     }
 
+    //FIXME dead code. Не знайшла, де він використовується
     companion object {
         fun create(context: Context): BiometricAuthManager? {
             return when (context) {

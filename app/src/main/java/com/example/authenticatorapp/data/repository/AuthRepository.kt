@@ -36,6 +36,7 @@ class AuthRepository @Inject constructor(
     }
 
     suspend fun signOut(context: Context) {
+        //FIXME deprecations
         val googleSignInClient = GoogleSignIn.getClient(
             context.applicationContext,
             GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -52,6 +53,7 @@ class AuthRepository @Inject constructor(
         }
 
         auth.signOut()
+        //FIXME використати signOut замість revokeAccess
         googleSignInClient.revokeAccess().addOnCompleteListener {
             Log.d("GoogleSignIn", "User fully signed out")
         }

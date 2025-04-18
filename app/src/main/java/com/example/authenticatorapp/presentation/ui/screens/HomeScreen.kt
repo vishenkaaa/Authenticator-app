@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -51,7 +50,6 @@ import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.components.AccountItem
 import com.example.authenticatorapp.presentation.ui.components.TabLayout
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
-import com.example.authenticatorapp.presentation.ui.theme.Gray3
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
@@ -65,6 +63,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     accounts: List<AccountEntity>
 ) {
+    //FIXME не потрібно так присвоювати. Це не має сенсу.
     val allAccounts = accounts
     val isLoading by viewModel.isLoadingAccounts.collectAsState()
 
@@ -128,6 +127,8 @@ fun HomeScreen(
             }
         } else
             if (allAccounts.isNotEmpty()) {
+                //TODO неправильне будуєш лейаут
+                // Розділи кожну вкладку на різні composable і подивись в документації або в статтях на медіумі, як правильно використовувати TabRow
                 TabLayout(
                     selectedTabIndex = selectedTabIndex,
                     onTabSelected = { selectedTabIndex = it }
@@ -165,6 +166,7 @@ fun HomeScreen(
                         val remainingTime = remember { mutableStateOf(calculateRemainingTime()) }
 
                         LaunchedEffect(Unit) {
+                            //FIXME не використовуємо while (true). Кращее пошукай якісь рішення з таймером, який спрацьовуватиме кожні 30 секунд і винести цю логіку в viewModel
                             while (true) {
                                 delay(1000)
                                 remainingTime.value = calculateRemainingTime()
@@ -272,6 +274,7 @@ fun HomeScreen(
     }
 }
 
+//TODO виносимо логіку в viewModel, додаємо в репозиторій метод для пошуку
 private fun matchesSearchQuery(account: AccountEntity, query: String): Boolean {
     if (query.isBlank()) return true
 

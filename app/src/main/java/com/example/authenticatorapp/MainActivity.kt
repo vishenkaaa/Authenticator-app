@@ -8,8 +8,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -63,6 +61,7 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        //FIXME цей код непотрібний взагалі. Система сама визначить, який файл з локалізацією обрати. Якщо в тебе системна мова українська і в тебе є файл values-uk/strings.xml, воно візьме текст звідти, якщо мова китайська, а в тебе немає файлу для цієї мови - візьме дефолтні значення. Файл, який знаходиться в папці values буде дефолтної мовою(в твоєму випадку це англійська). Цей підхід можна буде використати, якщо в тебе в застосунку є пікер мови в налаштуваннях і мова застосунку повиннна відрізнятись від мови системи
         val currentLocale = Locale.getDefault().language
         if (currentLocale == "uk") {
             setAppLocale(this, "uk")
@@ -70,8 +69,17 @@ class MainActivity : FragmentActivity() {
             setAppLocale(this, "en")
         }
 
-        window?.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+        //TODO давай ми це винисемо в окрему функцію і назвемо щось типу disableScreenCapture. Це дасть більше контексту, що саме робить цей код
+        window?.setFlags(
+            WindowManager.LayoutParams.FLAG_SECURE,
+            WindowManager.LayoutParams.FLAG_SECURE
+        )
 
+
+        //TODO було б непогано винести цю логіку в viewModel. А з активності вже використати isAppLocked і тоді вже в викликати
+        //                      if (isAppLocked) {
+        //                        checkLockAndNavigate()
+        //                    }
         lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStop(owner: LifecycleOwner) {
                 isInBackground = true
@@ -93,6 +101,7 @@ class MainActivity : FragmentActivity() {
             }
         })
 
+        //TODO Тут в навігації дуже багато літералів. Давай ми використаємо typesafe підхід, і сторимо класи. В документації це описано https://developer.android.com/guide/navigation/design/type-safety 
         setContent {
             AuthenticatorAppTheme {
                 Surface(
@@ -101,14 +110,15 @@ class MainActivity : FragmentActivity() {
                     val navController = rememberNavController()
                     navHostController = navController
 
+                    //FIXME Краще винести wasSplashShown в view model. Зараз, якщо я переверну телефон, активність перествориться і твоє значення wasSplashShown буде знову false, і сплеш покажеться, хоча так бути не повнно. Якщо ця змінна буде всередині viewModel, цього не станеться
                     val startDestination = if (wasSplashShown) {
                         if (PasscodeManager(this@MainActivity).isPasscodeSet() && isAppLocked) {
                             "verify_passcode/unlock"
                         } else "Main"
                     } else "Splash"
 
-                    NavHost(navController = navController, startDestination = startDestination){
-                        composable("Splash"){
+                    NavHost(navController = navController, startDestination = startDestination) {
+                        composable("Splash") {
                             wasSplashShown = true
                             SplashScreen(navController, this@MainActivity)
                         }
@@ -118,14 +128,18 @@ class MainActivity : FragmentActivity() {
                         composable("Main") {
                             MainScreen(navController, this@MainActivity)
                         }
-                        composable("Paywall"){
+                        composable("Paywall") {
                             PaywallScreen(navController, this@MainActivity)
                         }
-                        composable("SignIn"){
+                        composable("SignIn") {
                             SigninScreen(navController)
                         }
-                        composable("Home"){
-                            HomeScreen(navController, this@MainActivity, accounts = emptyList<AccountEntity>())
+                        composable("Home") {
+                            HomeScreen(
+                                navController,
+                                this@MainActivity,
+                                accounts = emptyList<AccountEntity>()
+                            )
                         }
                         composable("QrScanner") {
                             QRcodeScreen(navController)
@@ -179,19 +193,28 @@ class MainActivity : FragmentActivity() {
                                 when (action) {
                                     "disable" -> {
                                         passcodeManager.savePasscode("")
-                                        navController.previousBackStackEntry?.savedStateHandle?.set("passcode_enabled", false)
+                                        navController.previousBackStackEntry?.savedStateHandle?.set(
+                                            "passcode_enabled",
+                                            false
+                                        )
                                         navController.popBackStack()
                                     }
+
                                     "change" -> {
                                         navController.navigate("create_passcode") {
                                             popUpTo("verify_passcode/{action}") { inclusive = true }
                                         }
                                     }
+
                                     "unlock" -> {
                                         navController.navigate("Main") {
-                                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                            popUpTo(navController.graph.startDestinationId) {
+                                                inclusive =
+                                                    true
+                                            }
                                         }
                                     }
+
                                     else -> {
                                         navController.popBackStack()
                                     }
@@ -211,10 +234,11 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun checkLockAndNavigate() {
+        //FIXME двіччі перевіряєш if (isAppLocked). Краще тоді залиш перевірку тут, а там, де викликаєш checkLockAndNavigate прибери її
         if (isAppLocked) {
             isAppLocked = false
             navHostController.navigate("verify_passcode/unlock") {
-               popUpTo(navHostController.graph.startDestinationId) { saveState = true }
+                popUpTo(navHostController.graph.startDestinationId) { saveState = true }
             }
         }
     }

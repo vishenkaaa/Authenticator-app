@@ -7,16 +7,20 @@ import com.google.firebase.firestore.DocumentSnapshot
 @Entity(tableName = "accounts")
 data class AccountEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    //TODO стровюємо enum або sealed class
     val serviceName: String,
     val email: String,
     val secret: String,
+    //TODO стровюємо enum або sealed class
     val type: String, // "TOTP" або "HOTP"
+    //TODO стровюємо enum або sealed class
     val algorithm: String, // "SHA1", "SHA256", "SHA512"
     val digits: Int = 6,
     val counter: Long = 0
 )
 
 // для конвертації AccountEntity в Map для збереження в Firebase
+//TODO винести літерали в companion object
 fun AccountEntity.toFirebaseMap(): Map<String, Any> {
     return mapOf(
         "serviceName" to serviceName,
@@ -31,10 +35,12 @@ fun AccountEntity.toFirebaseMap(): Map<String, Any> {
 }
 
 // для створення AccountEntity з Map даних Firebase
+//FIXME перенести в companion object
 fun Map<String, Any>.toAccountEntity(id: Int): AccountEntity? {
     return try {
         AccountEntity(
-            id = id,
+            id = id, 
+            //TODO тут використати вже змінні з companion object
             serviceName = this["serviceName"] as String,
             email = this["email"] as String,
             secret = this["secret"] as String,
