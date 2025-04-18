@@ -170,7 +170,7 @@ fun SubscriptionScreen(
                     shape = RoundedCornerShape(24.dp),
                     colors = androidx.compose.material3.ButtonDefaults.buttonColors(
                         containerColor = colors.background,
-                        contentColor = MainBlue
+                        contentColor = Red
                     ),
                     border = BorderStroke(2.dp, Red.copy(0.6f))
                 ) {
@@ -186,33 +186,6 @@ fun SubscriptionScreen(
             Column {
                 ChoosePlanBox(navController)
                 Spacer(modifier = Modifier.height(16.dp))
-
-//                Button(
-//                    onClick = { showConfirmDialog = true },
-//                    modifier = Modifier
-//                        .padding(horizontal = 16.dp)
-//                        .fillMaxWidth()
-//                        .height(50.dp),
-//                    shape = RoundedCornerShape(24.dp),
-//                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-//                        containerColor = colors.background,
-//                        contentColor = MainBlue
-//                    ),
-//                    border = if (!isSystemInDarkTheme()) BorderStroke(
-//                        2.dp,
-//                        Color(0xFFE33C3C)
-//                    ) else BorderStroke(
-//                        2.dp,
-//                        Gray6
-//                    )
-//                ) {
-//                    Spacer(modifier = Modifier.width(8.dp))
-//                    Text(
-//                        text = stringResource(R.string.cancel_plan),
-//                        style = AppTypography.bodyMedium,
-//                        color = if (!isSystemInDarkTheme()) Color(0xFFE33C3C) else White
-//                    )
-//                }
             }
         }
 
