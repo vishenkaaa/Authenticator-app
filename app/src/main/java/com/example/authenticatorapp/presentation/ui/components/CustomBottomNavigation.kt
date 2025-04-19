@@ -40,6 +40,7 @@ fun CustomBottomNavigation(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
+                //FIXME спробувати позиціонувати іншим варіантом
                 .padding(horizontal = 40.dp)
                 .offset(y = (14).dp)
         ) {

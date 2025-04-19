@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface AccountDao {
     @Query("SELECT * FROM accounts")
+    //FIXME повертати просто список замість flow
     fun getAllAccounts(): Flow<List<AccountEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

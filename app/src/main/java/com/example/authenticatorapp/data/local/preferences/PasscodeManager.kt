@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 
+//FIXME літерали
 class PasscodeManager(private val context: Context) {
 
     private val encryptedSharedPreferences by lazy {
@@ -21,6 +22,7 @@ class PasscodeManager(private val context: Context) {
     }
 
     fun savePasscode(passcode: String) {
+        //FIXME фіксимо варнінги. Використовуємо KTX extension function 
         encryptedSharedPreferences.edit().putString("passcode", passcode).apply()
     }
 
@@ -37,6 +39,7 @@ class PasscodeManager(private val context: Context) {
     }
 
     fun setTouchIdEnabled(enabled: Boolean) {
+        //FIXME використовуємо KTX extension function
         encryptedSharedPreferences.edit().putBoolean("touch_id_enabled", enabled).apply()
     }
 }

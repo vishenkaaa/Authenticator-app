@@ -12,6 +12,7 @@ import com.example.authenticatorapp.presentation.viewmodel.AddAccountViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 
+//FIXME я б не виносила це все в окремий клас, бо ти тут і viewModel передаєш і методи навігації викликаєш. Краще залиш цей код в composable і винеси що потрібно до viewModel відповідно до правок які я вже внесла до решти твого коду
 class QRCodeAnalyzer(
     private val viewModel: AddAccountViewModel,
     private val navController: NavController,

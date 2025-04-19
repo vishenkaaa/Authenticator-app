@@ -66,6 +66,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     accounts: List<AccountEntity>
 ) {
+    //FIXME не потрібно так присвоювати. Це не має сенсу.
     val allAccounts = accounts
     val isLoading by viewModel.isLoadingAccounts.collectAsState()
 
@@ -129,6 +130,8 @@ fun HomeScreen(
             }
         } else
             if (allAccounts.isNotEmpty()) {
+                //TODO неправильне будуєш лейаут
+                // Розділи кожну вкладку на різні composable і подивись в документації або в статтях на медіумі, як правильно використовувати TabRow
                 TabLayout(
                     selectedTabIndex = selectedTabIndex,
                     onTabSelected = { selectedTabIndex = it }
@@ -162,10 +165,16 @@ fun HomeScreen(
                 LazyColumn() {
                     itemsIndexed(filteredAccounts) { index, account ->
                         val isLastItem = index == filteredAccounts.size - 1
-
                         val otp = remember { mutableStateOf("...") }
-                        val remainingTime = remember { mutableStateOf(30) }
+                        val remainingTime = remember { mutableStateOf(0) }
 
+                        LaunchedEffect(account) {
+                            otp.value = viewModel.generateOtp(account)
+                            remainingTime.value = calculateRemainingTime()
+                        }
+
+
+                        //FIXME не використовуємо while (true). Кращее пошукай якісь рішення з таймером, який спрацьовуватиме кожні 30 секунд і винести цю логіку в viewModel
                         LaunchedEffect(account.id) {
                             var lastCounter: Long = -1L
                             val timeStep = 30L
@@ -285,6 +294,7 @@ fun HomeScreen(
     }
 }
 
+//TODO виносимо логіку в viewModel, додаємо в репозиторій метод для пошуку
 private fun matchesSearchQuery(account: AccountEntity, query: String): Boolean {
     if (query.isBlank()) return true
 

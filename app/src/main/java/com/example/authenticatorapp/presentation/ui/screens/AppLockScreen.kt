@@ -50,6 +50,7 @@ import com.example.authenticatorapp.presentation.utils.BiometricAuthManager
 
 @Composable
 fun AppLockScreen(navController: NavController, context: Context) {
+    //FIXME не використовуємо напряму MaterialTheme.colorScheme замість colors
     val colors = MaterialTheme.colorScheme
     val passcodeManager = remember { PasscodeManager(context) }
     var isPasscode by remember { mutableStateOf(passcodeManager.isPasscodeSet()) }

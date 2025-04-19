@@ -7,8 +7,6 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+//FIXME давай ми також максимально пофіксимо варнінги, щоб таких жовтих підкреслень не було як закінчиш редагувати після код рев'ю
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
@@ -45,16 +44,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.data.local.model.AccountEntity
 import com.example.authenticatorapp.presentation.ui.components.CustomBottomNavigation
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
@@ -126,17 +126,28 @@ fun MainScreen(
                 .fillMaxWidth()
         ) {
             CustomBottomNavigation(currentScreen) { selectedScreen ->
+                //FIXME це не потрібно виносити у viewModel, це можна зберегти тут
                 navigationViewModel.selectTab(selectedScreen)
             }
 
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
+                    //FIXME offset
                     .offset(y = (-44).dp)
             ) {
                 FloatingActionButton(
-                    onClick = { openSheet() },
+                    onClick = {
+                        openSheet()
+                        //FIXME показуй ботомшит використовуючи sheetState.show()  і тоді в invokeOnCompletion {
+                        //                                if (!sheetState.isVisible) {
+                        //                                    isMenuExpanded = true
+                        //                                }
+                        //                            }
+                        // І так само коли потрібно заховати його
+                              },
                     backgroundColor = MainBlue,
+                    //FIXME давай використаємо тут size краще
                     modifier = Modifier.scale(1.25f)
                 ) {
                     Icon(
@@ -149,6 +160,7 @@ fun MainScreen(
             }
         }
 
+        //TODO винести ботомшит як окремий компонент
         if (sheetState.isVisible) {
         ModalBottomSheet(
             onDismissRequest = { closeSheet() },
@@ -159,6 +171,7 @@ fun MainScreen(
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
+                    //FIXME в дизайні відступ 40
                     .padding(bottom = 60.dp)
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -180,6 +193,7 @@ fun MainScreen(
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .fillMaxWidth()
+                            //FIXME не використовуй статичний розмір. Якщо в користувача буде збільшений щрифт в системі, він не поміститься у кнопку, бо ти обмежила її висоту. Краще додай відступи для контенту
                             .height(50.dp),
                         shape = RoundedCornerShape(24.dp),
                         colors = androidx.compose.material3.ButtonDefaults.buttonColors(
@@ -214,6 +228,7 @@ fun MainScreen(
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .fillMaxWidth()
+                            // FIXME статичний розмір
                             .height(50.dp),
                         shape = RoundedCornerShape(24.dp),
                         colors = androidx.compose.material3.ButtonDefaults.buttonColors(
@@ -221,6 +236,7 @@ fun MainScreen(
                             else MaterialTheme.colorScheme.background,
                             contentColor = MainBlue
                         ),
+                        // FIXME давай замість того, щоб кожен раз перевіряти яка в нас зараз тема ми використаємо кольори з ColorScheme
                         border = if (!isSystemInDarkTheme()) BorderStroke(
                             2.dp,
                             MainBlue
@@ -244,3 +260,5 @@ fun MainScreen(
         }
     }
 }
+
+//TODO переробити таким чином, щоб можна було показати превʼю. Решту скрінів теж

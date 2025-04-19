@@ -103,7 +103,7 @@ fun InfoScreen(navController: NavController, context: Context){
         )
     }
 }
-
+//TODO давай створимо в presentation шарі пекедж models і винесимо туди моделі як ця
 data class InfoItem(
     val icon: Int,
     val text: String,

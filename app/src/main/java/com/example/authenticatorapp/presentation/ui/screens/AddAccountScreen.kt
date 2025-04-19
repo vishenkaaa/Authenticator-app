@@ -57,6 +57,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddAccountScreen(navController: NavController, context: Context, viewModel: AddAccountViewModel = hiltViewModel(), oldAccountId: Int? = null) {
+    //FIXME не використовуємо напряму MaterialTheme.colorScheme замість colors
     val colors = MaterialTheme.colorScheme
     val serviceSheetState = rememberModalBottomSheetState()
     val keySheetState = rememberModalBottomSheetState()
@@ -74,10 +75,13 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
 
     val base32Regex = Regex("^[A-Z2-7]+=*$")
 
+    //FIXME не використовуємо напряму tringResource(R.string.time_based) замість змінної
     val txt_time_based = stringResource(R.string.time_based)
     var selectedService by remember { mutableStateOf("") }
     var selectedTypeOfKey by remember { mutableStateOf(txt_time_based) }
 
+    
+    //FIXME переносимо це в viewModel
     var accountText by remember { mutableStateOf("") }
     var keyText by remember { mutableStateOf("") }
 
@@ -370,6 +374,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
+                //FIXME не потрібно змінних, напряму викликаємо stringResource
                 val txt_banking = stringResource(R.string.banking_and_finance)
                 val txt_website = stringResource(R.string.website)
                 val txt_mail = stringResource(R.string.mail)
@@ -541,6 +546,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 27.dp)
             ) {
+                //FIXME не потрібно змінних, напряму викликаємо stringResource
                 val txt_time_based = stringResource(R.string.time_based)
                 val txt_counter_based = stringResource(R.string.counter_based)
 

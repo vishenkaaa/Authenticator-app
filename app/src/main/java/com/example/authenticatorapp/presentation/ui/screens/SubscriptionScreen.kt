@@ -55,6 +55,7 @@ fun SubscriptionScreen(
     var showConfirmDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        //FIXME викликаємо цей метод всередині viewModel в init методі
         subscriptionViewModel.loadSubscription()
     }
 
@@ -99,6 +100,7 @@ fun SubscriptionScreen(
                     Modifier
                         .padding(horizontal = 16.dp)
                         .padding(bottom = 24.dp)
+                        //FIXME подвійне використання background
                         .background(
                             color = colors.onPrimaryContainer,
                             shape = RoundedCornerShape(24.dp)
@@ -117,6 +119,7 @@ fun SubscriptionScreen(
                         .fillMaxWidth()
                 ) {
                     Column() {
+                        //TODO зробити enum або sealed class(треба дивитись, де ти це ще використовуєш і яким чином) по типу SubscriptionType, де буде Weekly, Yearly. Створити SubscriptionTypeExtensions utils/extensions і перенести туди цю логіку отримання тексту для певного типу підписки
                         val localizedPlanName = when (plan) {
                             "Weekly" -> stringResource(R.string.weekly)
                             "Yearly" -> stringResource(R.string.yearly)

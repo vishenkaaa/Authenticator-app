@@ -8,6 +8,7 @@ import androidx.security.crypto.MasterKey
 
 class SyncPreferences(context: Context) {
 
+    //FIXME не скорочуємо назви. Краще використай  preferences або взагалі назву класу encryptedSharedPreferences
     private val prefs by lazy {
         EncryptedSharedPreferences.create(
             context,
@@ -20,7 +21,9 @@ class SyncPreferences(context: Context) {
         )
     }
 
+    //FIXME проблема з найменуванням функції, літерали,
     fun isSync(): Boolean? {
+        //FIXME тут ця перевірка недоречна. Якщо prefs ще немає isSyncEnabled воно поверне дефолтне значення(false)
         if (prefs.contains("isSyncEnabled")) {
             return prefs.getBoolean("isSyncEnabled", false)
         }

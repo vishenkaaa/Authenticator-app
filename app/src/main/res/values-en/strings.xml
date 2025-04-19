@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--TODO видалити цей файл, бо в тебе англійська мова є мовою по замовчуванню-->
 <resources>
     <string name="app_name">Authenticator</string>
     <string name="authenticator">Authenticator</string>

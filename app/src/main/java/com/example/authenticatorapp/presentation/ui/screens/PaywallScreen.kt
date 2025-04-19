@@ -55,16 +55,21 @@ import com.example.authenticatorapp.presentation.viewmodel.SubscriptionViewModel
 
 @Composable
 fun PaywallScreen(navController: NavController, context: MainActivity, viewModel: SubscriptionViewModel = hiltViewModel()){
+    //TODO робота з преференсами лише в репозиторії, view model викликає метод з репозиторію, апдейтить стейт і ти в залежності від стейту відмальовуєш свій ui певним чином
     val prefs = OnBoardingPreferences(context)
+
+    //TODO зберігай це в стейті viewModel
     var selectedPlan by remember { mutableStateOf("") }
     var freeTrialIsSelected by remember { mutableStateOf(false) }
 
+    //FIXME це теж можна буде винести як функцію/змінну розширення над SubscriptionType (описала в SubscriptionScreen)
     val oneYearText = stringResource(id = R.string._1_year)
     val freeTrialText = stringResource(id = R.string._3_days_free_trial)
 
     Box(
         modifier = Modifier.fillMaxSize()
     ){
+        //FIXME paywall_bg не повинен містити в собі іконку замка, це повинен бути окремий компонент зображення
         Image(
             painter = painterResource(id = R.drawable.paywall_bg),
             contentDescription = null,
@@ -146,6 +151,7 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
             ) {
                 Text(
                     text = stringResource(R.string.free_trial_enabled),
+                    //FIXME винести колір до решти кольорів
                     color = Color(0xFF2A313E),
                     fontWeight = FontWeight.W700,
                     fontSize = 14.sp
@@ -158,6 +164,7 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
                         else selectedPlan = oneYearText },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = Color.White,
+                        //FIXME винести колір до решти кольорів
                         checkedTrackColor = Color(0xFF00CF00),
                         uncheckedThumbColor = Color.White,
                         uncheckedTrackColor = Color.LightGray,
@@ -170,6 +177,7 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
 
             SubscriptionOption(
                 title = oneYearText,
+                //FIXME це теж можна буде винести як функцію/змінну розширення над SubscriptionType (описала в SubscriptionScreen)
                 description = stringResource(R.string._39_99_usd_only_0_83_per_week),
                 isSelected = selectedPlan == oneYearText
             ) {
@@ -179,6 +187,7 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
 
             SubscriptionOption(
                 title = freeTrialText,
+                //FIXME це теж можна буде винести як функцію/змінну розширення над SubscriptionType (описала в SubscriptionScreen)
                 description = stringResource(R.string.than_6_99_usd_per_week),
                 isSelected = selectedPlan == freeTrialText
             ) {
@@ -189,6 +198,7 @@ fun PaywallScreen(navController: NavController, context: MainActivity, viewModel
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
+                    //FIXME коли винисеш значення selectedPlan і freeTrialIsSelected в viewModel, saveSubscription не буде приймати ніяких параметрів і все це захендлиться всередині viewModel
                     if(selectedPlan==oneYearText)
                         viewModel.saveSubscription(
                             plan = "Yearly",

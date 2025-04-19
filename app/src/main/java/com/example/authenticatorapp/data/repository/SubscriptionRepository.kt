@@ -5,6 +5,7 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
+//TODO винести літерали, хендлінг помилок
 @Singleton
 class SubscriptionRepository  @Inject constructor(){
     private val firestore = FirebaseFirestore.getInstance()
@@ -26,6 +27,7 @@ class SubscriptionRepository  @Inject constructor(){
         firestore.collection("users").document(uid).collection("subscription").document("current").set(data).await()
     }
 
+    //FIXME не використовується, чому? Якщо треба, використовуємо, якщо ні, прибираємо
     suspend fun isUserPremium(uid: String): Boolean {
         val doc = firestore.collection("users").document(uid).get().await()
         return doc.getBoolean("premium") ?: false
@@ -55,7 +57,8 @@ class SubscriptionRepository  @Inject constructor(){
             .update(data)
             .await()
     }
-
+    
+    //FIXME не використовується, чому? Якщо треба, використовуємо, якщо ні, прибираємо
     suspend fun deleteUserData(uid: String) {
         firestore.collection("users").document(uid).delete().await()
     }
