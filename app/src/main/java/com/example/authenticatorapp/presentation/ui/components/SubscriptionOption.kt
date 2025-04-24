@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Blue
+import com.example.authenticatorapp.presentation.ui.theme.DarkBlue
 import com.example.authenticatorapp.presentation.ui.theme.Gray2
 import com.example.authenticatorapp.presentation.ui.theme.Gray3
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
@@ -68,14 +68,14 @@ fun SubscriptionOption(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = title,
-                        color = if (isSelected) Blue else Color(0xFF2A313E),
+                        color = if (isSelected) Blue else DarkBlue,
                         fontWeight = FontWeight.W700,
                         fontSize = 14.sp,
                         fontFamily = interFontFamily,
                     )
                     Text(
                         text = description,
-                        color = Color(0xFF2A313E),
+                        color = DarkBlue,
                         style = AppTypography.labelSmall
                     )
                 }
@@ -94,7 +94,7 @@ fun SubscriptionOption(
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .offset(x = -59.dp, y = (0).dp)
+                    .offset(x = (-59).dp, y = (0).dp)
                     .background(MainBlue, shape = RoundedCornerShape(50))
                     .padding(horizontal = 10.dp, vertical = 6.dp)
             ) {

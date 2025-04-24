@@ -21,28 +21,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.presentation.ui.navigation.SignIn
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 
 @Composable
 fun SignInBox(navController: NavController){
-    val colors = MaterialTheme.colorScheme
     Box(
         Modifier
             .padding(horizontal = 16.dp)
             .padding(bottom = 24.dp)
-            .background(
-                color = colors.onPrimaryContainer,
-                shape = RoundedCornerShape(24.dp)
-            )
             .shadow(
                 elevation = 8.dp,
                 shape = RoundedCornerShape(24.dp),
-                ambientColor = colors.inverseSurface,
-                spotColor = colors.inverseSurface
+                ambientColor = MaterialTheme.colorScheme.inverseSurface,
+                spotColor = MaterialTheme.colorScheme.inverseSurface
             )
-            .clickable { navController.navigate("SignIn") }
+            .clickable { navController.navigate(SignIn) }
             .background(
-                color = colors.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
                 shape = RoundedCornerShape(24.dp)
             )
             .padding(horizontal = 16.dp, vertical = 20.dp)

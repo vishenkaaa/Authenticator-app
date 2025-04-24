@@ -1,5 +1,6 @@
 package com.example.authenticatorapp.presentation.ui.screens
 
+import android.content.Context
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -7,15 +8,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -26,24 +26,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.authenticatorapp.MainActivity
 import com.example.authenticatorapp.R
-import com.example.authenticatorapp.data.local.preferences.PasscodeManager
 import com.example.authenticatorapp.data.local.preferences.OnBoardingPreferences
+import com.example.authenticatorapp.presentation.ui.navigation.Main
+import com.example.authenticatorapp.presentation.ui.navigation.Onboarding
+import com.example.authenticatorapp.presentation.ui.navigation.VerifyPasscode
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
+import com.example.authenticatorapp.presentation.viewmodel.MainActivityViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
 
 @Composable
-fun SplashScreen(navController: NavController, context: MainActivity) {
+fun SplashScreen(
+    navController: NavController,
+    context: Context,
+    mainActivityViewModel: MainActivityViewModel = hiltViewModel()) {
 
-    val viewModel: HomeViewModel = hiltViewModel()
-    val isLoading by viewModel.isLoadingAccounts.collectAsState()
+    val homeViewModel: HomeViewModel = hiltViewModel()
+    val isLoading by homeViewModel.isLoadingAccounts.collectAsState()
 
     //FIXME винести цю логіку в viewModel
-    val passcodeManager = remember { PasscodeManager(context) }
-    var isPasscodeEnabled by remember { mutableStateOf(passcodeManager.isPasscodeSet())}
+    //Done
+    val isPasscodeEnabled by mainActivityViewModel.isPasscodeEnabled.collectAsState()
 
     val prefs = OnBoardingPreferences(context)
 
@@ -65,20 +70,20 @@ fun SplashScreen(navController: NavController, context: MainActivity) {
 
         delay(500)
 
-        if (prefs.isFinished()) {
+        if (prefs.isOnboardingShowed()) {
             navController.popBackStack()
             if (isPasscodeEnabled) {
-                navController.navigate("verify_passcode/unlock") {
+                navController.navigate(VerifyPasscode("unlock")) {
                     popUpTo(navController.graph.startDestinationId) { inclusive = true }
                 }
             } else {
-                navController.navigate("Main") {
+                navController.navigate(Main) {
                     popUpTo(navController.graph.startDestinationId) { inclusive = true }
                 }
             }
         } else {
             navController.popBackStack()
-            navController.navigate("Onboarding")
+            navController.navigate(Onboarding)
         }
     }
 
@@ -87,10 +92,17 @@ fun SplashScreen(navController: NavController, context: MainActivity) {
     ){
         Image(
             //FIXME splash bg повинен бути лише фон, іконка повинна бути додана як окремe фото тут
+            //Done
             painter = painterResource(id = R.drawable.splash_bg),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
+        )
+
+        Image(
+            painter = painterResource(id = R.drawable.keyhole_shield),
+            contentDescription = null,
+            modifier = Modifier.padding(top = 207.dp).fillMaxWidth()
         )
 
         Column(

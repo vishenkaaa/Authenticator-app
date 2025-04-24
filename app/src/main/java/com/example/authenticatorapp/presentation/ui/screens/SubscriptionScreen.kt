@@ -1,13 +1,10 @@
 package com.example.authenticatorapp.presentation.ui.screens
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,11 +33,14 @@ import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.presentation.ui.components.ChoosePlanBox
 import com.example.authenticatorapp.presentation.ui.components.ConfirmationAlertDialog
+import com.example.authenticatorapp.presentation.ui.components.CustomTopAppBar
 import com.example.authenticatorapp.presentation.ui.components.SignInBox
+import com.example.authenticatorapp.presentation.ui.navigation.Paywall
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
+import com.example.authenticatorapp.presentation.utils.extensions.toName
 import com.example.authenticatorapp.presentation.viewmodel.AuthViewModel
 import com.example.authenticatorapp.presentation.viewmodel.SubscriptionViewModel
 
@@ -51,45 +50,25 @@ fun SubscriptionScreen(
     subscriptionViewModel: SubscriptionViewModel = hiltViewModel(),
     authViewModel: AuthViewModel = hiltViewModel()
     ) {
-    val colors = MaterialTheme.colorScheme
     var showConfirmDialog by remember { mutableStateOf(false) }
 
+    //FIXME викликаємо цей метод всередині viewModel в init методі
+    //Якщо використовувати тільки в init, то не оновиться стан підписки на цій сторінці, а тільки на тій де я викликала зміну
+    //і це найпростіший спосіб, щоб завжди показувалась актуальна підписка
     LaunchedEffect(Unit) {
-        //FIXME викликаємо цей метод всередині viewModel в init методі
         subscriptionViewModel.loadSubscription()
     }
 
-    val plan by subscriptionViewModel.plan.collectAsState()
+    val plan by subscriptionViewModel.currentPlan.collectAsState()
     val billing by subscriptionViewModel.nextBilling.collectAsState()
     val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
 
     Column(
         Modifier
-            .background(colors.background)
+            .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
     ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp)
-                .padding(top = 52.dp, bottom = 24.dp),
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.back),
-                contentDescription = "Back",
-                modifier = Modifier
-                    .clickable {
-                        navController.popBackStack()
-                    }
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = stringResource(R.string.subscription),
-                color = colors.onPrimary,
-                style = AppTypography.bodyLarge,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-        }
+        CustomTopAppBar(navController, stringResource(R.string.subscription))
 
         if(!isAuthenticated){
             SignInBox(navController)
@@ -101,52 +80,51 @@ fun SubscriptionScreen(
                         .padding(horizontal = 16.dp)
                         .padding(bottom = 24.dp)
                         //FIXME подвійне використання background
-                        .background(
-                            color = colors.onPrimaryContainer,
-                            shape = RoundedCornerShape(24.dp)
-                        )
+                        //Done
                         .shadow(
                             elevation = 8.dp,
                             shape = RoundedCornerShape(24.dp),
-                            ambientColor = colors.inverseSurface,
-                            spotColor = colors.inverseSurface
+                            ambientColor = MaterialTheme.colorScheme.inverseSurface,
+                            spotColor = MaterialTheme.colorScheme.inverseSurface
                         )
                         .background(
-                            color = colors.onPrimaryContainer,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             shape = RoundedCornerShape(24.dp)
                         )
                         .padding(horizontal = 16.dp, vertical = 20.dp)
                         .fillMaxWidth()
                 ) {
-                    Column() {
-                        //TODO зробити enum або sealed class(треба дивитись, де ти це ще використовуєш і яким чином) по типу SubscriptionType, де буде Weekly, Yearly. Створити SubscriptionTypeExtensions utils/extensions і перенести туди цю логіку отримання тексту для певного типу підписки
-                        val localizedPlanName = when (plan) {
-                            "Weekly" -> stringResource(R.string.weekly)
-                            "Yearly" -> stringResource(R.string.yearly)
-                            else -> plan ?: ""
+                    Column {
+                        //TODO зробити enum або sealed class(треба дивитись, де ти це ще використовуєш і яким чином) по типу SubscriptionType, де буде Weekly, Yearly.
+                        // Створити SubscriptionTypeExtensions utils/extensions і перенести туди цю логіку отримання тексту для певного типу підписки
+                        //Done
+                        plan?.let {
+                            Text(
+                                text = stringResource(
+                                    R.string.your_current_plan_is_a_subscription,
+                                    it.toName()
+                                ),
+                                Modifier.padding(bottom = 8.dp),
+                                style = AppTypography.bodyLarge
+                            )
+                            Text(
+                                text = stringResource(R.string.next_billing_date, billing ?: ""),
+                                style = AppTypography.labelMedium,
+                                color = Gray5
+                            )
                         }
-                        Text(
-                            text = stringResource(R.string.your_current_plan_is_a_subscription, localizedPlanName ?: ""),
-                            Modifier.padding(bottom = 8.dp),
-                            style = AppTypography.bodyLarge
-                        )
-                        Text(
-                            text = stringResource(R.string.next_billing_date, billing ?: ""),
-                            style = AppTypography.labelMedium,
-                            color = Gray5
-                        )
                     }
                 }
 
                 Button(
-                    onClick = { navController.navigate("Paywall") },
+                    onClick = { navController.navigate(Paywall) },
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
                         .height(50.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                        containerColor = colors.background,
+                        containerColor = MaterialTheme.colorScheme.background,
                         contentColor = MainBlue
                     ),
                     border = if (!isSystemInDarkTheme()) BorderStroke(2.dp, MainBlue) else BorderStroke(
@@ -172,7 +150,7 @@ fun SubscriptionScreen(
                         .height(50.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                        containerColor = colors.background,
+                        containerColor = MaterialTheme.colorScheme.background,
                         contentColor = Red
                     ),
                     border = BorderStroke(2.dp, Red.copy(0.6f))

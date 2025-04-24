@@ -29,11 +29,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,15 +44,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
-import com.example.authenticatorapp.presentation.utils.BiometricAuthManager
-import com.example.authenticatorapp.data.local.preferences.PasscodeManager
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Blue
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
+import com.example.authenticatorapp.presentation.utils.BiometricAuthManager
+import com.example.authenticatorapp.presentation.viewmodel.PasscodeViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 //TODO помилки ті ж самі, що на інших екранах, зроби ревʼю сама на базі тих правок, що я вже дала і відредагуй. Також екрани PremiumFeature, PrivacyPolicy, QRcodeScanner, SignIn, TermsOfUse я теж не переглядала 
 @Composable
@@ -63,30 +61,27 @@ fun PasscodeScreen(
     isCreatingMode: Boolean = false,
     isEditingMode: Boolean = false,
     action: String? = null,
-    onPasscodeConfirmed: (String) -> Unit
+    viewModel: PasscodeViewModel = hiltViewModel(),
+    onPasscodeConfirmed: (String) -> Unit,
 ) {
     val context = LocalContext.current
-    val passcodeManager = remember { PasscodeManager(context) }
 
-    val isTouchIdEnabled = remember { passcodeManager.isTouchIdEnabled() }
-    val biometricManager = remember {
-        if (context is FragmentActivity) BiometricAuthManager(context) else null
-    }
-    val isBiometricAvailable = remember { biometricManager?.isBiometricAvailable() ?: false }
-    val showBiometricPrompt = !isCreatingMode && !isEditingMode && isTouchIdEnabled && isBiometricAvailable
+    val activity = context as FragmentActivity
+    val biometricAuthManager = remember { BiometricAuthManager(activity) }
 
-    var passcode by remember { mutableStateOf("") }
-    var confirmPasscode by remember { mutableStateOf("") }
-    var isConfirmStep by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
+    val isTouchIdEnabled by viewModel.isTouchIdEnabled.collectAsState()
+    val isBiometricAvailable = biometricAuthManager.isBiometricAvailable()
 
-    var isProcessing by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
+    val showBiometricPrompt = action == "unlock" && isTouchIdEnabled && isBiometricAvailable
+
+    val passcode by viewModel.passcode.collectAsState()
+    val isConfirmStep by viewModel.isConfirmStep.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     val headerTitle = when {
         isCreatingMode -> stringResource(R.string.create_passcode)
         isEditingMode -> stringResource(R.string.edit_passcode)
-        else -> stringResource(R.string.create_passcode)
+        else -> stringResource(R.string.confirm_current_passcode)
     }
 
     val instructionText = when {
@@ -97,23 +92,17 @@ fun PasscodeScreen(
         else -> stringResource(R.string.enter_the_passcode)
     }
 
-    fun showBiometricAuth() {
-        if (context is FragmentActivity) {
-            biometricManager?.showBiometricPrompt(
-                onSuccess = {
-                    val savedPasscode = passcodeManager.getPasscode()
-                    onPasscodeConfirmed(savedPasscode)
-                },
-                onError = { error -> },
-                onCancel = {}
-            )
-        }
-    }
-
     LaunchedEffect(showBiometricPrompt) {
         if (showBiometricPrompt) {
             delay(300)
-            showBiometricAuth()
+            biometricAuthManager.showBiometricPrompt(
+                onSuccess = {
+                    val savedCode = viewModel.getSavedPasscode()
+                    onPasscodeConfirmed(savedCode)
+                },
+                onError = {},
+                onCancel = {}
+            )
         }
     }
 
@@ -123,71 +112,20 @@ fun PasscodeScreen(
         }
     }
 
-    // Перевірка паролю коли він досягає 4 символів
-    fun checkPasscode(newPasscode: String) {
-        if (newPasscode.length == 4) {
-            isProcessing = true
-            scope.launch {
-                delay(500)
-            if (isCreatingMode) {
-                if (!isConfirmStep) {
-                    isConfirmStep = true
-                    confirmPasscode = newPasscode
-                    passcode = ""
-                } else {
-                    if (newPasscode == confirmPasscode) {
-                        passcodeManager.savePasscode(newPasscode)
-                        onPasscodeConfirmed(newPasscode)
-                        navController.previousBackStackEntry?.savedStateHandle?.set(
-                            "passcode_enabled",
-                            true
-                        )
-                        navController.popBackStack()
-                    } else {
-                        errorMessage =
-                            context.getString(R.string.the_codes_do_not_match_please_try_again)
-                        passcode = ""
-                        confirmPasscode = ""
-                        isConfirmStep = false
-                    }
-                }
-            } else if (isEditingMode) {
-                if (!isConfirmStep) {
-                    // Перевірка старого паролю
-                    val savedCode = passcodeManager.getPasscode()
-                    if (newPasscode == savedCode) {
-                        isConfirmStep = true
-                        passcode = ""
-                    } else {
-                        errorMessage = context.getString(R.string.invalid_passcode_please_try_again)
-                        passcode = ""
-                    }
-                } else {
-                    passcodeManager.savePasscode(newPasscode)
-                    onPasscodeConfirmed(newPasscode)
+    fun addDigit(d: String) {
+        viewModel.addDigit(
+            digit = d,
+            isCreatingMode = isCreatingMode,
+            isEditingMode = isEditingMode,
+            onSuccess = { code, shouldClose ->
+                onPasscodeConfirmed(code)
+                if (shouldClose) {
+                    navController.previousBackStackEntry?.savedStateHandle?.set("passcode_enabled", true)
                     navController.popBackStack()
                 }
-            } else {
-                val savedCode = passcodeManager.getPasscode()
-                if (newPasscode == savedCode) {
-                    onPasscodeConfirmed(newPasscode)
-                } else {
-                    errorMessage = context.getString(R.string.invalid_passcode_please_try_again)
-                    passcode = ""
-                }
-            }
-        }
-            isProcessing = false
-        }
-    }
-
-    fun addDigit(digit: String) {
-        if (passcode.length < 4) {
-            val newPasscode = passcode + digit
-            passcode = newPasscode
-            errorMessage = ""
-            checkPasscode(newPasscode)
-        }
+            },
+            onError = { }
+        )
     }
 
     Column(
@@ -301,9 +239,18 @@ fun PasscodeScreen(
                         }
                     } else {
                         // Останній рядок: порожньо (відбиток), 0, backspace
-                        if (showBiometricPrompt && action == "unlock") {
+                        if (showBiometricPrompt) {
                             IconButton(
-                                onClick = { showBiometricAuth() },
+                                onClick = {
+                                    biometricAuthManager.showBiometricPrompt(
+                                        onSuccess = {
+                                            val savedCode = viewModel.getSavedPasscode()
+                                            onPasscodeConfirmed(savedCode)
+                                        },
+                                        onError = {},
+                                        onCancel = {}
+                                    )
+                                },
                                 modifier = Modifier
                                     .size(72.dp)
                                     .clip(CircleShape)
@@ -320,7 +267,9 @@ fun PasscodeScreen(
                                 )
                             }
                         }
-                        else Box(modifier = Modifier.size(72.dp)) { }
+                        else {
+                            Box(modifier = Modifier.size(72.dp)) { }
+                        }
 
                         KeypadButton(number = "0") {
                             addDigit("0")
@@ -328,10 +277,7 @@ fun PasscodeScreen(
 
                         IconButton(
                             onClick = {
-                                if (passcode.isNotEmpty()) {
-                                    passcode = passcode.dropLast(1)
-                                    errorMessage = ""
-                                }
+                                viewModel.removeLastDigit()
                             },
                             modifier = Modifier
                                 .size(72.dp)
@@ -344,7 +290,7 @@ fun PasscodeScreen(
                             Icon(
                                 painter = painterResource(id = R.drawable.backspace),
                                 contentDescription = "Backspace",
-                                modifier = Modifier.size(24.dp),
+                                modifier = Modifier.size(32.dp),
                                 tint = Color.White
                             )
                         }

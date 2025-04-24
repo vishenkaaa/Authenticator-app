@@ -4,8 +4,10 @@ import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.VibrationEffect
 import android.os.Vibrator
 import android.widget.Toast
+import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,11 +24,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -56,16 +57,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.data.local.model.AccountEntity
+import com.example.authenticatorapp.data.model.ServiceName
+import com.example.authenticatorapp.presentation.ui.navigation.EditAccount
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
+import com.example.authenticatorapp.presentation.utils.extensions.toLocalizedStringRes
 import com.example.authenticatorapp.presentation.viewmodel.AddAccountViewModel
 import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
 import kotlinx.coroutines.launch
-import android.os.VibrationEffect
-import androidx.annotation.RequiresPermission
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -128,7 +129,7 @@ fun AccountItem(account: AccountEntity,
         Spacer(modifier = Modifier.width(16.dp))
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = account.serviceName, style = AppTypography.bodyMedium)
+            Text(text = account.serviceName.toLocalizedStringRes(), style = AppTypography.bodyMedium)
             Spacer(modifier = Modifier.height(2.dp))
             Text(text = account.email, color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.W400, fontFamily = interFontFamily)
             Spacer(modifier = Modifier.height(2.dp))
@@ -196,7 +197,7 @@ fun AccountItem(account: AccountEntity,
                                 .fillMaxWidth()
                                 .clickable(onClick = {
                                     closeEditSheet()
-                                    navController.navigate("EditAccount/${account.id}")
+                                    navController.navigate(EditAccount(account.id))
                                 })
                                 .padding(vertical = 12.dp)
                         ) {
@@ -213,7 +214,8 @@ fun AccountItem(account: AccountEntity,
                                 style = AppTypography.labelMedium
                             )
                         }
-                        Divider(
+
+                        HorizontalDivider(
                             modifier = Modifier.fillMaxWidth(),
                             color = Black.copy(alpha = 0.1f)
                         )
@@ -241,7 +243,7 @@ fun AccountItem(account: AccountEntity,
                                 style = AppTypography.labelMedium
                             )
                         }
-                        Divider(
+                        HorizontalDivider(
                             modifier = Modifier.fillMaxWidth(),
                             color = Black.copy(alpha = 0.1f)
                         )
@@ -334,28 +336,11 @@ fun copyToClipboard(text: String, context: Context) {
 
     Toast.makeText(context, context.getString(R.string.code_copied_to_clipboard), Toast.LENGTH_LONG).show()
 
-    val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    val vibrator = context.getSystemService(Vibrator::class.java)
     vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
 }
 
 @Composable
-fun getServiceIcon(serviceName: String): Int {
-    return when (serviceName) {
-        stringResource(R.string.banking_and_finance) -> R.drawable.s_banking_and_finance
-        stringResource(R.string.website) -> R.drawable.s_website
-        stringResource(R.string.mail) -> R.drawable.s_mail
-        stringResource(R.string.social) -> R.drawable.s_social
-        "Facebook" -> R.drawable.s_facebook
-        "Instagram" -> R.drawable.s_instagram
-        "Google" -> R.drawable.s_google
-        "Linkedin" -> R.drawable.s_linkedin
-        "Amazon" -> R.drawable.s_amazon_png
-        "Paypal" -> R.drawable.s_paypall_png
-        "Microsoft" -> R.drawable.s_microsoft
-        "Discord" -> R.drawable.s_discord
-        "Reddit" -> R.drawable.s_reddit_png
-        "Netflix" -> R.drawable.s_netflix
-        else -> R.drawable.s_mail
-    }
+fun getServiceIcon(serviceName: ServiceName): Int {
+    return ServiceName.from(serviceName.displayName).iconRes
 }
-

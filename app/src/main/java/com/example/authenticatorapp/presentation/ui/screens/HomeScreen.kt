@@ -1,6 +1,11 @@
 package com.example.authenticatorapp.presentation.ui.screens
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -13,9 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,35 +47,63 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.data.local.model.AccountEntity
-import com.example.authenticatorapp.presentation.ui.components.AccountItem
+import com.example.authenticatorapp.presentation.model.AccountTab
+import com.example.authenticatorapp.presentation.ui.components.CounterBasedTab
 import com.example.authenticatorapp.presentation.ui.components.TabLayout
+import com.example.authenticatorapp.presentation.ui.components.TimeBasedTab
+import com.example.authenticatorapp.presentation.ui.navigation.QrScanner
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
-import com.example.authenticatorapp.presentation.ui.theme.Gray3
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
-import com.example.authenticatorapp.presentation.utils.NtpTimeProvider.getNtpTime
 import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
-import kotlinx.coroutines.delay
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
     context: Context,
-    viewModel: HomeViewModel = hiltViewModel(),
-    accounts: List<AccountEntity>
+    accounts: List<AccountEntity>,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     //FIXME не потрібно так присвоювати. Це не має сенсу.
-    val allAccounts = accounts
-    val isLoading by viewModel.isLoadingAccounts.collectAsState()
+    //Done
 
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    val isLoading by viewModel.isLoadingAccounts.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
-    val colors = MaterialTheme.colorScheme
+    val pagerState = rememberPagerState()
+    val coroutineScope = rememberCoroutineScope()
+    val selectedTab = AccountTab.fromPage(pagerState.currentPage)
+
+    var cameraPermissionGranted by remember { mutableStateOf(false) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            cameraPermissionGranted = true
+        } else {
+            Toast.makeText(
+                context,
+                context.getString(R.string.camera_permission_is_required_to_scan_the_qr_code),
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    LaunchedEffect(cameraPermissionGranted) {
+        if (cameraPermissionGranted) {
+            navController.navigate(QrScanner)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -86,7 +117,7 @@ fun HomeScreen(
             style = AppTypography.bodyLarge
         )
 
-        if (!isLoading && allAccounts.isNotEmpty())
+        if (!isLoading && accounts.isNotEmpty())
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
@@ -110,8 +141,8 @@ fun HomeScreen(
                     .padding(top = 20.dp),
                 shape = RoundedCornerShape(20.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = colors.onPrimaryContainer,
-                    focusedContainerColor = colors.onPrimaryContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    focusedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     focusedBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent,
                     focusedLabelColor = Gray5,
@@ -129,94 +160,31 @@ fun HomeScreen(
                 CircularProgressIndicator()
             }
         } else
-            if (allAccounts.isNotEmpty()) {
+            if (accounts.isNotEmpty()) {
                 //TODO неправильне будуєш лейаут
                 // Розділи кожну вкладку на різні composable і подивись в документації або в статтях на медіумі, як правильно використовувати TabRow
+                //Done
                 TabLayout(
-                    selectedTabIndex = selectedTabIndex,
-                    onTabSelected = { selectedTabIndex = it }
+                    selectedTab = selectedTab,
+                    onTabSelected = { tab ->
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(AccountTab.toPage(tab))
+                        }
+                    }
                 )
 
-                val filteredAccounts = if (selectedTabIndex == 0) {
-                    allAccounts.filter {
-                        it.type == "TOTP" && matchesSearchQuery(it, searchQuery)
-                    }
-                } else {
-                    allAccounts.filter {
-                        it.type == "HOTP" && matchesSearchQuery(it, searchQuery)
-                    }
-                }
-
-                if (filteredAccounts.isEmpty()) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.nothing_found),
-                            color = Color.Gray,
-                            style = AppTypography.labelMedium
-                        )
+                HorizontalPager(
+                    count = AccountTab.values.size,
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.Top
+                ) { page ->
+                    when (AccountTab.fromPage(page)) {
+                        AccountTab.TimeBased -> TimeBasedTab(accounts, searchQuery, context, navController, viewModel)
+                        AccountTab.CounterBased -> CounterBasedTab(accounts, searchQuery, context, navController, viewModel)
                     }
                 }
 
-                LazyColumn() {
-                    itemsIndexed(filteredAccounts) { index, account ->
-                        val isLastItem = index == filteredAccounts.size - 1
-                        val otp = remember { mutableStateOf("...") }
-                        val remainingTime = remember { mutableStateOf(0) }
-
-                        LaunchedEffect(account) {
-                            otp.value = viewModel.generateOtp(account)
-                            remainingTime.value = calculateRemainingTime()
-                        }
-
-
-                        //FIXME не використовуємо while (true). Кращее пошукай якісь рішення з таймером, який спрацьовуватиме кожні 30 секунд і винести цю логіку в viewModel
-                        LaunchedEffect(account.id) {
-                            var lastCounter: Long = -1L
-                            val timeStep = 30L
-
-                            while (true) {
-                                val ntpTime = getNtpTime() ?: System.currentTimeMillis()
-                                val currentTimeSeconds = ntpTime / 1000
-                                val currentCounter = currentTimeSeconds / timeStep
-                                val remaining = (timeStep - (currentTimeSeconds % timeStep)).toInt()
-
-                                remainingTime.value = remaining
-
-                                if (currentCounter != lastCounter) {
-                                    otp.value = viewModel.generateOtp(account)
-                                    lastCounter = currentCounter
-                                }
-
-                                delay(1000)
-                            }
-                        }
-
-                        if (selectedTabIndex == 0)
-                            AccountItem(
-                                account = account,
-                                otp = otp.value,
-                                remainingTime = remainingTime.value,
-                                context = context,
-                                isTimeBased = true,
-                                navController = navController,
-                                isLastItem = isLastItem
-                            )
-                        else
-                            AccountItem(
-                                account = account,
-                                otp = otp.value,
-                                context = context,
-                                isTimeBased = false,
-                                navController = navController,
-                                isLastItem = isLastItem
-                            )
-                    }
-                }
             } else {
                 Box(
                     modifier = Modifier
@@ -227,8 +195,8 @@ fun HomeScreen(
                             elevation = 10.dp,
                             shape = RoundedCornerShape(24.dp),
                             clip = false,
-                            spotColor = colors.inverseSurface,
-                            ambientColor = colors.inverseSurface
+                            spotColor = MaterialTheme.colorScheme.inverseSurface,
+                            ambientColor = MaterialTheme.colorScheme.inverseSurface
                         )
                         .background(Color.Transparent, RoundedCornerShape(24.dp)),
                     contentAlignment = Alignment.BottomCenter
@@ -266,7 +234,15 @@ fun HomeScreen(
 
                         Button(
                             onClick = {
-                                navController.navigate("QrScanner")
+                                if (ContextCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.CAMERA
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    navController.navigate(QrScanner)
+                                } else {
+                                    permissionLauncher.launch(Manifest.permission.CAMERA)
+                                }
                             },
                             modifier = Modifier
                                 .height(50.dp)
@@ -295,17 +271,4 @@ fun HomeScreen(
 }
 
 //TODO виносимо логіку в viewModel, додаємо в репозиторій метод для пошуку
-private fun matchesSearchQuery(account: AccountEntity, query: String): Boolean {
-    if (query.isBlank()) return true
-
-    val searchLower = query.lowercase()
-    return account.serviceName.lowercase().contains(searchLower) ||
-            account.email.lowercase().contains(searchLower)
-}
-
-private suspend fun calculateRemainingTime(): Int {
-    val periodSeconds = 30
-    val ntpTime = getNtpTime() ?: System.currentTimeMillis()
-    val currentTimeSeconds = ntpTime / 1000
-    return periodSeconds - (currentTimeSeconds % periodSeconds).toInt()
-}
+//Done
