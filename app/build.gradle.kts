@@ -6,6 +6,7 @@ plugins {
 
     id("com.google.dagger.hilt.android")
     kotlin("kapt")
+    kotlin("plugin.serialization") version "2.0.0"
 }
 
 android {
@@ -60,6 +61,7 @@ dependencies {
     implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -97,4 +99,11 @@ dependencies {
     implementation (libs.androidx.biometric)
 
     implementation("commons-net:commons-net:3.9.0")
+    implementation(libs.play.services.auth.v2070)
+    implementation(libs.com.google.firebase.firebase.auth.ktx)
+    implementation ("androidx.credentials:credentials:1.5.0")
+    implementation ("androidx.credentials:credentials-play-services-auth:1.5.0")
+    implementation ("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
+    implementation(libs.kotlinx.serialization.json)
 }

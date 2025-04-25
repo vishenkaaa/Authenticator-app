@@ -5,10 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,13 +16,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.authenticatorapp.R
-import com.example.authenticatorapp.presentation.ui.screens.Screen
+import com.example.authenticatorapp.presentation.model.TabScreen
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 
 @Composable
 fun CustomBottomNavigation(
-    currentScreen: Screen,
-    onScreenSelected: (Screen) -> Unit
+    currentScreen: TabScreen,
+    onScreenSelected: (TabScreen) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -40,12 +39,13 @@ fun CustomBottomNavigation(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 40.dp)
-                .offset(y = (14).dp)
+                //FIXME спробувати позиціонувати іншим варіантом
+                //Done
+                .padding(start = 40.dp, end = 40.dp, top = 12.dp)
         ) {
-            IconButton(onClick = { onScreenSelected(Screen.HOME) }) {
+            IconButton(onClick = { onScreenSelected(TabScreen.HOME) }) {
                 Icon(
-                    if (currentScreen == Screen.HOME) painterResource(R.drawable.key_checked) else painterResource(
+                    if (currentScreen == TabScreen.HOME) painterResource(R.drawable.key_checked) else painterResource(
                         R.drawable.key),
                     contentDescription = "Головна",
                     tint = MainBlue
@@ -55,9 +55,9 @@ fun CustomBottomNavigation(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            IconButton(onClick = { onScreenSelected(Screen.INFO) }) {
+            IconButton(onClick = { onScreenSelected(TabScreen.INFO) }) {
                 Icon(
-                    if (currentScreen == Screen.INFO) painterResource(R.drawable.info_checked) else painterResource(
+                    if (currentScreen == TabScreen.INFO) painterResource(R.drawable.info_checked) else painterResource(
                         R.drawable.info),
                     contentDescription = "Інформація",
                     tint = MainBlue

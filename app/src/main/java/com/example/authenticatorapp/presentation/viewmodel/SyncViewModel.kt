@@ -26,18 +26,14 @@ class SyncViewModel @Inject constructor(
     private fun checkSyncStatus() {
         viewModelScope.launch {
             val uid = authRepository.getCurrentUser()?.id ?: return@launch
-            _isSyncEnabled.value = syncRepository.isSynchronizing(uid)
+            _isSyncEnabled.value = syncRepository.getShouldSynchronize(uid)
         }
     }
 
     fun setSyncEnabled(enabled: Boolean) {
         viewModelScope.launch {
             val uid = authRepository.getCurrentUser()?.id ?: return@launch
-            if (enabled) {
-                syncRepository.startSynchronize(uid)
-            } else {
-                syncRepository.cancelSynchronize(uid)
-            }
+            syncRepository.setShouldSynchronize(uid, enabled)
             _isSyncEnabled.value = enabled
         }
     }

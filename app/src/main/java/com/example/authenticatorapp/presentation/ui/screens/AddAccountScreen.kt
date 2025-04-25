@@ -32,10 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -46,18 +43,27 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.data.model.AccountType
+import com.example.authenticatorapp.data.model.OtpAlgorithm
+import com.example.authenticatorapp.data.model.ServiceName
 import com.example.authenticatorapp.presentation.ui.components.ServiceItem
 import com.example.authenticatorapp.presentation.ui.components.SimpleServiceItem
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
+import com.example.authenticatorapp.presentation.utils.extensions.toLocalizedStringRes
 import com.example.authenticatorapp.presentation.viewmodel.AddAccountViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddAccountScreen(navController: NavController, context: Context, viewModel: AddAccountViewModel = hiltViewModel(), oldAccountId: Int? = null) {
-    val colors = MaterialTheme.colorScheme
+fun AddAccountScreen(
+    navController: NavController,
+    context: Context,
+    viewModel: AddAccountViewModel = hiltViewModel(),
+    oldAccountId: Int? = null) {
+    //FIXME не використовуємо напряму MaterialTheme.colorScheme замість colors
+    //Done
     val serviceSheetState = rememberModalBottomSheetState()
     val keySheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
@@ -74,27 +80,20 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
 
     val base32Regex = Regex("^[A-Z2-7]+=*$")
 
-    val txt_time_based = stringResource(R.string.time_based)
-    var selectedService by remember { mutableStateOf("") }
-    var selectedTypeOfKey by remember { mutableStateOf(txt_time_based) }
+    //FIXME не використовуємо напряму tringResource(R.string.time_based) замість змінної
+    //Done
+    val selectedService by viewModel.selectedService.collectAsState()
+    val selectedTypeOfKey by viewModel.selectedTypeOfKey.collectAsState()
 
-    var accountText by remember { mutableStateOf("") }
-    var keyText by remember { mutableStateOf("") }
+    //FIXME переносимо це в viewModel
+    //Done
+    val accountText by viewModel.accountName.collectAsState()
+    val keyText by viewModel.secretKey.collectAsState()
 
     if(oldAccountId!=null){
         LaunchedEffect(key1 = oldAccountId) {
-            oldAccountId?.let { id ->
+            oldAccountId.let { id ->
                 viewModel.getAccountById(id)
-            }
-        }
-
-        val oldAccount = viewModel.account.collectAsState().value
-        LaunchedEffect(key1 = oldAccount) {
-            oldAccount?.let {
-                accountText = it.email
-                keyText = it.secret
-                selectedService = it.serviceName
-                selectedTypeOfKey = if(it.type == "TOTP") "Time-based" else "Counter-based"
             }
         }
     }
@@ -102,7 +101,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 16.dp)
     ) {
         Row(
@@ -121,7 +120,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
             Spacer(modifier = Modifier.weight(1f))
             Text(
                 text = stringResource(R.string.add_account),
-                color = colors.onPrimary,
+                color = MaterialTheme.colorScheme.onPrimary,
                 style = AppTypography.bodyLarge,
             )
             Spacer(modifier = Modifier.weight(1f))
@@ -136,8 +135,8 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                 .clickable { openSheetService() }
         ) {
             OutlinedTextField(
-                value = selectedService,
-                onValueChange = { selectedService = it },
+                value = selectedService?.toLocalizedStringRes() ?: "",
+                onValueChange = { viewModel.setSelectedService(ServiceName.from(it)) },
                 readOnly = true,
                 enabled = false,
                 textStyle = AppTypography.labelMedium,
@@ -156,11 +155,11 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                 },
                 shape = RoundedCornerShape(20.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = colors.onPrimaryContainer,
-                    focusedContainerColor = colors.onPrimaryContainer,
-                    disabledContainerColor = colors.onPrimaryContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    focusedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     disabledBorderColor = Color.Transparent,
-                    disabledTextColor = colors.onPrimary,
+                    disabledTextColor = MaterialTheme.colorScheme.onPrimary,
                     disabledPlaceholderColor = Color.Gray
                 ),
                 modifier = Modifier
@@ -172,8 +171,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
 
         OutlinedTextField(
             value = accountText,
-            onValueChange = {newText ->
-                accountText = newText  },
+            onValueChange = { viewModel.setAccountName(it) },
             readOnly = false,
             placeholder = { Text(text = stringResource(R.string.account), style = AppTypography.labelMedium) },
             textStyle = AppTypography.labelMedium,
@@ -186,8 +184,8 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
             },
             shape = RoundedCornerShape(20.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = colors.onPrimaryContainer,
-                focusedContainerColor = colors.onPrimaryContainer,
+                unfocusedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                focusedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
                 focusedLabelColor = Gray5,
@@ -200,9 +198,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
 
         OutlinedTextField(
             value = keyText,
-            onValueChange = { newText ->
-                keyText = newText
-            },
+            onValueChange = { viewModel.setSecretKey(it) },
             readOnly = false,
             placeholder = { Text(text = stringResource(R.string.key), style = AppTypography.labelMedium) },
             textStyle = AppTypography.labelMedium,
@@ -215,8 +211,8 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
             },
             shape = RoundedCornerShape(20.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = colors.onPrimaryContainer,
-                focusedContainerColor = colors.onPrimaryContainer,
+                unfocusedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                focusedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
                 focusedLabelColor = Gray5,
@@ -234,8 +230,10 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                 .clickable { openSheetKey() }
         ) {
             OutlinedTextField(
-                value = selectedTypeOfKey,
-                onValueChange = { selectedTypeOfKey = it },
+                value = selectedTypeOfKey.toLocalizedStringRes(),
+                onValueChange = { AccountType.from(it)?.let { type ->
+                    viewModel.setSelectedKeyType(type)
+                } },
                 readOnly = true,
                 enabled = false,
                 textStyle = AppTypography.labelMedium,
@@ -254,11 +252,11 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                 },
                 shape = RoundedCornerShape(20.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = colors.onPrimaryContainer,
-                    focusedContainerColor = colors.onPrimaryContainer,
-                    disabledContainerColor = colors.onPrimaryContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    focusedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     disabledBorderColor = Color.Transparent,
-                    disabledTextColor = colors.onPrimary,
+                    disabledTextColor = MaterialTheme.colorScheme.onPrimary,
                     disabledPlaceholderColor = Color.Gray
                 ),
                 modifier = Modifier
@@ -277,7 +275,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                         context.getString(R.string.invalid_secret_format), Toast.LENGTH_LONG).show()
                     return@Button
                 }
-                if (selectedService.isBlank()) {
+                if (selectedService == null) {
                     Toast.makeText(context,
                         context.getString(R.string.service_name_is_required), Toast.LENGTH_LONG).show()
                     return@Button
@@ -293,14 +291,14 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                     return@Button
                 }
 
-                val initialCounter = if (selectedTypeOfKey == "Counter-based") 1L else 0L
+                val initialCounter = if (selectedTypeOfKey == AccountType.HOTP) 1L else 0L
                 if(oldAccountId == null){
                     viewModel.addAccount(
-                        service = selectedService,
+                        service = selectedService!!.displayName,
                         email = accountText,
                         secret = keyText,
                         type = selectedTypeOfKey,
-                        algorithm = "HmacSHA1",
+                        algorithm = OtpAlgorithm.SHA1,
                         digits = 6,
                         counter = initialCounter
                     )
@@ -308,16 +306,16 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                 }
                 else {
                     val account = viewModel.account.value
-                    val newCounter = if (selectedTypeOfKey == "Counter-based" && account?.counter == 0L) 1L
+                    val newCounter = if (selectedTypeOfKey == AccountType.HOTP && account?.counter == 0L) 1L
                     else account?.counter ?: initialCounter
 
                     viewModel.updateAccount(
                         id = oldAccountId,
-                        service = selectedService,
+                        service = selectedService!!.displayName,
                         email = accountText,
                         secret = keyText,
                         type = selectedTypeOfKey,
-                        algorithm = "HmacSHA1",
+                        algorithm = OtpAlgorithm.SHA1,
                         digits = 6,
                         counter = newCounter
                     )
@@ -338,7 +336,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                 else painterResource(R.drawable.edit),
                 contentDescription = "Add",
                 Modifier.size(24.dp),
-                tint = Color.White
+                tint = White
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
@@ -354,7 +352,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
         ModalBottomSheet(
             onDismissRequest = { closeSheetService() },
             sheetState = serviceSheetState,
-            containerColor = colors.onPrimaryContainer,
+            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
             windowInsets = WindowInsets(0, 0, 0, 0)
         ) {
             Column(
@@ -370,17 +368,15 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
-                val txt_banking = stringResource(R.string.banking_and_finance)
-                val txt_website = stringResource(R.string.website)
-                val txt_mail = stringResource(R.string.mail)
-                val txt_social = stringResource(R.string.social)
+                //FIXME не потрібно змінних, напряму викликаємо stringResource
+                //Done
                 LazyColumn {
                     item {
                         ServiceItem(
                             text = stringResource(R.string.banking_and_finance),
                             iconResId = R.drawable.s_banking_and_finance
                         ) {
-                            selectedService = txt_banking
+                            viewModel.setSelectedService(ServiceName.BANKING_AND_FINANCE)
                             closeSheetService()
                         }
                     }
@@ -390,7 +386,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             text = stringResource(R.string.website),
                             iconResId = R.drawable.s_website
                         ) {
-                            selectedService = txt_website
+                            viewModel.setSelectedService(ServiceName.WEBSITE)
                             closeSheetService()
                         }
                     }
@@ -400,7 +396,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             text = stringResource(R.string.mail),
                             iconResId = R.drawable.s_mail
                         ) {
-                            selectedService = txt_mail
+                            viewModel.setSelectedService(ServiceName.MAIL)
                             closeSheetService()
                         }
                     }
@@ -410,7 +406,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             text = stringResource(R.string.social),
                             iconResId = R.drawable.s_social
                         ) {
-                            selectedService = txt_social
+                            viewModel.setSelectedService(ServiceName.SOCIAL)
                             closeSheetService()
                         }
                     }
@@ -429,7 +425,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             text = "Google",
                             iconResId = R.drawable.s_google
                         ) {
-                            selectedService = "Google"
+                            viewModel.setSelectedService(ServiceName.GOOGLE)
                             closeSheetService()
                         }
                     }
@@ -439,7 +435,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             text = "Instagram",
                             iconResId = R.drawable.s_instagram
                         ) {
-                            selectedService = "Instagram"
+                            viewModel.setSelectedService(ServiceName.INSTAGRAM)
                             closeSheetService()
                         }
                     }
@@ -449,7 +445,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             text = "Facebook",
                             iconResId = R.drawable.s_facebook
                         ) {
-                            selectedService = "Facebook"
+                            viewModel.setSelectedService(ServiceName.FACEBOOK)
                             closeSheetService()
                         }
                     }
@@ -459,7 +455,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             text = "LinkedIn",
                             iconResId = R.drawable.s_linkedin
                         ) {
-                            selectedService = "LinkedIn"
+                            viewModel.setSelectedService(ServiceName.LINKEDIN)
                             closeSheetService()
                         }
                     }
@@ -469,7 +465,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             text = "Amazon",
                             iconResId = R.drawable.s_amazon_png
                         ) {
-                            selectedService = "Amazon"
+                            viewModel.setSelectedService(ServiceName.AMAZON)
                             closeSheetService()
                         }
                     }
@@ -479,7 +475,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             text = "PayPal",
                             iconResId = R.drawable.s_paypall_png
                         ) {
-                            selectedService = "PayPal"
+                            viewModel.setSelectedService(ServiceName.PAYPAL)
                             closeSheetService()
                         }
                     }
@@ -489,7 +485,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             text = "Microsoft",
                             iconResId = R.drawable.s_microsoft
                         ) {
-                            selectedService = "Microsoft"
+                            viewModel.setSelectedService(ServiceName.MICROSOFT)
                             closeSheetService()
                         }
                     }
@@ -499,7 +495,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             text = "Discord",
                             iconResId = R.drawable.s_discord
                         ) {
-                            selectedService = "Discord"
+                            viewModel.setSelectedService(ServiceName.DISCORD)
                             closeSheetService()
                         }
                     }
@@ -509,7 +505,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             text = "Reddit",
                             iconResId = R.drawable.s_reddit_png
                         ) {
-                            selectedService = "Reddit"
+                            viewModel.setSelectedService(ServiceName.REDDIT)
                             closeSheetService()
                         }
                     }
@@ -519,7 +515,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                             text = "Netflix",
                             iconResId = R.drawable.s_netflix
                         ) {
-                            selectedService = "Netflix"
+                            viewModel.setSelectedService(ServiceName.NETFLIX)
                             closeSheetService()
                         }
                     }
@@ -532,7 +528,7 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
         ModalBottomSheet(
             onDismissRequest = { openSheetKey() },
             sheetState = keySheetState,
-            containerColor = colors.onPrimaryContainer,
+            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
             windowInsets = WindowInsets(0, 0, 0, 0)
         ) {
             Column(
@@ -541,16 +537,16 @@ fun AddAccountScreen(navController: NavController, context: Context, viewModel: 
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 27.dp)
             ) {
-                val txt_time_based = stringResource(R.string.time_based)
-                val txt_counter_based = stringResource(R.string.counter_based)
+                //FIXME не потрібно змінних, напряму викликаємо stringResource
+                //Done
 
                 SimpleServiceItem(text = stringResource(R.string.time_based)) {
-                    selectedTypeOfKey = txt_time_based
+                    viewModel.setSelectedKeyType(AccountType.TOTP)
                     closeSheetKey()
                 }
 
                 SimpleServiceItem(text = stringResource(R.string.counter_based)) {
-                    selectedTypeOfKey = txt_counter_based
+                    viewModel.setSelectedKeyType(AccountType.HOTP)
                     closeSheetKey()
                 }
             }

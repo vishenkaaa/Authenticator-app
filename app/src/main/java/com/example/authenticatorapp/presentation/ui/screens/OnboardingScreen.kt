@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
@@ -37,13 +38,21 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.presentation.model.OnboardingPage
+import com.example.authenticatorapp.presentation.model.OnboardingPage.Companion.BULLET_SYMBOL
+import com.example.authenticatorapp.presentation.ui.navigation.Main
+import com.example.authenticatorapp.presentation.ui.navigation.Paywall
+import com.example.authenticatorapp.presentation.ui.navigation.PrivacyPolicy
+import com.example.authenticatorapp.presentation.ui.navigation.TermsOfUse
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Gray2
 import com.example.authenticatorapp.presentation.ui.theme.LightBlue
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
-import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
+import com.example.authenticatorapp.presentation.utils.extensions.getData
+import com.example.authenticatorapp.presentation.viewmodel.OnboardingViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -51,43 +60,34 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun OnboardingScreen(navController: NavController){
+fun OnboardingScreen(navController: NavController,
+                     onboardingViewModel: OnboardingViewModel = hiltViewModel()){
 
-    val titles = listOf(
-        stringResource(R.string.safer_account),
-        stringResource(R.string.simple_camera_code_setting),
-        stringResource(R.string.enhanced_privacy),
-        stringResource(R.string.unlock_full_access_to_all_the_features)
-    )
-
-    val descriptions = listOf(
-        stringResource(R.string.securely_protect_your_data_from_intrusion_and_data_loss),
-        stringResource(R.string.just_scan_the_qr_code_or_add_it_manually),
-        stringResource(R.string.securely_conduct_crypto_transactions_and_keep_your_wallet_safe),
-        stringResource(R.string._3_day_free_trial_than_6_99_usd_per_week)
-    )
-
-    val images = listOf(
-        R.drawable.onboarding_bg1,
-        R.drawable.onboarding_bg2,
-        R.drawable.onboarding_bg3,
-        R.drawable.onboarding_bg4
-    )
+    //TODO створити sealed class OnboardingPage та нащадків PageOne, PageTwo...
+    // В companion object створити функцію getPageById, яка приймає int id і повертає 0->PageOne, 1->PageTwo...
+    // Створити клас OnboardingPageData з полями title, description, image
+    // Створити extension функцію, OnboardingPage.getData():OnboardingPageData, і використати when(this) і вернути обʼєкт з необхідними даними
+    //Done
 
     val pagerState = rememberPagerState()
     val currentPage by remember { derivedStateOf { pagerState.currentPage } }
     val coroutineScope = rememberCoroutineScope()
 
+    val currentPageData = OnboardingPage.getPageById(currentPage).getData()
+    val idLastPage = OnboardingPage.PageFour.id
+
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
-        if (currentPage == titles.size - 1) {
+        //FIXME використати !pagerState.canScrollForward замість цієї умови
+        //Неправильно працює так
+        if (currentPage == idLastPage) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp, top = 60.dp)
                     .align(Alignment.TopCenter)
-                    .zIndex(1f),
+                    .zIndex(5f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
@@ -95,11 +95,10 @@ fun OnboardingScreen(navController: NavController){
                     contentDescription = "Close",
 
                     modifier = Modifier
-                        .size(24.dp)
                         .padding(end = 5.dp, top = 5.dp, bottom = 5.dp)
                         .clickable {
-                            navController.popBackStack()
-                            navController.navigate("SignIn")
+                            navController.navigate(Main)
+                            onboardingViewModel.setOnboardingShowed()
                         }
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -120,17 +119,32 @@ fun OnboardingScreen(navController: NavController){
 
         HorizontalPager(
             state = pagerState,
-            count = titles.size,
+            count = 4,
             modifier = Modifier.fillMaxSize()
-        ) { currentPage ->
+        ) {
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
                 Image(
-                    painter = painterResource(id = images[currentPage]),
+                    //TODO після всіх змін що я описала зверху ти зможеш зробити щось накшталт 
+                    // OnboardingPage.getPageById(currentPage).getData().image
+                    //Done
+                    painter = painterResource(id = R.drawable.onboarding_bg),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
+                )
+                if(currentPage == OnboardingPage.PageFour.id) {
+                    Image(
+                        painter = painterResource(id = R.drawable.onboarding_ic4_1),
+                        contentDescription = null,
+                        modifier = Modifier.padding(top = 110.dp).fillMaxWidth()
+                    )
+                }
+                Image(
+                    painter = painterResource(id = currentPageData.image),
+                    contentDescription = null,
+                    modifier = Modifier.padding(top = 189.dp).fillMaxWidth().blueShadow()
                 )
                 Column(
                     modifier = Modifier
@@ -140,13 +154,17 @@ fun OnboardingScreen(navController: NavController){
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text = titles[currentPage],
+                        //TODO OnboardingPage.getPageById(currentPage).getData().title
+                        //Done
+                        text = currentPageData.title,
                         textAlign = TextAlign.Center,
                         color = White,
                         style = AppTypography.titleMedium
                     )
                     Text(
-                        text = descriptions[currentPage],
+                        //TODO OnboardingPage.getPageById(currentPage).getData().description
+                        //Done
+                        text = currentPageData.description,
                         Modifier.padding(16.dp),
                         color = Gray2,
                         textAlign = TextAlign.Center,
@@ -167,11 +185,11 @@ fun OnboardingScreen(navController: NavController){
                 modifier = Modifier
                     .width(40.dp)
                     .height(4.dp)
-                    .background(Color.White.copy(alpha = 0.2f), shape = CircleShape),
+                    .background(White.copy(alpha = 0.2f), shape = CircleShape),
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth((pagerState.currentPage + 1) / titles.size.toFloat())
+                        .fillMaxWidth((pagerState.currentPage + 1) / (4).toFloat())
                         .height(4.dp)
                         .background(LightBlue, shape = CircleShape)
                 )
@@ -187,12 +205,11 @@ fun OnboardingScreen(navController: NavController){
                             pagerState.animateScrollToPage(nextPage)
                         } else {
                             navController.popBackStack()
-                            navController.navigate("Paywall")
+                            navController.navigate(Paywall)
                         }
                     }
                 },
                 modifier = Modifier
-                    .height(50.dp)
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp),
                 shape = RoundedCornerShape(30.dp),
@@ -201,14 +218,16 @@ fun OnboardingScreen(navController: NavController){
                 )
             ) {
                 Text(
+                    modifier = Modifier.padding(vertical = 8.dp),
                     text = stringResource(R.string.continue_),
                     color = MainBlue,
                     style = AppTypography.bodyMedium
                 )
             }
         }
-
-        if (currentPage == titles.size - 1) {
+        //FIXME використати !pagerState.canScrollForward замість цієї умови
+        //Не правильно працює так
+        if (currentPage == idLastPage) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -224,11 +243,13 @@ fun OnboardingScreen(navController: NavController){
                     fontWeight = FontWeight.W400,
                     fontSize = 12.sp,
                     textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.clickable { navController.navigate("TermsOfUse") }
+                    modifier = Modifier.clickable { navController.navigate(TermsOfUse) }
                         .padding(vertical = 4.dp)
                 )
                 Text(
-                    text = "\u2022",
+                    //FIXME винести це кудись, я не знаю, що таке u2022
+                    //Done
+                    text = BULLET_SYMBOL,
                     color = White,
                     style = AppTypography.labelMedium,
                     modifier = Modifier
@@ -240,11 +261,28 @@ fun OnboardingScreen(navController: NavController){
                     fontWeight = FontWeight.W400,
                     fontSize = 12.sp,
                     textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.clickable { navController.navigate("PrivacyPolicy") }
+                    modifier = Modifier.clickable { navController.navigate(PrivacyPolicy) }
                         .padding(vertical = 4.dp)
                 )
             }
         }
     }
 }
+
+fun Modifier.blueShadow() = this.then(
+    Modifier.drawBehind {
+        drawCircle(
+            brush = Brush.radialGradient(
+                colors = listOf(
+                    MainBlue,
+                    Color(0x0033B5E5)
+                ),
+                radius = size.minDimension,
+                center = center
+            ),
+            radius = size.minDimension,
+            center = center
+        )
+    }
+)
 

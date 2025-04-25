@@ -4,22 +4,27 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.authenticatorapp.data.local.dao.AccountDao
 import com.example.authenticatorapp.data.local.model.AccountEntity
 
 @Database(entities = [AccountEntity::class], version = 2, exportSchema = false)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun accountDao(): AccountDao
 
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
+        private const val DB_NAME = "authenticator_db"
 
         private val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE accounts ADD COLUMN counter INTEGER NOT NULL DEFAULT 0")
+            //FIXME варнінг
+            //Done
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE accounts ADD COLUMN counter INTEGER NOT NULL DEFAULT 0")
             }
         }
 
@@ -28,7 +33,9 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "authenticator_db"
+                    //FIXME літерал
+                    //Done
+                    DB_NAME
                 )
                     .addMigrations(MIGRATION_1_2)
                     .build()

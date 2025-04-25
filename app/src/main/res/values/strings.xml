@@ -82,7 +82,7 @@
     <string name="and_your_account">" and your account."</string>
     <string name="is_an_app_that_generates_secure_two_factor_authentication_2fa_codes_for_your_accounts_when_you_set_up_your_account_with_two_factor_authentication_2fa_you_will_receive_a_secret_key_to_enter_into_the_authenticator_usually_the_key_is_in_a_qr_code_form">" is an app that generates secure two-factor authentication (2FA) codes for your accounts. When you set up your account with two-factor authentication (2FA), you will receive a secret key to enter into the Authenticator, usually the key is in a QR code form."</string>
     <string name="this_establishes_a_secure_connection_etween_the">"This establishes a secure connection  etween the "</string>
-    <string name="once_this_secure_connection_is_established_the_authenticator_will_generate_a_6_8_digit_code_that_is_required_to_access_your_account">Once this secure connection is established, the Authenticator will generate a 6-8 digit code that is required to access your account.</string>
+    <string name="once_this_secure_connection_is_established_the_authenticator_will_generate_a_6_digit">Once this secure connection is established, the Authenticator will generate a 6 digit code that is required to access your account.</string>
     <string name="even_if_someone_knows_your_password_they_still_need_the_2fa_code_to_access_your_account">Even, if someone knows your password they still need the 2FA code to access your account.</string>
     <string name="no_internet_connection">No Internet connection</string>
     <string name="app_lock">App lock</string>
@@ -137,4 +137,6 @@
     <string name="and">" and "</string>
     <string name="code_copied_to_clipboard">Code copied to clipboard</string>
     <string name="update_code">Update code</string>
+    <string name="unknown">Unknown</string>
+    <string name="confirm_current_passcode">Confirm current passcode</string>
 </resources>

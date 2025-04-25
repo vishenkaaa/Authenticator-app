@@ -1,7 +1,9 @@
-package com.example.authenticatorapp.data.local
+package com.example.authenticatorapp.di
 
+//FIXME невикористаний імпорт
+//Done
 import android.content.Context
-import androidx.room.Room
+import com.example.authenticatorapp.data.local.AppDatabase
 import com.example.authenticatorapp.data.local.dao.AccountDao
 import dagger.Module
 import dagger.Provides

@@ -1,6 +1,5 @@
 package com.example.authenticatorapp.presentation.utils
 
-import android.content.Context
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
@@ -39,13 +38,19 @@ class BiometricAuthManager(private val activity: FragmentActivity) {
                     errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
                     onCancel()
                 } else {
+                    //FIXME якщо сталася помилка, то було б непогано викликати return, щоб функція не продовжувала виконання
+                    //Done
                     onError(errString.toString())
+                    return
                 }
             }
 
             override fun onAuthenticationFailed() {
                 super.onAuthenticationFailed()
+                //FIXME так само, return
+                //Done
                 onError(activity.getString(R.string.biometric_authentication_failed))
+                return
             }
         }
 
@@ -68,16 +73,6 @@ class BiometricAuthManager(private val activity: FragmentActivity) {
         }
     }
 
-    companion object {
-        fun create(context: Context): BiometricAuthManager? {
-            return when (context) {
-                is FragmentActivity -> {
-                    BiometricAuthManager(context)
-                }
-                else -> {
-                    null
-                }
-            }
-        }
-    }
+    //FIXME dead code. Не знайшла, де він використовується
+   //Done
 }

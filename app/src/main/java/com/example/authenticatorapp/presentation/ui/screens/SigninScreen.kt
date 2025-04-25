@@ -6,12 +6,11 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,11 +23,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.Checkbox
-import androidx.compose.material.CheckboxDefaults
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,10 +44,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
@@ -56,16 +57,24 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
+import com.example.authenticatorapp.presentation.ui.components.CustomTopAppBar
+import com.example.authenticatorapp.presentation.ui.navigation.Main
+import com.example.authenticatorapp.presentation.ui.navigation.Onboarding
+import com.example.authenticatorapp.presentation.ui.navigation.PrivacyPolicy
+import com.example.authenticatorapp.presentation.ui.navigation.SignIn
+import com.example.authenticatorapp.presentation.ui.navigation.TermsOfUse
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
 import com.example.authenticatorapp.presentation.ui.theme.Blue
 import com.example.authenticatorapp.presentation.ui.theme.Gray5
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.example.authenticatorapp.presentation.viewmodel.AuthViewModel
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.example.authenticatorapp.presentation.viewmodel.MainActivityViewModel
 
 @Composable
-fun SigninScreen(navController: NavController) {
+fun SigninScreen(
+    navController: NavController,
+    mainViewModel: MainActivityViewModel
+) {
     val colors = MaterialTheme.colorScheme
     val context = LocalContext.current
 
@@ -109,27 +118,7 @@ fun SigninScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 50.dp),
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.back),
-                    contentDescription = "Back",
-                    modifier = Modifier
-                        .clickable {
-                            navController.popBackStack()
-                        }
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = stringResource(R.string.sign_in),
-                    color = colors.onPrimary,
-                    style = AppTypography.bodyLarge,
-                )
-                Spacer(modifier = Modifier.weight(1f))
-            }
+            CustomTopAppBar(navController, stringResource(R.string.sign_in))
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -143,12 +132,12 @@ fun SigninScreen(navController: NavController) {
                     modifier = Modifier
                         .clickable {
                             navController.popBackStack()
-                            navController.navigate("Onboarding")
+                            navController.navigate(Onboarding)
                         }
                 )
 
                 Spacer(modifier = Modifier.height(60.dp))
-                GoogleSignInButton(context, navController, agreeToTermsAndPrivacy) {
+                GoogleSignInButton(context, navController, agreeToTermsAndPrivacy, mainViewModel) {
                     loginIsPressed = true
                 }
 
@@ -199,20 +188,27 @@ fun SigninScreen(navController: NavController) {
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    ClickableText(
+                    // LayoutResult щоб знати де натиснуто
+                    var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+
+                    BasicText(
                         text = annotatedText,
-                        style = AppTypography.labelSmall.copy(color = colors.onPrimary),
-                        onClick = { offset ->
-                            val annotation =
-                                annotatedText.getStringAnnotations(start = offset, end = offset)
-                                    .firstOrNull()
-                            annotation?.let {
-                                when (it.tag) {
-                                    "TERMS" -> { navController.navigate("TermsOfUse") }
-                                    "PRIVACY" -> { navController.navigate("PrivacyPolicy")}
+                        modifier = Modifier
+                            .pointerInput(Unit) {
+                                detectTapGestures { offset ->
+                                    textLayoutResult?.let { layoutResult ->
+                                        val position = layoutResult.getOffsetForPosition(offset)
+                                        annotatedText.getStringAnnotations(position, position).firstOrNull()?.let { annotation ->
+                                            when (annotation.tag) {
+                                                "TERMS" -> { navController.navigate(TermsOfUse) }
+                                                "PRIVACY" -> { navController.navigate(PrivacyPolicy)}
+                                            }
+                                        }
+                                    }
                                 }
-                            }
-                        }
+                            },
+                        onTextLayout = { textLayoutResult = it },
+                        style = AppTypography.labelSmall.copy(color = colors.onPrimary)
                     )
                 }
 
@@ -266,7 +262,7 @@ fun SigninScreen(navController: NavController) {
             ) {
                 Text(
                     text = stringResource(R.string.no_internet_connection),
-                    color = Color.White,
+                    color = White,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -280,6 +276,7 @@ fun GoogleSignInButton(
     context: Context,
     navController: NavController,
     agreeToTermsAndPrivacy: Boolean,
+    mainViewModel: MainActivityViewModel,
     authViewModel: AuthViewModel = hiltViewModel(),
     onLoginAttempt: () -> Unit,
 ) {
@@ -288,8 +285,8 @@ fun GoogleSignInButton(
     LaunchedEffect(authState) {
         when (authState) {
             is AuthViewModel.AuthState.Success -> {
-                navController.navigate("Main") {
-                    popUpTo("login") { inclusive = true }
+                navController.navigate(Main) {
+                    popUpTo(SignIn) { inclusive = true }
                 }
             }
             is AuthViewModel.AuthState.Error -> {
@@ -302,26 +299,16 @@ fun GoogleSignInButton(
             else -> {}
         }
     }
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        authViewModel.handleSignInResult(task)
-    }
-
-    val googleSignInClient = remember {
-        GoogleSignIn.getClient(
-            context.applicationContext, GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("659133148753-gdeg9eu8k0mffj8nbtptirv2920glm3v.apps.googleusercontent.com")
-                .requestEmail()
-                .build()
-        )
-    }
 
     Button(
         onClick = {
-            if(agreeToTermsAndPrivacy){ launcher.launch(googleSignInClient.signInIntent) }
-            else onLoginAttempt()},
+            if (agreeToTermsAndPrivacy) {
+                mainViewModel.setIntentionalExternalAction()
+                authViewModel.signInWithGoogle(context)
+            } else {
+                onLoginAttempt()
+            }
+        },
         modifier = Modifier
             .height(50.dp)
             .fillMaxWidth()
@@ -331,7 +318,6 @@ fun GoogleSignInButton(
                 color = if (isSystemInDarkTheme()) Gray6 else White,
                 RoundedCornerShape(30.dp)
             ),
-        enabled = agreeToTermsAndPrivacy,
         shape = RoundedCornerShape(27.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.onPrimaryContainer,

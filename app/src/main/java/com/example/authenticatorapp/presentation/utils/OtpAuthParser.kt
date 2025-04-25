@@ -1,8 +1,11 @@
 package com.example.authenticatorapp.presentation.utils
 
-import android.net.Uri
 import android.util.Log
 import com.example.authenticatorapp.data.local.model.AccountEntity
+import androidx.core.net.toUri
+import com.example.authenticatorapp.data.model.AccountType
+import com.example.authenticatorapp.data.model.OtpAlgorithm
+import com.example.authenticatorapp.data.model.ServiceName
 
 object OtpAuthParser {
     fun parseOtpAuthUrl(url: String): AccountEntity? {
@@ -11,35 +14,29 @@ object OtpAuthParser {
                 return null
             }
 
-            val uri = Uri.parse(url)
-            val type = when (uri.host?.lowercase()) {
-                "totp" -> "TOTP"
-                "hotp" -> "HOTP"
-                else -> return null
-            }
+            val uri = url.toUri()
+            val typeString = uri.host?.uppercase() ?: return null
+            val type = AccountType.from(typeString) ?: return null
 
             val path = uri.path?.removePrefix("/") ?: return null
             val labelParts = path.split(":")
 
-            var service = uri.getQueryParameter("issuer")
-            if (service.isNullOrBlank() && labelParts.size > 1) {
-                service = labelParts[0]
-            } else if (service.isNullOrBlank()) {
-                service = "Unknown"
+            var serviceName = uri.getQueryParameter("issuer")
+            if (serviceName.isNullOrBlank() && labelParts.size > 1) {
+                serviceName = labelParts[0]
+            } else if (serviceName.isNullOrBlank()) {
+                serviceName = "Unknown"
             }
+            val service = ServiceName.from(serviceName)
 
             val email = if (labelParts.size > 1) labelParts[1] else labelParts[0]
 
             val secret = uri.getQueryParameter("secret") ?: return null
-            val algorithm = when (uri.getQueryParameter("algorithm")?.uppercase()) {
-                "SHA1" -> "HmacSHA1"
-                "SHA256" -> "HmacSHA256"
-                "SHA512" -> "HmacSHA512"
-                else -> "HmacSHA1"
-            }
+            val algorithmParam = uri.getQueryParameter("algorithm")?.uppercase() ?: "SHA1"
+            val algorithm = OtpAlgorithm.from(algorithmParam) ?: OtpAlgorithm.SHA1
 
             val digits = uri.getQueryParameter("digits")?.toIntOrNull() ?: 6
-            val counter = if (type == "HOTP") {
+            val counter = if (type == AccountType.HOTP) {
                 uri.getQueryParameter("counter")?.toLongOrNull() ?: 0
             } else 0
 

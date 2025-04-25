@@ -4,8 +4,10 @@ import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.VibrationEffect
 import android.os.Vibrator
 import android.widget.Toast
+import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,14 +24,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -46,39 +48,47 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.data.local.model.AccountEntity
+import com.example.authenticatorapp.data.model.AccountType
+import com.example.authenticatorapp.data.model.OtpAlgorithm
+import com.example.authenticatorapp.data.model.ServiceName
+import com.example.authenticatorapp.presentation.ui.navigation.EditAccount
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
+import com.example.authenticatorapp.presentation.ui.theme.AuthenticatorAppTheme
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
+import com.example.authenticatorapp.presentation.utils.extensions.toLocalizedStringRes
 import com.example.authenticatorapp.presentation.viewmodel.AddAccountViewModel
 import com.example.authenticatorapp.presentation.viewmodel.HomeViewModel
 import kotlinx.coroutines.launch
-import android.os.VibrationEffect
-import androidx.annotation.RequiresPermission
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountItem(account: AccountEntity,
-                otp: String,
-                remainingTime: Int = 0,
-                context: Context,
-                isTimeBased: Boolean,
-                accountViewModel: AddAccountViewModel = hiltViewModel(),
-                homeViewModel: HomeViewModel = hiltViewModel(),
-                navController: NavController,
-                isLastItem: Boolean = false
+fun AccountItemTemplate(
+    account: AccountEntity,
+    otp: String,
+    remainingTime: Int = 0,
+    context: Context,
+    isTimeBased: Boolean,
+    isLastItem: Boolean = false,
+    onCopyClick: (String) -> Unit = { copyToClipboard(it, context) },
+    onUpdateClick: () -> Unit = {},
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
+    val formattedOtp = otp.chunked(3).joinToString(" ")
     var showConfirmDialog by remember { mutableStateOf(false) }
 
     val editSheetState = rememberModalBottomSheetState()
@@ -86,16 +96,20 @@ fun AccountItem(account: AccountEntity,
     val coroutineScope = rememberCoroutineScope()
 
     fun openEditSheet() {
-        coroutineScope.launch { editSheetState.show() } }
+        coroutineScope.launch { editSheetState.show() }
+    }
+
     fun closeEditSheet() {
-        coroutineScope.launch { editSheetState.hide() } }
+        coroutineScope.launch { editSheetState.hide() }
+    }
 
     fun openUpdateSheet() {
-        coroutineScope.launch { updateSheetState.show() } }
-    fun closeUpdateSheet() {
-        coroutineScope.launch { updateSheetState.hide() } }
+        coroutineScope.launch { updateSheetState.show() }
+    }
 
-    var formattedOtp = otp.chunked(3).joinToString(" ")
+    fun closeUpdateSheet() {
+        coroutineScope.launch { updateSheetState.hide() }
+    }
 
     Row(
         modifier = Modifier
@@ -128,7 +142,7 @@ fun AccountItem(account: AccountEntity,
         Spacer(modifier = Modifier.width(16.dp))
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = account.serviceName, style = AppTypography.bodyMedium)
+            Text(text = account.serviceName.toLocalizedStringRes(), style = AppTypography.bodyMedium)
             Spacer(modifier = Modifier.height(2.dp))
             Text(text = account.email, color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.W400, fontFamily = interFontFamily)
             Spacer(modifier = Modifier.height(2.dp))
@@ -155,7 +169,7 @@ fun AccountItem(account: AccountEntity,
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
-                        copyToClipboard(otp, context)
+                        onCopyClick(otp)
                     }
             )
 
@@ -176,7 +190,7 @@ fun AccountItem(account: AccountEntity,
             }
         }
 
-        if(editSheetState.isVisible)
+        if (editSheetState.isVisible) {
             ModalBottomSheet(
                 onDismissRequest = { closeEditSheet() },
                 sheetState = editSheetState,
@@ -196,7 +210,7 @@ fun AccountItem(account: AccountEntity,
                                 .fillMaxWidth()
                                 .clickable(onClick = {
                                     closeEditSheet()
-                                    navController.navigate("EditAccount/${account.id}")
+                                    onEditClick()
                                 })
                                 .padding(vertical = 12.dp)
                         ) {
@@ -213,7 +227,8 @@ fun AccountItem(account: AccountEntity,
                                 style = AppTypography.labelMedium
                             )
                         }
-                        Divider(
+
+                        HorizontalDivider(
                             modifier = Modifier.fillMaxWidth(),
                             color = Black.copy(alpha = 0.1f)
                         )
@@ -241,13 +256,14 @@ fun AccountItem(account: AccountEntity,
                                 style = AppTypography.labelMedium
                             )
                         }
-                        Divider(
+                        HorizontalDivider(
                             modifier = Modifier.fillMaxWidth(),
                             color = Black.copy(alpha = 0.1f)
                         )
                     }
                 }
             }
+        }
 
         if (updateSheetState.isVisible) {
             ModalBottomSheet(
@@ -273,12 +289,9 @@ fun AccountItem(account: AccountEntity,
                     Button(
                         onClick = {
                             coroutineScope.launch {
-                                accountViewModel.incrementCounter(account)
-                                val updatedOtp =
-                                    homeViewModel.generateOtp(account.copy(counter = account.counter + 1))
-                                formattedOtp = updatedOtp.chunked(3).joinToString(" ")
-                                closeUpdateSheet()
+                                onUpdateClick()
                             }
+                            closeUpdateSheet()
                         },
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
@@ -310,19 +323,115 @@ fun AccountItem(account: AccountEntity,
             }
         }
 
-        if (showConfirmDialog)
+        if (showConfirmDialog) {
             ConfirmationAlertDialog(
                 stringResource(R.string.confirm_deletion),
                 stringResource(R.string.are_you_sure_you_want_to_delete_this_account),
                 stringResource(R.string.delete),
                 stringResource(R.string.cancel),
                 {
-                    accountViewModel.deleteAccount(account.id)
-                    showConfirmDialog = false },
+                    onDeleteClick()
+                    showConfirmDialog = false
+                },
                 {
                     showConfirmDialog = false
                 }
             )
+        }
+    }
+}
+
+@Composable
+fun AccountItem(
+    account: AccountEntity,
+    otp: String,
+    remainingTime: Int = 0,
+    context: Context,
+    isTimeBased: Boolean,
+    accountViewModel: AddAccountViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    navController: NavController,
+    isLastItem: Boolean = false
+) {
+    AccountItemTemplate(
+        account = account,
+        otp = otp,
+        remainingTime = remainingTime,
+        context = context,
+        isTimeBased = isTimeBased,
+        isLastItem = isLastItem,
+        onCopyClick = { copyToClipboard(it, context) },
+        onUpdateClick = {
+            accountViewModel.incrementCounter(account)
+            homeViewModel.generateOtp(account.copy(counter = account.counter + 1))
+            },
+        onEditClick = {
+            navController.navigate(EditAccount(account.id))
+        },
+        onDeleteClick = {
+            accountViewModel.deleteAccount(account.id)
+        }
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AccountItemPreview() {
+    val testAccount = AccountEntity(
+        id = 1,
+        serviceName = ServiceName.GOOGLE,
+        email = "test@example.com",
+        secret = "JNHJ 7FRW IYZG AVJT 3IZ2 YUOG TLY7 33RT",
+        counter = 0,
+        digits = 6,
+        algorithm = OtpAlgorithm.SHA1,
+        type = AccountType.TOTP
+    )
+
+    AuthenticatorAppTheme {
+        Surface {
+            AccountItemTemplate(
+                account = testAccount,
+                otp = "123456",
+                remainingTime = 15,
+                context = LocalContext.current,
+                isTimeBased = true,
+                onCopyClick = { },
+                onUpdateClick = { },
+                onEditClick = { },
+                onDeleteClick = { }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AccountItemHOTPPreview() {
+    val testAccount = AccountEntity(
+        id = 2,
+        serviceName = ServiceName.GOOGLE,
+        email = "test@example.com",
+        secret = "JNHJ 7FRW IYZG AVJT 3IZ2 YUOG TLY7 33RT",
+        counter = 1,
+        digits = 6,
+        algorithm = OtpAlgorithm.SHA1,
+        type = AccountType.HOTP
+    )
+
+    AuthenticatorAppTheme {
+        Surface {
+            AccountItemTemplate(
+                account = testAccount,
+                otp = "987654",
+                context = LocalContext.current,
+                isTimeBased = false,
+                onCopyClick = { },
+                onUpdateClick = { },
+                onEditClick = { },
+                onDeleteClick = { }
+            )
+        }
     }
 }
 
@@ -334,28 +443,12 @@ fun copyToClipboard(text: String, context: Context) {
 
     Toast.makeText(context, context.getString(R.string.code_copied_to_clipboard), Toast.LENGTH_LONG).show()
 
-    val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    val vibrator = context.getSystemService(Vibrator::class.java)
     vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
 }
 
 @Composable
-fun getServiceIcon(serviceName: String): Int {
-    return when (serviceName) {
-        stringResource(R.string.banking_and_finance) -> R.drawable.s_banking_and_finance
-        stringResource(R.string.website) -> R.drawable.s_website
-        stringResource(R.string.mail) -> R.drawable.s_mail
-        stringResource(R.string.social) -> R.drawable.s_social
-        "Facebook" -> R.drawable.s_facebook
-        "Instagram" -> R.drawable.s_instagram
-        "Google" -> R.drawable.s_google
-        "Linkedin" -> R.drawable.s_linkedin
-        "Amazon" -> R.drawable.s_amazon_png
-        "Paypal" -> R.drawable.s_paypall_png
-        "Microsoft" -> R.drawable.s_microsoft
-        "Discord" -> R.drawable.s_discord
-        "Reddit" -> R.drawable.s_reddit_png
-        "Netflix" -> R.drawable.s_netflix
-        else -> R.drawable.s_mail
-    }
+fun getServiceIcon(serviceName: ServiceName): Int {
+    return ServiceName.from(serviceName.displayName).iconRes
 }
 
