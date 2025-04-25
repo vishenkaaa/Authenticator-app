@@ -277,10 +277,10 @@ fun Modifier.blueShadow() = this.then(
                     MainBlue,
                     Color(0x0033B5E5)
                 ),
-                radius = size.minDimension * 0.9f,
+                radius = size.minDimension,
                 center = center
             ),
-            radius = size.minDimension * 0.9f,
+            radius = size.minDimension,
             center = center
         )
     }

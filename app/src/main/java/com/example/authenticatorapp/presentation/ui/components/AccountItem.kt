@@ -31,6 +31,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -47,19 +48,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authenticatorapp.R
 import com.example.authenticatorapp.data.local.model.AccountEntity
+import com.example.authenticatorapp.data.model.AccountType
+import com.example.authenticatorapp.data.model.OtpAlgorithm
 import com.example.authenticatorapp.data.model.ServiceName
 import com.example.authenticatorapp.presentation.ui.navigation.EditAccount
 import com.example.authenticatorapp.presentation.ui.theme.AppTypography
+import com.example.authenticatorapp.presentation.ui.theme.AuthenticatorAppTheme
 import com.example.authenticatorapp.presentation.ui.theme.Gray6
 import com.example.authenticatorapp.presentation.ui.theme.MainBlue
 import com.example.authenticatorapp.presentation.ui.theme.interFontFamily
@@ -70,16 +76,19 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountItem(account: AccountEntity,
-                otp: String,
-                remainingTime: Int = 0,
-                context: Context,
-                isTimeBased: Boolean,
-                accountViewModel: AddAccountViewModel = hiltViewModel(),
-                homeViewModel: HomeViewModel = hiltViewModel(),
-                navController: NavController,
-                isLastItem: Boolean = false
+fun AccountItemTemplate(
+    account: AccountEntity,
+    otp: String,
+    remainingTime: Int = 0,
+    context: Context,
+    isTimeBased: Boolean,
+    isLastItem: Boolean = false,
+    onCopyClick: (String) -> Unit = { copyToClipboard(it, context) },
+    onUpdateClick: () -> Unit = {},
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
+    val formattedOtp = otp.chunked(3).joinToString(" ")
     var showConfirmDialog by remember { mutableStateOf(false) }
 
     val editSheetState = rememberModalBottomSheetState()
@@ -87,16 +96,20 @@ fun AccountItem(account: AccountEntity,
     val coroutineScope = rememberCoroutineScope()
 
     fun openEditSheet() {
-        coroutineScope.launch { editSheetState.show() } }
+        coroutineScope.launch { editSheetState.show() }
+    }
+
     fun closeEditSheet() {
-        coroutineScope.launch { editSheetState.hide() } }
+        coroutineScope.launch { editSheetState.hide() }
+    }
 
     fun openUpdateSheet() {
-        coroutineScope.launch { updateSheetState.show() } }
-    fun closeUpdateSheet() {
-        coroutineScope.launch { updateSheetState.hide() } }
+        coroutineScope.launch { updateSheetState.show() }
+    }
 
-    var formattedOtp = otp.chunked(3).joinToString(" ")
+    fun closeUpdateSheet() {
+        coroutineScope.launch { updateSheetState.hide() }
+    }
 
     Row(
         modifier = Modifier
@@ -156,7 +169,7 @@ fun AccountItem(account: AccountEntity,
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
-                        copyToClipboard(otp, context)
+                        onCopyClick(otp)
                     }
             )
 
@@ -177,7 +190,7 @@ fun AccountItem(account: AccountEntity,
             }
         }
 
-        if(editSheetState.isVisible)
+        if (editSheetState.isVisible) {
             ModalBottomSheet(
                 onDismissRequest = { closeEditSheet() },
                 sheetState = editSheetState,
@@ -197,7 +210,7 @@ fun AccountItem(account: AccountEntity,
                                 .fillMaxWidth()
                                 .clickable(onClick = {
                                     closeEditSheet()
-                                    navController.navigate(EditAccount(account.id))
+                                    onEditClick()
                                 })
                                 .padding(vertical = 12.dp)
                         ) {
@@ -250,6 +263,7 @@ fun AccountItem(account: AccountEntity,
                     }
                 }
             }
+        }
 
         if (updateSheetState.isVisible) {
             ModalBottomSheet(
@@ -275,12 +289,9 @@ fun AccountItem(account: AccountEntity,
                     Button(
                         onClick = {
                             coroutineScope.launch {
-                                accountViewModel.incrementCounter(account)
-                                val updatedOtp =
-                                    homeViewModel.generateOtp(account.copy(counter = account.counter + 1))
-                                formattedOtp = updatedOtp.chunked(3).joinToString(" ")
-                                closeUpdateSheet()
+                                onUpdateClick()
                             }
+                            closeUpdateSheet()
                         },
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
@@ -312,19 +323,115 @@ fun AccountItem(account: AccountEntity,
             }
         }
 
-        if (showConfirmDialog)
+        if (showConfirmDialog) {
             ConfirmationAlertDialog(
                 stringResource(R.string.confirm_deletion),
                 stringResource(R.string.are_you_sure_you_want_to_delete_this_account),
                 stringResource(R.string.delete),
                 stringResource(R.string.cancel),
                 {
-                    accountViewModel.deleteAccount(account.id)
-                    showConfirmDialog = false },
+                    onDeleteClick()
+                    showConfirmDialog = false
+                },
                 {
                     showConfirmDialog = false
                 }
             )
+        }
+    }
+}
+
+@Composable
+fun AccountItem(
+    account: AccountEntity,
+    otp: String,
+    remainingTime: Int = 0,
+    context: Context,
+    isTimeBased: Boolean,
+    accountViewModel: AddAccountViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    navController: NavController,
+    isLastItem: Boolean = false
+) {
+    AccountItemTemplate(
+        account = account,
+        otp = otp,
+        remainingTime = remainingTime,
+        context = context,
+        isTimeBased = isTimeBased,
+        isLastItem = isLastItem,
+        onCopyClick = { copyToClipboard(it, context) },
+        onUpdateClick = {
+            accountViewModel.incrementCounter(account)
+            homeViewModel.generateOtp(account.copy(counter = account.counter + 1))
+            },
+        onEditClick = {
+            navController.navigate(EditAccount(account.id))
+        },
+        onDeleteClick = {
+            accountViewModel.deleteAccount(account.id)
+        }
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AccountItemPreview() {
+    val testAccount = AccountEntity(
+        id = 1,
+        serviceName = ServiceName.GOOGLE,
+        email = "test@example.com",
+        secret = "JNHJ 7FRW IYZG AVJT 3IZ2 YUOG TLY7 33RT",
+        counter = 0,
+        digits = 6,
+        algorithm = OtpAlgorithm.SHA1,
+        type = AccountType.TOTP
+    )
+
+    AuthenticatorAppTheme {
+        Surface {
+            AccountItemTemplate(
+                account = testAccount,
+                otp = "123456",
+                remainingTime = 15,
+                context = LocalContext.current,
+                isTimeBased = true,
+                onCopyClick = { },
+                onUpdateClick = { },
+                onEditClick = { },
+                onDeleteClick = { }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AccountItemHOTPPreview() {
+    val testAccount = AccountEntity(
+        id = 2,
+        serviceName = ServiceName.GOOGLE,
+        email = "test@example.com",
+        secret = "JNHJ 7FRW IYZG AVJT 3IZ2 YUOG TLY7 33RT",
+        counter = 1,
+        digits = 6,
+        algorithm = OtpAlgorithm.SHA1,
+        type = AccountType.HOTP
+    )
+
+    AuthenticatorAppTheme {
+        Surface {
+            AccountItemTemplate(
+                account = testAccount,
+                otp = "987654",
+                context = LocalContext.current,
+                isTimeBased = false,
+                onCopyClick = { },
+                onUpdateClick = { },
+                onEditClick = { },
+                onDeleteClick = { }
+            )
+        }
     }
 }
 
@@ -344,3 +451,4 @@ fun copyToClipboard(text: String, context: Context) {
 fun getServiceIcon(serviceName: ServiceName): Int {
     return ServiceName.from(serviceName.displayName).iconRes
 }
+
